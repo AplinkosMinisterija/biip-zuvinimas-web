@@ -1,0 +1,17 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-staging:
+    name: Deploy staging
+    uses: AplinkosMinisterija/reusable-workflows/.github/workflows/biip-deploy.yml@main
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: Staging
+      docker-image: ghcr.io/AplinkosMinisterija/biip-zuvinimas-web
