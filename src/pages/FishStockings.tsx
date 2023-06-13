@@ -1,11 +1,12 @@
 import { useMediaQuery } from "@material-ui/core";
 import { isEmpty } from "lodash";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { useInfiniteQuery } from "react-query";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
-import DefaultLayout from "../components/Layouts/Default";
 import Button from "../components/buttons/Button";
+import DefaultLayout from "../components/Layouts/Default";
 import DisplayMap from "../components/other/DisplayMap";
 import DynamicFilter from "../components/other/DynamicFilter";
 import { FilterInputTypes } from "../components/other/DynamicFilter/Filter";
@@ -15,32 +16,27 @@ import { actions } from "../state/filters/reducer";
 import { useAppSelector } from "../state/hooks";
 import { RootState } from "../state/store";
 import { device } from "../styles";
-import api, { GetAllResponse } from "../utils/api";
+import api from "../utils/api";
+import { intersectionObserverConfig } from "../utils/configs";
 import {
   getFishStockingStatusOptions,
-  handleResponse,
-  mapFishStockingsRequestParams,
+  mapFishStockingsRequestParams
 } from "../utils/functions";
 import { useFishTypes, useMunicipalities } from "../utils/hooks";
 import { slugs } from "../utils/routes";
 import {
   buttonsTitles,
   descriptions,
-  fishStockingsFiltersLabels,
+  fishStockingsFiltersLabels
 } from "../utils/texts";
-import {
-  FishStocking,
-  FishStockingFilters,
-  FishType,
-  Municipality,
-} from "../utils/types";
+import { FishStockingFilters, FishType, Municipality } from "../utils/types";
 
 const rowConfig = [
   ["locationName"],
   ["municipality"],
   ["eventTimeFrom", "eventTimeTo"],
   ["fishTypes"],
-  ["status"],
+  ["status"]
 ];
 
 interface FilterConfig {
@@ -52,43 +48,39 @@ const filterConfig = ({ municipalities, fishTypes }: FilterConfig) => ({
   eventTimeFrom: {
     label: fishStockingsFiltersLabels.dateFrom,
     key: "eventTimeFrom",
-    inputType: FilterInputTypes.date,
+    inputType: FilterInputTypes.date
   },
   eventTimeTo: {
     label: fishStockingsFiltersLabels.dateTo,
     key: "eventTimeTo",
-    inputType: FilterInputTypes.date,
+    inputType: FilterInputTypes.date
   },
   fishTypes: {
     label: fishStockingsFiltersLabels.fishes,
     key: "fishTypes",
     inputType: FilterInputTypes.multiselect,
-    options: fishTypes,
+    options: fishTypes
   },
   municipality: {
     label: fishStockingsFiltersLabels.municipality,
     key: "municipality",
     inputType: FilterInputTypes.singleSelect,
     options: municipalities,
-    optionLabel: (option: any) => `${option?.name}`,
+    optionLabel: (option: any) => `${option?.name}`
   },
   locationName: {
     label: fishStockingsFiltersLabels.locationName,
     key: "locationName",
-    inputType: FilterInputTypes.text,
+    inputType: FilterInputTypes.text
   },
   status: {
     label: fishStockingsFiltersLabels.status,
     key: "status",
     inputType: FilterInputTypes.multiselect,
-    options: getFishStockingStatusOptions(),
-  },
+    options: getFishStockingStatusOptions()
+  }
 });
 const FishStockings = () => {
-  const [loading, setLoading] = useState(true);
-  const [fishStockings, setFishStockings] = useState<FishStocking[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [hasMore, setHasMore] = useState(false);
   const isMobile = useMediaQuery(device.mobileL);
   const fishTypes = useFishTypes();
   const municipalities = useMunicipalities();
@@ -104,47 +96,59 @@ const FishStockings = () => {
   };
 
   const getStockings = async (page: number) => {
-    setLoading(true);
-    handleResponse({
-      endpoint: () =>
-        api.getFishStockings({
-          filter: mapFishStockingsRequestParams(filters),
-          page: page,
-        }),
-      onSuccess: (list: GetAllResponse<FishStocking>) => {
-        setCurrentPage(list.page);
-        setHasMore(list.page < list.totalPages);
-        if (page == 1) {
-          setFishStockings(list?.rows);
-        } else {
-          setFishStockings([...fishStockings, ...list?.rows]);
-        }
-        setLoading(false);
-      },
+    const fishStockings = await api.getFishStockings({
+      filter: mapFishStockingsRequestParams(filters),
+      page: page
     });
-  };
 
-  const handleScroll = async (e: any) => {
-    const element = e.currentTarget;
-    const isTheBottom =
-      Math.abs(
-        element.scrollHeight - element.clientHeight - element.scrollTop
-      ) < 1;
-
-    if (isTheBottom && hasMore && !loading) {
-      getStockings(currentPage + 1);
-    }
+    return {
+      data: fishStockings.rows,
+      page:
+        fishStockings.page < fishStockings.totalPages
+          ? fishStockings.page + 1
+          : undefined
+    };
   };
 
   useEffect(() => {
     getStockings(1);
   }, [filters]);
 
-  const isNoFishStockings = isEmpty(fishStockings) && isEmpty(filters);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
+    useInfiniteQuery(
+      ["fishStockings", filters],
+      ({ pageParam }) => getStockings(pageParam),
+      {
+        getNextPageParam: (lastPage) => lastPage.page,
+        cacheTime: 60000
+      }
+    );
+
+  const observerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, intersectionObserverConfig);
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);
+
+  const isNoFishStockings = isEmpty(data?.pages?.[0]?.data) && isEmpty(filters);
 
   const renderContent = () => {
-    if (isEmpty(fishStockings))
-      return loading ? (
+    if (isEmpty(data?.pages?.[0]?.data))
+      return isFetching ? (
         <LoaderComponent />
       ) : (
         <NotFoundContainer>
@@ -168,14 +172,29 @@ const FishStockings = () => {
 
     return (
       <>
-        {fishStockings.map((fishStocking) => (
-          <EventItem
-            key={fishStocking.id}
-            fishStocking={fishStocking}
-            onClick={() => navigate(slugs.fishStocking(`${fishStocking?.id}`))}
-          />
-        ))}
-        {loading && <LoaderComponent />}
+        {data?.pages.map((page, pageIndex) => {
+          return (
+            <React.Fragment key={pageIndex}>
+              {page.data.map((fishStocking, index) => (
+                <>
+                  <EventItem
+                    key={fishStocking.id}
+                    fishStocking={fishStocking}
+                    onClick={() =>
+                      navigate(slugs.fishStocking(`${fishStocking?.id}`))
+                    }
+                  />
+                  {pageIndex === data.pages.length - 1 &&
+                    index === page.data.length - 1 && (
+                      <div ref={observerRef}></div>
+                    )}
+                </>
+              ))}
+            </React.Fragment>
+          );
+        })}
+        {observerRef && <Invisible ref={observerRef} />}
+        {isFetching && <LoaderComponent />}
       </>
     );
   };
@@ -183,13 +202,13 @@ const FishStockings = () => {
   return (
     <DefaultLayout>
       <InnerContainer>
-        <Container onScroll={handleScroll}>
+        <Container>
           <DynamicFilter
             filters={filters}
             filterConfig={filterConfig({ fishTypes, municipalities })}
             rowConfig={rowConfig}
             onSetFilters={handleFilterStockings}
-            disabled={loading}
+            disabled={isFetching}
           />
           {renderContent()}
         </Container>
@@ -218,6 +237,11 @@ const InnerContainer = styled.div`
   @media ${device.mobileL} {
     grid-template-columns: 1fr;
   }
+`;
+
+const Invisible = styled.div`
+  width: 10px;
+  height: 16px;
 `;
 
 const Description = styled.div`

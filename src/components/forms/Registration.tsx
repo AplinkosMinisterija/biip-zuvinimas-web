@@ -1,27 +1,23 @@
 import { useMediaQuery } from "@material-ui/core";
 import { FieldArray, Form, Formik } from "formik";
 import { useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useMutation } from "react-query";
+import { useParams } from "react-router";
 import styled from "styled-components";
 import Cookies from "universal-cookie";
 import { useAppSelector } from "../../state/hooks";
 import { device } from "../../styles";
 import api from "../../utils/api";
 import { FishOriginTypes } from "../../utils/constants";
-import {
-  getLocationList,
-  getTenantsList,
-  handleResponse,
-  isNew
-} from "../../utils/functions";
+import { getLocationList, getTenantsList, isNew } from "../../utils/functions";
 import {
   useAssignedToUsers,
   useFishAges,
+  useFishStockingCallbacks,
   useFishTypes,
   useIsFreelancer,
   useSettings
 } from "../../utils/hooks";
-import { slugs } from "../../utils/routes";
 import { buttonsTitles, formLabels, queryStrings } from "../../utils/texts";
 import { FishStocking } from "../../utils/types";
 import {
@@ -73,9 +69,7 @@ const RegistrationForm = ({
   renderTabs?: JSX.Element;
   disabled?: boolean;
 }) => {
-  const navigate = useNavigate();
   const [showMap, setShowMap] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
   const [queryString, setQueryString] = useState("");
   const isMobile = useMediaQuery(device.mobileL);
   const fishAges = useFishAges();
@@ -87,8 +81,38 @@ const RegistrationForm = ({
   const [showModal, setShowModal] = useState(false);
   const users = useAssignedToUsers();
 
+  const callBacks = useFishStockingCallbacks();
+
+  const createFishStockingMutation = useMutation(
+    (params: FishStocking) => api.registerFishStocking(params),
+    { ...callBacks }
+  );
+
+  const updateFishStockingMutation = useMutation(
+    (params: FishStocking) => api.updateFishStocking(params, id!),
+    { ...callBacks }
+  );
+
+  const cancelFishStockingMutation = useMutation(
+    () => api.cancelFishStocking(id!),
+    { ...callBacks }
+  );
+
+  const deleteFishStockingMutation = useMutation(
+    () => api.deleteFishStocking(id!),
+    { ...callBacks }
+  );
+
+  const submitLoading = [
+    createFishStockingMutation.isLoading,
+    updateFishStockingMutation.isLoading,
+    cancelFishStockingMutation.isLoading,
+    deleteFishStockingMutation.isLoading
+  ].some((loading) => loading);
+
   const isCustomer =
     fishStocking?.stockingCustomer?.id === cookies.get("profileId");
+  console.log(fishStocking?.stockingCustomer, "ce");
 
   const { id } = useParams();
 
@@ -123,6 +147,7 @@ const RegistrationForm = ({
       fishOriginReservoir,
       fishOrigin,
       fishOriginCompanyName,
+      stockingCustomer,
       batches
     } = values;
     const params = {
@@ -130,6 +155,7 @@ const RegistrationForm = ({
       phone,
       geom,
       assignedTo: assignedTo?.id,
+      stockingCustomer: stockingCustomer?.id,
       location: location,
       fishOrigin,
       fishOriginCompanyName,
@@ -145,45 +171,23 @@ const RegistrationForm = ({
         };
       })
     };
-    setSubmitLoading(true);
     await handleCreateOrUpdate(params);
-    setSubmitLoading(false);
   };
 
   const handleCreateOrUpdate = async (params: any) => {
     if (isNew(id)) {
-      return await handleResponse({
-        endpoint: () => api.registerFishStocking(params),
-        onSuccess: () => {
-          navigate(slugs.fishStockings);
-        }
-      });
+      return await createFishStockingMutation.mutateAsync(params);
     }
 
-    return await handleResponse({
-      endpoint: () => api.updateFishStocking(params, id!),
-      onSuccess: () => {
-        navigate(slugs.fishStockings);
-      }
-    });
+    return await updateFishStockingMutation.mutateAsync(params);
   };
 
   const handleDelete = async () => {
-    await handleResponse({
-      endpoint: () => api.deleteFishStocking(id!),
-      onSuccess: () => {
-        navigate(slugs.fishStockings);
-      }
-    });
+    deleteFishStockingMutation.mutateAsync();
   };
 
   const handleCancel = async () => {
-    await handleResponse({
-      endpoint: () => api.cancelFishStocking(id!),
-      onSuccess: () => {
-        navigate(slugs.fishStockings);
-      }
-    });
+    cancelFishStockingMutation.mutateAsync();
   };
 
   const getDeleteInfo = () => {
@@ -208,14 +212,16 @@ const RegistrationForm = ({
 
   const deleteInfo = getDeleteInfo();
 
+  const validationSchema = isFreelancer
+    ? validateFreelancerFishStocking
+    : validateFishStocking;
+
   return (
     <>
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmit}
-        validationSchema={
-          isFreelancer ? validateFreelancerFishStocking : validateFishStocking
-        }
+        validationSchema={validationSchema}
         validateOnChange={false}
       >
         {({ values, errors, handleSubmit, handleChange, setFieldValue }) => {
@@ -308,6 +314,7 @@ const RegistrationForm = ({
                   ) : (
                     <AsyncSelectField
                       label="Vandens telkinys"
+                      name="fishOriginReservoir"
                       value={values.fishOriginReservoir}
                       error={errors.fishOriginReservoir}
                       onChange={(value) =>

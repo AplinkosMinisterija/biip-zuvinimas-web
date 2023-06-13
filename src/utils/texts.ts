@@ -2,6 +2,7 @@ import { FishStockingStatus, ServerErrors } from "./constants";
 
 export const validationTexts: any = {
   formFillError: "Neteisingai užpildyta forma",
+  offline: "Šiuo metu esate neprisijungęs",
   requireMap: "Privalote pasirinkti vietą žemėlapyje",
   requirePhotos: "Privalote įkelti nuotrauką",
   userDeniedLocation: "Turite leisti nustatyti jūsų buvimo vietą",
@@ -76,6 +77,7 @@ export const descriptions = {
 export const buttonsTitles = {
   cancel: "Atšaukti",
   select: "Pasirinkti",
+  excel: "Atsisiųsti duomenis",
   yes: "Taip",
   no: "Ne",
   add: "Pridėti",

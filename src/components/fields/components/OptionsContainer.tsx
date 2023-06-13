@@ -17,6 +17,7 @@ export interface OptionsContainerProps {
   loading?: boolean;
   showSelect: boolean;
   hideNoOptions?: boolean;
+  observerRef?: any;
   handleClick: (option: any) => any;
 }
 
@@ -29,6 +30,7 @@ const OptionsContainer = ({
   handleScroll,
   showSelect,
   loading,
+  observerRef
 }: OptionsContainerProps) => {
   if (!showSelect || disabled) {
     return <></>;
@@ -61,6 +63,7 @@ const OptionsContainer = ({
           );
         })}
         {loading && <LoaderComponent />}
+        {observerRef && <div ref={observerRef} />}
       </>
     );
   };

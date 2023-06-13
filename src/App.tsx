@@ -1,5 +1,6 @@
 import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
+import { useMutation } from "react-query";
 import {
   Location,
   Navigate,
@@ -16,16 +17,15 @@ import Cookies from "universal-cookie";
 import LoaderComponent from "./components/other/LoaderComponent";
 import { CantLogin } from "./pages/CantLogin";
 import { Login } from "./pages/Login";
-import { useAppDispatch, useAppSelector } from "./state/hooks";
-import { actions } from "./state/user/reducer";
+import { useAppSelector } from "./state/hooks";
 import api from "./utils/api";
 import { ServerErrorCodes } from "./utils/constants";
+import { handleUpdateTokens } from "./utils/functions";
 import {
-  handleGetCurrentUser,
-  handleResponse,
-  handleUpdateTokens
-} from "./utils/functions";
-import { useFilteredRoutes } from "./utils/hooks";
+  useCheckAuthMutation,
+  useEGatesSign,
+  useFilteredRoutes
+} from "./utils/hooks";
 import { slugs } from "./utils/routes";
 import { ProfileId } from "./utils/types";
 const cookies = new Cookies();
@@ -41,98 +41,88 @@ function App() {
   const [searchParams] = useSearchParams();
   const { ticket, eGates } = Object.fromEntries([...Array.from(searchParams)]);
   const profileId: ProfileId = cookies.get("profileId");
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const routes = useFilteredRoutes();
 
-  const dispatch = useAppDispatch();
+  const isInvalidProfile =
+    !profiles?.map((profile) => profile?.id?.toString()).includes(profileId) &&
+    loggedIn;
+
+  const updateTokensMutation = useMutation(api.refreshToken, {
+    onError: ({ response }: any) => {
+      if (isEqual(response.status, ServerErrorCodes.NOT_FOUND)) {
+        cookies.remove("refreshToken", { path: "/" });
+      }
+    },
+    onSuccess: (data) => {
+      handleUpdateTokens(data);
+    }
+  });
+
+  const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
+    useEGatesSign();
+
+  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } =
+    useCheckAuthMutation();
+
+  const eGatesLoginMutation = useMutation(
+    (ticket: string) => api.eGatesLogin({ ticket }),
+    {
+      onError: () => {
+        navigate(slugs.cantLogin);
+      },
+      onSuccess: (data) => {
+        handleUpdateTokens(data);
+        checkAuthMutation();
+      }
+    }
+  );
+
+  const isLoading =
+    initialLoading ||
+    [
+      eGatesLoginMutation.isLoading,
+      eGatesSignLoading,
+      updateTokensMutation.isLoading
+    ].some((loading) => loading);
 
   const shouldUpdateTokens = async () => {
     if (!cookies.get("token") && cookies.get("refreshToken")) {
-      await handleResponse({
-        endpoint: () => api.refreshToken(),
-        onError: (code) => {
-          if (isEqual(code, ServerErrorCodes.NOT_FOUND)) {
-            cookies.remove("refreshToken", { path: "/" });
-          }
-        },
-        onSuccess: (data) => {
-          handleUpdateTokens(data);
-        }
-      });
+      await updateTokensMutation.mutateAsync();
     }
   };
 
-  const handleCheckAuth = async () => {
-    await shouldUpdateTokens();
-
-    const currentUserData = await handleGetCurrentUser();
-    if (currentUserData) {
-      dispatch(actions.setUser(currentUserData));
-    }
-    setLoading(false);
-  };
-
-  const handleEGatesSign = async () => {
-    await handleResponse({
-      endpoint: () => api.eGatesSign(),
-      onSuccess: ({ url }) => {
-        window.location.replace(url);
-      }
-    });
-  };
+  useEffect(() => {
+    (async () => {
+      await shouldUpdateTokens();
+      checkAuthMutation();
+      setInitialLoading(false);
+    })();
+  }, [location.pathname]);
 
   useEffect(() => {
     (async () => {
       if (loggedIn) return;
 
       if (ticket) {
-        setLoading(true);
-        await handleResponse({
-          endpoint: () => api.eGatesLogin({ ticket }),
-          onError: () => {
-            navigate(slugs.cantLogin);
-          },
-          onSuccess: async (data) => {
-            handleUpdateTokens(data);
-            const currentUserData = await handleGetCurrentUser();
-            if (currentUserData) {
-              dispatch(actions.setUser(currentUserData));
-            }
-            setLoading(false);
-          }
-        });
+        eGatesLoginMutation.mutateAsync(ticket);
       }
       if (eGates !== undefined) {
-        setLoading(true);
-        await handleEGatesSign();
-        setLoading(false);
+        eGatesMutation();
       }
     })();
   }, [ticket, eGates]);
 
   useEffect(() => {
-    (async () => {
-      console.log(location.pathname);
-      await handleCheckAuth();
-    })();
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const isValidProfile =
-      !profiles
-        ?.map((profile) => profile?.id?.toString())
-        .includes(profileId) && loggedIn;
-
-    if (isValidProfile) {
+    if (isInvalidProfile) {
       cookies.remove("profileId", { path: "/" });
-
       navigate("");
     }
   }, [profileId, loggedIn]);
 
-  if (loading) {
+  if (isLoading) {
     return <LoaderComponent />;
   }
 

@@ -1,11 +1,8 @@
 import { useMediaQuery } from "@material-ui/core";
-import { isEmpty } from "lodash";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import styled from "styled-components";
 import { device } from "../../styles";
-import api from "../../utils/api";
-import { handleResponse } from "../../utils/functions";
-import { buttonsTitles, Url } from "../../utils/texts";
+import { Url } from "../../utils/texts";
 import Button from "../buttons/Button";
 import Icon from "./Icon";
 import LoaderComponent from "./LoaderComponent";
@@ -20,19 +17,9 @@ export interface MapProps {
   display: boolean;
 }
 
-const Map = ({
-  height,
-  onSave,
-  onClose,
-  value,
-  queryString = "",
-  display
-}: MapProps) => {
+const Map = ({ height, onSave, onClose, value, display }: MapProps) => {
   const [showModal, setShowModal] = useState(false);
 
-  const [locations, setLocations] = useState<any[]>([]);
-  const [popUploading, setPopUpLoading] = useState(false);
-  const [geom, setGeom] = useState<any[]>();
   const [loading, setLoading] = useState(true);
   const iframeRef = useRef<any>(null);
   const isMobile = useMediaQuery(device.mobileL);
@@ -42,39 +29,11 @@ const Map = ({
   const handleLoadMap = () => {
     setLoading(false);
 
-    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify(value), "*");
+    iframeRef?.current?.contentWindow?.postMessage(
+      JSON.stringify({ geom: value }),
+      "*"
+    );
   };
-
-  const handleGetLocations = async (location: any) => {
-    setGeom(location);
-    setPopUpLoading(true);
-    return await handleResponse({
-      endpoint: () =>
-        api.getLocations({
-          geom: JSON.stringify(location)
-        }),
-      onSuccess: (data) => {
-        setLocations(data);
-        setPopUpLoading(false);
-      }
-    });
-  };
-
-  const handleSaveGeom = useCallback((event: any) => {
-    if (!event?.data?.mapIframeMsg) return;
-
-    const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
-    if (!userObjects) return;
-
-    if (isEmpty(userObjects.features)) return;
-
-    handleGetLocations(userObjects);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("message", handleSaveGeom);
-    return () => window.removeEventListener("message", handleSaveGeom);
-  }, []);
 
   return (
     <>
@@ -100,48 +59,6 @@ const Map = ({
         )}
 
         <InnerContainer>
-          {geom && (
-            <MapModal>
-              <ModalContainer>
-                {popUploading ? (
-                  <LoaderComponent />
-                ) : (
-                  <>
-                    <IconContainer
-                      onClick={() => {
-                        setLocations([]);
-                        setGeom(undefined);
-                      }}
-                    >
-                      <StyledIcon name="close" />
-                    </IconContainer>
-                    <ItemContainer>
-                      {!isEmpty(locations)
-                        ? locations.map((location) => (
-                            <Item>
-                              <TitleContainer>
-                                <Title>{location?.name}</Title>
-                                <Description>{`${location?.cadastral_id}, ${location?.municipality}`}</Description>
-                              </TitleContainer>
-                              <Button
-                                onClick={() => {
-                                  setLocations([]);
-                                  setGeom(undefined);
-                                  onSave && onSave(geom, location);
-                                }}
-                              >
-                                {buttonsTitles.select}
-                              </Button>
-                            </Item>
-                          ))
-                        : "Nerastas telkinys"}
-                    </ItemContainer>
-                  </>
-                )}
-              </ModalContainer>
-            </MapModal>
-          )}
-
           <StyledIframe
             ref={iframeRef}
             src={src}
@@ -165,39 +82,9 @@ const Container = styled.div<{ display: boolean }>`
   display: ${({ display }) => (display ? "flex" : "none")};
 `;
 
-const IconContainer = styled.div`
-  position: absolute;
-  top: 5px;
-  right: 5px;
-`;
-
 const StyledIcon = styled(Icon)`
   font-size: 2rem;
   color: #6b7280;
-`;
-
-const MapModal = styled.div`
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%
-z-index:999;
-top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  overflow-y: auto;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: #0b1b607a;
-  top: 0;
-  left: 0;
-  overflow-y: auto;
 `;
 
 const InnerContainer = styled.div<{}>`
@@ -219,56 +106,6 @@ const StyledIframe = styled.iframe<{
 }>`
   width: ${({ width }) => width};
   height: ${({ height }) => height};
-`;
-
-const ModalContainer = styled.div<{ width?: string }>`
-  background-color: white;
-  padding: 16px;
-  border: 1px solid #dfdfdf;
-  border-radius: 4px;
-  position: relative;
-  height: fit-content;
-  min-width: 440px;
-  width: ${({ width }) => width};
-  background-color: white;
-  flex-basis: auto;
-  margin: auto;
-  display:flex
-  flex-direction: column;
-  gap: 12px;
-
-  @media ${device.mobileL} {
-    min-width: 100%;
-  }
-
-
-`;
-
-const ItemContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-`;
-
-const Description = styled.div`
-  font-size: 1.3rem;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled.div`
-  font-size: 1.9rem;
-  font-weight: bold;
-`;
-
-const Item = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 const StyledButton = styled(Button)<{ popup: boolean }>`

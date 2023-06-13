@@ -1,11 +1,21 @@
+import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useNavigate } from "react-router";
 import Cookies from "universal-cookie";
-import { useAppSelector } from "../state/hooks";
-import api, { GetAllResponse } from "./api";
-import { RolesTypes } from "./constants";
-import { getOnLineStatus, handleResponse } from "./functions";
-import { routes } from "./routes";
-import { FishType, Municipality, User } from "./types";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
+import { actions, UserReducerProps } from "../state/user/reducer";
+import api from "./api";
+import { RolesTypes, ServerErrorCodes } from "./constants";
+import {
+  clearCookies,
+  emptyUser,
+  getOnLineStatus,
+  handleAlert,
+  handleGetCurrentUser,
+  handleSetProfile
+} from "./functions";
+import { routes, slugs } from "./routes";
 
 const cookies = new Cookies();
 
@@ -23,71 +33,44 @@ export const useFilteredRoutes = () => {
 };
 
 export const useFishTypes = () => {
-  const [fishAges, setFishAges] = useState<FishType[]>([]);
+  const { data } = useQuery("fishTypes", () => api.getFishTypes(), {
+    onError: () => {
+      handleAlert();
+    }
+  });
 
-  useEffect(() => {
-    handleResponse({
-      endpoint: () => api.getFishTypes(),
-      onSuccess: (list: GetAllResponse<FishType>) => {
-        setFishAges(list.rows);
-      },
-    });
-  }, []);
-
-  return fishAges;
+  return data?.rows || [];
 };
 
 export const useMunicipalities = () => {
-  const [fishAges, setFishAges] = useState<Municipality[]>([]);
+  const { data } = useQuery("municipalities", () => api.getMunicipalities(), {
+    onError: () => {
+      handleAlert();
+    }
+  });
 
-  useEffect(() => {
-    handleResponse({
-      endpoint: () => api.getMunicipalities(),
-      onSuccess: (list: GetAllResponse<Municipality>) => {
-        setFishAges(list.rows);
-      },
-    });
-  }, []);
-
-  return fishAges;
+  return data?.rows || [];
 };
 
 export const useSignatureUsers = (id: string) => {
-  const [users, setUsers] = useState<
-    { id: string; name: string; users: string[] }[]
-  >([]);
+  const { data } = useQuery("signatureUsers", () => api.geSignatureUsers(id), {
+    onError: () => {
+      handleAlert();
+    }
+  });
 
-  useEffect(() => {
-    handleResponse({
-      endpoint: () => api.geSignatureUsers(id),
-      onSuccess: (list: { id: string; name: string; users: string[] }[]) => {
-        setUsers(list);
-      },
-    });
-  }, []);
-
-  return users;
+  return data || [];
 };
 
 export const useAssignedToUsers = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const { data } = useQuery("usersByTenant", () => api.geUsersByTenant(), {
+    onError: () => {
+      handleAlert();
+    },
+    enabled: cookies.get("profileId") !== "freelancer"
+  });
 
-  const handleSetUsers = () => {
-    if (cookies.get("profileId") === "freelancer") return;
-
-    handleResponse({
-      endpoint: () => api.geUsersByTenant(),
-      onSuccess: (list: User[]) => {
-        setUsers(list);
-      },
-    });
-  };
-
-  useEffect(() => {
-    handleSetUsers();
-  }, []);
-
-  return users;
+  return data || [];
 };
 
 export const useCurrentLocation = () => {
@@ -105,54 +88,33 @@ export const useCurrentLocation = () => {
 };
 
 export const useSettings = () => {
-  const [settings, setSettings] = useState<any>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useQuery("location", () => api.getSettings(), {
+    onError: () => {
+      handleAlert();
+    }
+  });
 
-  useEffect(() => {
-    setLoading(true);
-    handleResponse({
-      endpoint: () => api.getSettings(),
-      onSuccess: (settings: {
-        minTimeTillFishStocking: number;
-        maxTimeForRegistration: number;
-      }) => {
-        setSettings(settings);
-        setLoading(false);
-      },
-    });
-  }, []);
-
-  return { loading, minTime: settings.minTimeTillFishStocking || 0 };
+  return { loading: isLoading, minTime: data?.minTimeTillFishStocking || 0 };
 };
 
 export const useRecentLocations = () => {
-  const [location, setLocation] = useState<any>([]);
+  const { data } = useQuery("location", () => api.getRecentLocations(), {
+    onError: () => {
+      handleAlert();
+    }
+  });
 
-  useEffect(() => {
-    handleResponse({
-      endpoint: () => api.getRecentLocations(),
-      onSuccess: (data) => {
-        setLocation(data);
-      },
-    });
-  }, []);
-
-  return location;
+  return data || [];
 };
 
 export const useFishAges = () => {
-  const [fishAges, setFishAges] = useState<any>([]);
+  const { data } = useQuery("fishAges", () => api.getFishAges(), {
+    onError: () => {
+      handleAlert();
+    }
+  });
 
-  useEffect(() => {
-    handleResponse({
-      endpoint: () => api.getFishAges(),
-      onSuccess: (list: GetAllResponse<any>) => {
-        setFishAges(list.rows);
-      },
-    });
-  }, []);
-
-  return fishAges;
+  return data?.rows || [];
 };
 
 export const useGetCurrentProfile = () => {
@@ -184,4 +146,76 @@ export const useNavigatorOnLine = () => {
   }, []);
 
   return status;
+};
+
+export const useEGatesSign = () => {
+  const { mutateAsync, isLoading } = useMutation(api.eGatesSign, {
+    onError: () => {
+      handleAlert();
+    },
+    onSuccess: ({ url }) => {
+      window.location.replace(url);
+    }
+  });
+
+  return { isLoading, mutateAsync };
+};
+
+export const useFishStockingCallbacks = () => {
+  const queryClient = useQueryClient();
+  const filters = useAppSelector((state) => state.filters.fishStocking);
+  const navigate = useNavigate();
+  const callBacks = {
+    onError: () => {
+      handleAlert();
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(["fishStockings", filters]);
+      navigate(slugs.fishStockings);
+    }
+  };
+
+  return callBacks;
+};
+
+export const useCheckAuthMutation = () => {
+  const dispatch = useAppDispatch();
+
+  const { mutateAsync, isLoading } = useMutation(handleGetCurrentUser, {
+    onError: ({ response }: any) => {
+      if (isEqual(response.status, ServerErrorCodes.NO_PERMISSION)) {
+        clearCookies();
+        dispatch(actions.setUser(emptyUser));
+
+        return;
+      }
+
+      handleAlert();
+    },
+    onSuccess: (data: UserReducerProps) => {
+      if (data) {
+        handleSetProfile(data?.userData?.profiles);
+        dispatch(actions.setUser(data));
+      }
+    },
+    retry: 5
+  });
+
+  return { isLoading, mutateAsync };
+};
+
+export const useLogoutMutation = () => {
+  const dispatch = useAppDispatch();
+
+  const { mutateAsync } = useMutation(() => api.logout(), {
+    onError: () => {
+      handleAlert();
+    },
+    onSuccess: () => {
+      clearCookies();
+      dispatch(actions.setUser(emptyUser));
+    }
+  });
+
+  return { mutateAsync };
 };

@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation } from "react-query";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import Cookies from "universal-cookie";
@@ -7,11 +8,10 @@ import { useAppSelector } from "../../state/hooks";
 import { device } from "../../styles";
 import api from "../../utils/api";
 
-import { handleResponse } from "../../utils/functions";
+import { handleAlert } from "../../utils/functions";
 import { useIsFreelancer } from "../../utils/hooks";
 import { slugs } from "../../utils/routes";
 import { Url } from "../../utils/texts";
-import { FishStocking } from "../../utils/types";
 import FishStockingTag from "./FishStockingTag";
 import Icon from "./Icon";
 import LoaderComponent from "./LoaderComponent";
@@ -19,7 +19,6 @@ import FishStockingStatusIcon from "./StatusIcon";
 
 const DisplayMap = () => {
   const cookies = new Cookies();
-  const [currentStocking, setCurrentStocking] = useState<FishStocking>();
   const [loading, setLoading] = useState(true);
   const isFreelancer = useIsFreelancer();
   const iframeRef = useRef<any>(null);
@@ -34,22 +33,22 @@ const DisplayMap = () => {
     setLoading(false);
   };
 
-  const [popUploading, setPopUpLoading] = useState(false);
+  const fishStockingMutation = useMutation(
+    (id: string) => api.getFishStocking(id),
+    {
+      onError: () => {
+        handleAlert();
+      }
+    }
+  );
+
+  const currentStocking = fishStockingMutation?.data!;
+
   const handleSaveGeom = useCallback(async (event: any) => {
     const stocking = event?.data?.mapIframeMsg?.click[0];
-    if (!stocking) return;
+    if (!stocking?.id) return;
 
-    setPopUpLoading(true);
-
-    await handleResponse({
-      endpoint: () => api.getFishStocking(stocking.id),
-
-      onSuccess: (item: FishStocking) => {
-        setCurrentStocking(item);
-      }
-    });
-
-    setPopUpLoading(false);
+    await fishStockingMutation.mutateAsync(stocking.id);
   }, []);
 
   useEffect(() => {
@@ -61,16 +60,16 @@ const DisplayMap = () => {
     <>
       {loading ? <LoaderComponent /> : null}
       <MapContainer>
-        {currentStocking && (
+        {fishStockingMutation.data && (
           <MapModal>
             <ModalContainer>
-              {popUploading ? (
+              {fishStockingMutation.isLoading ? (
                 <LoaderComponent />
               ) : (
                 <>
                   <IconContainer
                     onClick={() => {
-                      setCurrentStocking(undefined);
+                      fishStockingMutation.reset();
                     }}
                   >
                     <StyledIcon name="close" />

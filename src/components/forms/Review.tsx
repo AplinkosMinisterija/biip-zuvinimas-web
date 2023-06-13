@@ -2,15 +2,17 @@ import { useMediaQuery } from "@material-ui/core";
 import { FieldArray, Form, Formik } from "formik";
 import { isEmpty } from "lodash";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useMutation } from "react-query";
+import { useParams } from "react-router";
 
 import styled from "styled-components";
 import Cookies from "universal-cookie";
 import { device } from "../../styles";
 import api from "../../utils/api";
-import { handleResponse } from "../../utils/functions";
-import { useCurrentLocation } from "../../utils/hooks";
-import { slugs } from "../../utils/routes";
+import {
+  useCurrentLocation,
+  useFishStockingCallbacks
+} from "../../utils/hooks";
 import { buttonsTitles } from "../../utils/texts";
 import { FishStocking } from "../../utils/types";
 import { validateFishStockingReview } from "../../utils/validations";
@@ -60,22 +62,31 @@ const Review = ({
   disabled,
   renderTabs
 }: FishStockingFactFormProps) => {
-  const [submitLoading, setSubmitLoading] = useState(false);
   const currentLocation = useCurrentLocation();
-  const navigate = useNavigate();
   const { id } = useParams();
   const isMobile = useMediaQuery(device.mobileL);
   const [showModal, setShowModal] = useState(false);
 
-  const handleCancel = async () => {
-    await handleResponse({
-      endpoint: () => api.cancelFishStocking(id!),
-      onSuccess: () => {
-        navigate(slugs.fishStockings);
-      }
-    });
-  };
+  const callBacks = useFishStockingCallbacks();
 
+  const cancelFishStockingMutation = useMutation(
+    () => api.cancelFishStocking(id!),
+    { ...callBacks }
+  );
+
+  const reviewFishStockingMutation = useMutation(
+    (params: any) => api.reviewFishStocking(params),
+    { ...callBacks }
+  );
+
+  const submitLoading = [
+    reviewFishStockingMutation.isLoading,
+    cancelFishStockingMutation.isLoading
+  ].some((loading) => loading);
+
+  const handleCancel = async () => {
+    cancelFishStockingMutation.mutateAsync();
+  };
   const handleSubmit = async (values: ReviewProps) => {
     const {
       waybillNo,
@@ -106,14 +117,7 @@ const Review = ({
       })
     };
 
-    setSubmitLoading(true);
-    await handleResponse({
-      endpoint: () => api.reviewFishStocking(params),
-      onSuccess: () => {
-        navigate(slugs.fishStockings);
-      }
-    });
-    setSubmitLoading(false);
+    reviewFishStockingMutation.mutateAsync(params);
   };
 
   const inspector = fishStocking?.inspector;

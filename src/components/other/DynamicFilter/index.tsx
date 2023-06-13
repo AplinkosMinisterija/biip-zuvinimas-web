@@ -1,13 +1,17 @@
 import { useMediaQuery } from "@material-ui/core";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
+import { useMutation } from "react-query";
 import styled from "styled-components";
 import { device } from "../../../styles";
+import api from "../../../utils/api";
 import {
   formatDate,
+  handleAlert,
   handleGetExcel,
-  mapFishStockingsRequestParams,
+  mapFishStockingsRequestParams
 } from "../../../utils/functions";
+import { buttonsTitles } from "../../../utils/texts";
 import Icon from "../Icon";
 import Loader from "../Loader";
 import Popup from "../Popup";
@@ -27,11 +31,11 @@ const mapFilters = (
       if (filter) {
         const multiSelects = [
           FilterInputTypes.multiselect,
-          FilterInputTypes.asyncMultiSelect,
+          FilterInputTypes.asyncMultiSelect
         ];
         const selects = [
           FilterInputTypes.singleSelect,
-          FilterInputTypes.asyncSingleSelect,
+          FilterInputTypes.asyncSingleSelect
         ];
 
         const label = `${config.label}:`;
@@ -39,7 +43,7 @@ const mapFilters = (
         if (config.inputType === FilterInputTypes.date) {
           applied.push({
             key: config.key,
-            label: `${label} ${formatDate(filter)}`,
+            label: `${label} ${formatDate(filter)}`
           });
         } else if (multiSelects.includes(config.inputType)) {
           applied.push(
@@ -49,7 +53,7 @@ const mapFilters = (
                 id: item.id,
                 label: `${label} ${
                   hasOptionLabelFunction ? optionLabel(item) : item.label
-                }`,
+                }`
               };
             })
           );
@@ -58,12 +62,12 @@ const mapFilters = (
             key: config.key,
             label: `${label} ${
               hasOptionLabelFunction ? optionLabel(filter) : filter.label
-            }`,
+            }`
           });
         } else {
           applied.push({
             key: config.key,
-            label: `${label} ${filter}`,
+            label: `${label} ${filter}`
           });
         }
       }
@@ -79,7 +83,7 @@ const DynamicFilter = ({
   filterConfig,
   rowConfig,
   onSetFilters,
-  filters,
+  filters
 }: any) => {
   const isMobile = useMediaQuery(device.mobileL);
 
@@ -92,6 +96,15 @@ const DynamicFilter = ({
   }, [filters, filterConfig]);
 
   const params = mapFishStockingsRequestParams(filters);
+
+  const excelMutation = useMutation((filter: any) => api.getExcel({ filter }), {
+    onError: () => {
+      handleAlert();
+    },
+    onSuccess: (data) => {
+      handleGetExcel(data);
+    }
+  });
 
   return (
     <>
@@ -108,7 +121,7 @@ const DynamicFilter = ({
                       ...rest,
                       [appliedFilter.key]: key.filter(
                         (filter: any) => filter.id !== appliedFilter.id
-                      ),
+                      )
                     });
 
                     return;
@@ -133,9 +146,9 @@ const DynamicFilter = ({
           </StyledButton>
         </Wrapper>
 
-        <StyledButton onClick={() => handleGetExcel(params)}>
+        <StyledButton onClick={() => excelMutation.mutateAsync(params)}>
           <StyledIcon name={"download"} />
-          Atsisiųsti duomenis
+          {buttonsTitles.excel}
         </StyledButton>
       </Container>
       <Popup visible={showFilters} onClose={() => setShowFilters(false)}>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Form, Formik } from "formik";
 import styled from "styled-components";
@@ -14,17 +14,21 @@ import Icon from "../components/other/Icon";
 import LoaderComponent from "../components/other/LoaderComponent";
 import Modal from "../components/other/Modal";
 import { device } from "../styles";
-import api, { GetAllResponse } from "../utils/api";
+import api from "../utils/api";
 import { RolesTypes } from "../utils/constants";
-import { handleResponse } from "../utils/functions";
+import { handleAlert } from "../utils/functions";
 import { useGetCurrentProfile } from "../utils/hooks";
+
+import React from "react";
+import { useInfiniteQuery, useMutation } from "react-query";
+import { intersectionObserverConfig } from "../utils/configs";
 import {
   buttonsTitles,
   descriptions,
   formLabels,
   inputLabels
 } from "../utils/texts";
-import { TenantUser, User } from "../utils/types";
+import { User } from "../utils/types";
 import {
   validateNewTenantUser,
   validateUpdateTenantUser
@@ -48,98 +52,117 @@ const cookies = new Cookies();
 const NariaiPage = () => {
   const [open, setOpen] = useState("");
   const currentProfile = useGetCurrentProfile();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>(initUser);
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [hasMore, setHasMore] = useState(false);
 
-  const getUsers = async (page: number) => {
-    setLoading(true);
+  const fetchTenantUsers = async (page: number) => {
+    const tenantUsers = await api.tenantUsers({ page });
 
-    await handleResponse({
-      endpoint: () => api.tenantUsers({ page: page }),
-      onSuccess: (list: GetAllResponse<TenantUser>) => {
-        setCurrentPage(list.page);
-        setHasMore(list.page < list.totalPages);
-
-        const newUsers = list?.rows.map((tenantUser) => {
-          return {
-            ...tenantUser.user,
-            id: tenantUser.id,
-            role: tenantUser.role
-          };
-        });
-
-        if (page == 1) {
-          setUsers(newUsers);
-        } else {
-          setUsers([...users, ...newUsers]);
-        }
-        setLoading(false);
-      }
+    const newUsers = tenantUsers?.rows.map((tenantUser) => {
+      return {
+        ...tenantUser.user,
+        id: tenantUser.id,
+        role: tenantUser.role
+      };
     });
 
-    setLoading(false);
+    return {
+      data: newUsers,
+      page:
+        tenantUsers.page < tenantUsers.totalPages
+          ? tenantUsers.page + 1
+          : undefined
+    };
   };
 
-  const handleScroll = async (e: any) => {
-    const element = e.currentTarget;
-    const isTheBottom =
-      Math.abs(
-        element.scrollHeight - element.clientHeight - element.scrollTop
-      ) < 1;
-
-    if (isTheBottom && hasMore && !loading) {
-      getUsers(currentPage + 1);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isFetching
+  } = useInfiniteQuery(
+    "tenantUsers",
+    ({ pageParam }) => fetchTenantUsers(pageParam),
+    {
+      getNextPageParam: (lastPage) => lastPage.page,
+      cacheTime: 60000
     }
-  };
+  );
 
-  const deleteUser = async (id?: string) => {
-    if (!id) return;
-    setDeleteLoading(true);
-    await handleResponse({
-      endpoint: () => api.deleteTenantUser(id),
-      onSuccess: () => {
-        getUsers(1);
-        setOpen("");
-      }
-    });
-    setDeleteLoading(false);
-  };
+  const observerRef = useRef(null);
 
   useEffect(() => {
-    getUsers(1);
-  }, []);
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, intersectionObserverConfig);
 
-  const handleSubmit = async (user: any) => {
-    setSubmitLoading(true);
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);
+
+  const deleteUserMutation = useMutation(
+    (id: string) => api.deleteTenantUser(id),
+    {
+      onError: () => {
+        handleAlert();
+      },
+      onSuccess: () => {
+        setOpen("");
+        refetch();
+      }
+    }
+  );
+
+  const createUserMutation = useMutation(
+    (params: User) => api.createTenantUser(params),
+    {
+      onError: () => {
+        handleAlert();
+      }
+    }
+  );
+
+  const updateUserMutation = useMutation(
+    (user: User) => api.updateTenantUser({ role: user.role }, user?.id!),
+    {
+      onError: () => {
+        handleAlert();
+      }
+    }
+  );
+
+  const submitLoading = [
+    updateUserMutation.isLoading,
+    createUserMutation.isLoading
+  ].some((loading) => loading);
+
+  const handleSubmit = async (user: User) => {
     await createOrUpdateUser(user);
-    setSubmitLoading(false);
-
-    getUsers(1);
     setOpen("");
+    refetch();
   };
 
   const createOrUpdateUser = async (user: User) => {
     const params = { ...user, tenant: parseInt(cookies.get("profileId")) };
     if (!!user.id) {
-      await handleResponse({
-        endpoint: () => api.updateTenantUser({ role: user.role }, user?.id!),
-        onSuccess: () => {}
-      });
+      await updateUserMutation.mutateAsync(user);
     } else {
-      await handleResponse({
-        endpoint: () => api.createTenantUser(params),
-        onSuccess: () => {}
-      });
+      await createUserMutation.mutateAsync(params);
     }
   };
 
   return (
-    <DefaultLayout onScroll={handleScroll} maxWidth="830px">
+    <DefaultLayout maxWidth="830px">
       <Container>
         <TopLine>
           <H1>
@@ -159,40 +182,50 @@ const NariaiPage = () => {
           </div>
         </TopLine>
         <CardContainer>
-          {(users || []).map((user) => {
+          {data?.pages.map((page, pageIndex) => {
             return (
-              <div key={user.id}>
-                <Card key={user.id}>
-                  <InnerCardContainer
-                    onClick={() => {
-                      setCurrentUser(user);
-                      setOpen("form");
-                    }}
-                  >
-                    <Avatar name={user.firstName!} surname={user.lastName!} />
-                    <NameContainer>
-                      <Title>
-                        {user.firstName} {user.lastName}
-                      </Title>
-                      <SubTitle>
-                        {user.phone} {user.email}
-                      </SubTitle>
-                    </NameContainer>
-                  </InnerCardContainer>
+              <React.Fragment key={pageIndex}>
+                {page.data.map((user, index) => {
+                  return (
+                    <div key={user.id}>
+                      <Card key={user.id}>
+                        <InnerCardContainer
+                          onClick={() => {
+                            setCurrentUser(user);
+                            setOpen("form");
+                          }}
+                        >
+                          <Avatar
+                            name={user.firstName!}
+                            surname={user.lastName!}
+                          />
+                          <NameContainer>
+                            <Title>
+                              {user.firstName} {user.lastName}
+                            </Title>
+                            <SubTitle>
+                              {user.phone} {user.email}
+                            </SubTitle>
+                          </NameContainer>
+                        </InnerCardContainer>
 
-                  <IconContainer
-                    onClick={() => {
-                      setCurrentUser(user);
-                      setOpen("remove");
-                    }}
-                  >
-                    <Dots name="trashcan" />
-                  </IconContainer>
-                </Card>
-              </div>
+                        <IconContainer
+                          onClick={() => {
+                            setCurrentUser(user);
+                            setOpen("remove");
+                          }}
+                        >
+                          <Dots name="trashcan" />
+                        </IconContainer>
+                      </Card>
+                    </div>
+                  );
+                })}
+              </React.Fragment>
             );
           })}
-          {loading && <LoaderComponent />}
+          {observerRef && <Invisible ref={observerRef} />}
+          {isFetching && <LoaderComponent />}
         </CardContainer>
       </Container>
       <Modal
@@ -323,8 +356,10 @@ const NariaiPage = () => {
               description={"Ar norite pašalinti įmonės darbuotoją"}
               name={`${currentUser?.firstName} ${currentUser?.lastName}`}
               onSetClose={() => setOpen("")}
-              handleDelete={() => deleteUser(currentUser?.id)}
-              deleteInProgress={deleteLoading}
+              handleDelete={() =>
+                deleteUserMutation.mutateAsync(currentUser?.id!)
+              }
+              deleteInProgress={deleteUserMutation.isLoading}
             />
           </DeleteCardContainer>
         )}
@@ -470,6 +505,12 @@ const DeleteCardContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
+const Invisible = styled.div`
+  width: 10px;
+  height: 16px;
+`;
+
 const SubH1Container = styled.div`
   width: 100%;
   display: flex;

@@ -2,14 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../../utils/types";
 import type { RootState } from "../store";
 
-interface UserReducerProps {
+export interface UserReducerProps {
   userData: User;
   loggedIn: boolean;
 }
 
 const initialState: UserReducerProps = {
   userData: { id: "", firstName: "", lastName: "", email: "" },
-  loggedIn: false,
+  loggedIn: false
 };
 
 export const UserReducer = createSlice({
@@ -22,10 +22,10 @@ export const UserReducer = createSlice({
         ...state,
         userData: { ...userData },
         loggedIn: loggedIn,
-        error: "",
+        error: ""
       };
-    },
-  },
+    }
+  }
 });
 
 export const selectUser = (state: RootState) => state;

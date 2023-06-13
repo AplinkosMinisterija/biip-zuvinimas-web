@@ -17,45 +17,47 @@ const NavBar = () => {
   const locationSlug = location?.pathname?.split("/")[1];
 
   return (
-    <Header>
-      <Logo onClick={() => navigate("/")} src="/logo.svg" />
-      <HeaderLeft>
-        <StyledButton
-          variant={ButtonColors.SECONDARY}
-          onClick={() => navigate(slugs.newFishStockings)}
-          height={40}
-          padding="0"
-          disabled={false}
-        >
-          {buttonsTitles.new}
-        </StyledButton>
+    <>
+      <Header>
+        <Logo onClick={() => navigate("/")} src="/logo.svg" />
+        <HeaderLeft>
+          <StyledButton
+            variant={ButtonColors.SECONDARY}
+            onClick={() => navigate(slugs.newFishStockings)}
+            height={40}
+            padding="0"
+            disabled={false}
+          >
+            {buttonsTitles.new}
+          </StyledButton>
 
-        {!isMobile ? (
-          routes.map((tab, index) => {
-            const slugRoot = tab.slug?.split("/")[1];
+          {!isMobile ? (
+            routes.map((tab, index) => {
+              const slugRoot = tab.slug?.split("/")[1];
 
-            return (
-              <MenuButton
-                key={`${tab.title}-${index}`}
-                isSelected={locationSlug?.includes(slugRoot)}
-                onClick={() => navigate(tab.slug)}
-              >
-                {tab.title}
-              </MenuButton>
-            );
-          })
-        ) : (
-          <SimpleSelect
-            options={routes}
-            getOptionLabel={(option: any) => option?.title}
-            onChange={(option: any) => navigate(option?.slug)}
-            iconRight="menu"
-          />
-        )}
+              return (
+                <MenuButton
+                  key={`${tab.title}-${index}`}
+                  isSelected={locationSlug?.includes(slugRoot)}
+                  onClick={() => navigate(tab.slug)}
+                >
+                  {tab.title}
+                </MenuButton>
+              );
+            })
+          ) : (
+            <SimpleSelect
+              options={routes}
+              getOptionLabel={(option: any) => option?.title}
+              onChange={(option: any) => navigate(option?.slug)}
+              iconRight="menu"
+            />
+          )}
 
-        <UserSwitchMenu />
-      </HeaderLeft>
-    </Header>
+          <UserSwitchMenu />
+        </HeaderLeft>
+      </Header>
+    </>
   );
 };
 

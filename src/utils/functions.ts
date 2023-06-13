@@ -1,13 +1,13 @@
 import { endOfDay, format, startOfDay } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { isEmpty, isEqual, map } from "lodash";
+import { isEmpty, map } from "lodash";
 import Compress from "react-image-file-resizer";
 import { toast } from "react-toastify";
 import Cookies from "universal-cookie";
 import { FilterConfig } from "../components/other/DynamicFilter/Filter";
-import { actions } from "../state/user/reducer";
+import { actions, UserReducerProps } from "../state/user/reducer";
 import api from "./api";
-import { FishStockingStatus, ServerErrorCodes } from "./constants";
+import { FishStockingStatus } from "./constants";
 import { fishStockingStatusLabels, validationTexts } from "./texts";
 import {
   FishStockingFilters,
@@ -20,6 +20,7 @@ interface SetResponseProps {
   endpoint: () => Promise<any>;
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
+  isOffline?: () => void;
 }
 
 export const handleResponse = async ({
@@ -52,7 +53,7 @@ export const validateFileTypes = (
   return true;
 };
 
-export const handleAlert = (responseError: string) => {
+export const handleAlert = (responseError?: string) => {
   toast.error(
     validationTexts[responseError as keyof typeof validationTexts] ||
       validationTexts.error,
@@ -76,10 +77,8 @@ export const handleSuccess = (message: string) => {
   });
 };
 
-export const handleGetExcel = async (filter: any) => {
-  const data = await api.getExcel({ filter });
+export const handleGetExcel = async (data: any) => {
   const url = window.URL.createObjectURL(data);
-
   const link = document.createElement("a");
   link.href = url;
   link.setAttribute("download", `Žuvinimai.xlsx`);
@@ -99,50 +98,28 @@ interface UpdateTokenProps {
 const cookies = new Cookies();
 
 export const handleUpdateTokens = (data: UpdateTokenProps) => {
-  const { token, refreshToken, error } = data;
+  const { token, refreshToken } = data;
   if (token) {
     cookies.set("token", `${token}`, {
       path: "/",
       expires: new Date(new Date().getTime() + 60 * 60 * 24 * 1000)
     });
-
-    if (refreshToken) {
-      cookies.set("refreshToken", `${refreshToken}`, { path: "/" });
-    }
   }
-  if (error) {
-    return { error };
+
+  if (refreshToken) {
+    cookies.set("refreshToken", `${refreshToken}`, { path: "/" });
   }
 };
 
-export const handleGetCurrentUser = async (justLoggedIn: boolean = false) => {
-  const emptyUser = { userData: null, loggedIn: false };
+export const emptyUser: UserReducerProps = {
+  userData: {},
+  loggedIn: false
+};
 
+export const handleGetCurrentUser = async () => {
   if (!cookies.get("token")) return emptyUser;
 
-  return handleResponse({
-    endpoint: () => api.checkAuth(),
-    onError: (code) => {
-      if (isEqual(code, ServerErrorCodes.NO_PERMISSION)) {
-        clearCookies();
-        return emptyUser;
-      }
-      return null;
-    },
-    onSuccess: (userData) => {
-      handleSetProfile(userData?.profiles, justLoggedIn);
-      return { userData: userData, loggedIn: true };
-    }
-  });
-};
-
-export const handleEGatesSign = async () => {
-  await handleResponse({
-    endpoint: () => api.eGatesSign(),
-    onSuccess: ({ url }) => {
-      window.location.replace(url);
-    }
-  });
+  return { userData: await api.checkAuth(), loggedIn: true };
 };
 
 export const handleSelectProfile = (profileId: ProfileId) => {
@@ -153,16 +130,6 @@ export const handleSelectProfile = (profileId: ProfileId) => {
   window.location.reload();
 };
 
-export const handleLogout = async (dispatch: any) => {
-  handleResponse({
-    endpoint: () => api.logout(),
-    onSuccess: () => {
-      clearCookies();
-      dispatch(actions.setUser({ userData: null, loggedIn: false }));
-    }
-  });
-};
-
 export const clearCookies = () => {
   cookies.remove("token", { path: "/" });
   cookies.remove("refreshToken", { path: "/" });
@@ -170,14 +137,15 @@ export const clearCookies = () => {
   cookies.remove("profileId", { path: "/" });
 };
 
-export const handleSetProfile = (
-  profiles?: Profile[],
-  justLoggedIn: boolean = false
-) => {
+export const handleSetProfile = (profiles?: Profile[]) => {
   const isOneProfile = profiles?.length === 1;
   const profileId = cookies.get("profileId");
 
-  if (profileId && justLoggedIn) {
+  if (isOneProfile) {
+    return handleSelectProfile(profiles[0].id);
+  }
+
+  if (profileId) {
     const hasProfile = profiles?.some((profile) => profile.id == profileId);
 
     if (hasProfile) {
@@ -185,8 +153,6 @@ export const handleSetProfile = (
     } else {
       cookies.remove("profileId", { path: "/" });
     }
-  } else if (isOneProfile) {
-    handleSelectProfile(profiles[0].id);
   }
 };
 

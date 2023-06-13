@@ -29,12 +29,11 @@ const locale = {
   vet_no_1: "Vet. patvirtinimo įsakymo nr.",
   waybill_no: "Važtaraščio nr.",
   fish_origin_company: "Žuvivaisos įmonės pavadinimas",
-  fish_origin_reservoir: "Vandens telkinio pavadinimas",
+  fish_origin_reservoir: "Vandens telkinio pavadinimas"
 };
 
 const FishStockingCompleted = ({
-  fishStocking,
-  disabled,
+  fishStocking
 }: FishStockingCompletedProps) => {
   const status = fishStocking?.status;
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ const FishStockingCompleted = ({
 
   const showAdditionalInfo = ![
     FishStockingStatus.NOT_FINISHED,
-    FishStockingStatus.CANCELED,
+    FishStockingStatus.CANCELED
   ].includes(status!);
 
   const fishStocker =
@@ -55,7 +54,7 @@ const FishStockingCompleted = ({
       {
         type: "location",
         value: fishStocking?.location?.municipality?.name,
-        label: "Įžuvinimo vieta",
+        label: "Įžuvinimo vieta"
       },
       {
         type: "date",
@@ -63,26 +62,26 @@ const FishStockingCompleted = ({
           new Date(fishStocking?.reviewTime || fishStocking.eventTime!),
           "yyyy-MM-dd HH:mm"
         ),
-        label: "Data",
+        label: "Data"
       },
       {
         type: "phone",
         value: fishStocking.phone,
-        label: "Telefonas",
-      },
+        label: "Telefonas"
+      }
     ],
     [
       {
         type: "info",
         value: `${fishStocking.location?.name}, ${fishStocking.location?.cadastral_id}`,
-        label: "Telkinys",
+        label: "Telkinys"
       },
       {
         type: "user",
         value: `${fishStocker?.firstName} ${fishStocker?.lastName}`,
-        label: "Atsakingas asmuo",
-      },
-    ],
+        label: "Atsakingas asmuo"
+      }
+    ]
   ];
   if (showAdditionalInfo) {
     info.push([
@@ -91,15 +90,15 @@ const FishStockingCompleted = ({
         value: fishStocking.containerWaterTemp
           ? fishStocking.containerWaterTemp + "\u00b0C"
           : "Nežinoma temperatūra",
-        label: "Vandens temperatūra taroje",
+        label: "Vandens temperatūra taroje"
       },
       {
         type: "water",
         value: fishStocking.waterTemp
           ? fishStocking.waterTemp + "\u00b0C"
           : "Nežinoma temperatūra",
-        label: "Vandens temperatūra telkinyje",
-      },
+        label: "Vandens temperatūra telkinyje"
+      }
     ]);
   }
 
@@ -182,8 +181,8 @@ const FishStockingCompleted = ({
                 navigate({
                   pathname: slugs.newFishStockings,
                   search: createSearchParams({
-                    repeat: fishStocking?.id!.toString(),
-                  }).toString(),
+                    repeat: fishStocking?.id!.toString()
+                  }).toString()
                 });
               }}
             >

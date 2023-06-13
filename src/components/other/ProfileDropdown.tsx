@@ -2,8 +2,8 @@ import { map } from "lodash";
 import { useState } from "react";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../state/hooks";
-import { handleLogout, handleSelectProfile } from "../../utils/functions";
-import { useGetCurrentProfile } from "../../utils/hooks";
+import { handleSelectProfile } from "../../utils/functions";
+import { useGetCurrentProfile, useLogoutMutation } from "../../utils/hooks";
 import { buttonsTitles } from "../../utils/texts";
 
 import Avatar from "./Avatar";
@@ -20,6 +20,9 @@ const UserSwitchMenu = () => {
       setShowSelect(false);
     }
   };
+
+  const { mutateAsync } = useLogoutMutation();
+
   return (
     <Container tabIndex={1} onBlur={handleBlur}>
       <div
@@ -70,7 +73,7 @@ const UserSwitchMenu = () => {
             );
           })}
           <Hr />
-          <BottomRow onClick={() => handleLogout(dispatch)}>
+          <BottomRow onClick={() => mutateAsync()}>
             <StyledLogoutIcon name="exit" />
             <LogoutText>{buttonsTitles.logout}</LogoutText>
           </BottomRow>

@@ -1,10 +1,11 @@
 import { useMediaQuery } from "@material-ui/core";
 import { isEmpty } from "lodash";
 import { useCallback, useEffect, useState } from "react";
+import { useMutation } from "react-query";
 import styled from "styled-components";
 import { device } from "../../styles";
 import api from "../../utils/api";
-import { handleResponse } from "../../utils/functions";
+import { handleAlert } from "../../utils/functions";
 import { buttonsTitles, Url } from "../../utils/texts";
 import Button from "../buttons/Button";
 import Icon from "./Icon";
@@ -26,14 +27,10 @@ const Map = ({
   onSave,
   onClose,
   value,
-  queryString = "",
   display,
   iframeRef
 }: MapProps) => {
   const [showModal, setShowModal] = useState(false);
-
-  const [locations, setLocations] = useState<any[]>([]);
-  const [popUploading, setPopUpLoading] = useState(false);
   const [geom, setGeom] = useState<any[]>();
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery(device.mobileL);
@@ -49,19 +46,21 @@ const Map = ({
     );
   };
 
+  const locationMutation = useMutation(
+    (location: any) =>
+      api.getLocations({
+        geom: JSON.stringify(location)
+      }),
+    {
+      onError: () => {
+        handleAlert();
+      }
+    }
+  );
+
   const handleGetLocations = async (location: any) => {
     setGeom(location);
-    setPopUpLoading(true);
-    return await handleResponse({
-      endpoint: () =>
-        api.getLocations({
-          geom: JSON.stringify(location)
-        }),
-      onSuccess: (data) => {
-        setLocations(data);
-        setPopUpLoading(false);
-      }
-    });
+    locationMutation.mutateAsync(location);
   };
 
   const handleSaveGeom = useCallback((event: any) => {
@@ -107,21 +106,20 @@ const Map = ({
           {geom && (
             <MapModal>
               <ModalContainer>
-                {popUploading ? (
+                {locationMutation.isLoading ? (
                   <LoaderComponent />
                 ) : (
                   <>
                     <IconContainer
                       onClick={() => {
-                        setLocations([]);
                         setGeom(undefined);
                       }}
                     >
                       <StyledIcon name="close" />
                     </IconContainer>
                     <ItemContainer>
-                      {!isEmpty(locations)
-                        ? locations.map((location) => (
+                      {!isEmpty(locationMutation.data)
+                        ? locationMutation?.data?.map((location) => (
                             <Item>
                               <TitleContainer>
                                 <Title>{location?.name}</Title>
@@ -129,7 +127,6 @@ const Map = ({
                               </TitleContainer>
                               <Button
                                 onClick={() => {
-                                  setLocations([]);
                                   setGeom(undefined);
                                   onSave && onSave(geom, location);
                                 }}
