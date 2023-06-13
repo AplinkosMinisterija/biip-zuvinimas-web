@@ -57,27 +57,34 @@ const Map = ({
       }
     }
   );
+  const locationMutationMutateAsync = locationMutation.mutateAsync;
+  const handleGetLocations = useCallback(
+    async (location: any) => {
+      setGeom(location);
+      locationMutationMutateAsync(location);
+    },
+    [locationMutationMutateAsync]
+  );
 
-  const handleGetLocations = async (location: any) => {
-    setGeom(location);
-    locationMutation.mutateAsync(location);
-  };
 
-  const handleSaveGeom = useCallback((event: any) => {
-    if (!event?.data?.mapIframeMsg) return;
+  const handleSaveGeom = useCallback(
+    (event: any) => {
+      if (!event?.data?.mapIframeMsg) return;
 
-    const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
-    if (!userObjects) return;
+      const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
+      if (!userObjects) return;
 
-    if (isEmpty(userObjects.features)) return;
+      if (isEmpty(userObjects.features)) return;
 
-    handleGetLocations(userObjects);
-  }, []);
+      handleGetLocations(userObjects);
+    },
+    [handleGetLocations]
+  );
 
   useEffect(() => {
     window.addEventListener("message", handleSaveGeom);
     return () => window.removeEventListener("message", handleSaveGeom);
-  }, []);
+  }, [handleSaveGeom]);
 
   return (
     <>
@@ -164,12 +171,6 @@ const Container = styled.div<{ display: boolean }>`
   width: 100%;
   height: 100%;
   display: ${({ display }) => (display ? "flex" : "none")};
-`;
-
-const IMG = styled.img`
-  width: 50px;
-  height: 25px;
-  margin-bottom: -5px;
 `;
 
 const IconContainer = styled.div`
@@ -304,15 +305,6 @@ const StyledIconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const InfoCard = styled.div`
-  position: absolute;
-  bottom: 0;
-  padding: 16px;
-  width: 100%;
-  background: #f7d19b;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 `;
 
 export default Map;

@@ -25,7 +25,7 @@ const DisplayMap = () => {
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.user?.userData);
 
-  const src = `${Url.FISH_STOCKING}&${
+  const src = `${Url.FISH_STOCKING}?${
     !isFreelancer ? `tenantId=${cookies.get("profileId")}` : `userId=${user.id}`
   }`;
 
@@ -43,18 +43,21 @@ const DisplayMap = () => {
   );
 
   const currentStocking = fishStockingMutation?.data!;
+  const fishStockingMutationMutateAsync = fishStockingMutation.mutateAsync;
+  const handleSaveGeom = useCallback(
+    async (event: any) => {
+      const stocking = event?.data?.mapIframeMsg?.click[0];
+      if (!stocking?.id) return;
 
-  const handleSaveGeom = useCallback(async (event: any) => {
-    const stocking = event?.data?.mapIframeMsg?.click[0];
-    if (!stocking?.id) return;
-
-    await fishStockingMutation.mutateAsync(stocking.id);
-  }, []);
+      await fishStockingMutationMutateAsync(stocking.id);
+    },
+    [fishStockingMutationMutateAsync]
+  );
 
   useEffect(() => {
     window.addEventListener("message", handleSaveGeom);
     return () => window.removeEventListener("message", handleSaveGeom);
-  }, []);
+  }, [handleSaveGeom]);
 
   return (
     <>
@@ -168,10 +171,6 @@ const FirstRowFirstColumn = styled.div`
   display: flex;
 `;
 
-const FirstRowSecondColumn = styled.div`
-  display: flex;
-`;
-
 const SecondRow = styled.div`
   display: flex;
   color: #121a55;
@@ -203,12 +202,6 @@ const CalendarIcon = styled(Icon)`
   vertical-align: middle;
   margin-right: 10px;
   font-size: 1.8rem;
-`;
-
-const StyledIoLocationSharp = styled(Icon)`
-  margin: 0px 10px 0px 20px;
-  color: #13c9e7;
-  font-size: 2rem;
 `;
 
 const IconContainer = styled.div`
@@ -292,12 +285,6 @@ const ItemContainer = styled.div`
   flex-direction: column;
   gap: 12px;
   margin-top: 20px;
-`;
-
-const Item = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export default DisplayMap;

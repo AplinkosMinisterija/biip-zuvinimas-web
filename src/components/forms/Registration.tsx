@@ -112,7 +112,6 @@ const RegistrationForm = ({
 
   const isCustomer =
     fishStocking?.stockingCustomer?.id === cookies.get("profileId");
-  console.log(fishStocking?.stockingCustomer, "ce");
 
   const { id } = useParams();
 

@@ -6,7 +6,6 @@ import { useMutation } from "react-query";
 import { useParams } from "react-router";
 
 import styled from "styled-components";
-import Cookies from "universal-cookie";
 import { device } from "../../styles";
 import api from "../../utils/api";
 import {
@@ -27,8 +26,6 @@ import Map from "../other/Map";
 import Modal from "../other/Modal";
 import FishStockingPageTitle from "../other/PageTitle";
 import SignatureRow from "../other/SignatureRow";
-
-const cookies = new Cookies();
 
 export interface FishStockingFactFormProps {
   fishStocking: FishStocking;

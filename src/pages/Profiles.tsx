@@ -4,13 +4,12 @@ import { LoginLayout } from "../components/Layouts/Login";
 import Icon from "../components/other/Icon";
 import Loader from "../components/other/Loader";
 import ProfileItem from "../components/other/ProfileItem";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
+import { useAppSelector } from "../state/hooks";
 import { handleSelectProfile } from "../utils/functions";
 import { useLogoutMutation } from "../utils/hooks";
 import { buttonsTitles, formLabels } from "../utils/texts";
 
 const Profiles = () => {
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state?.user?.userData);
   const [loading, setLoading] = useState(false);
   const { mutateAsync } = useLogoutMutation();

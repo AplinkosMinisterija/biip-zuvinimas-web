@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Props {
   render: (onClick: any) => JSX.Element;
@@ -39,7 +39,7 @@ const PWAInstallerPrompt = ({ render: InstallButton, callback }: Props) => {
         "isInstallFailed"
       )
         ? object.isInstallFailed
-        : false,
+        : false
     };
   };
 
@@ -50,35 +50,46 @@ const PWAInstallerPrompt = ({ render: InstallButton, callback }: Props) => {
     if (callback) {
       callback(installStatus);
     }
-  }, [installStatus]);
+  }, [installStatus, callback]);
 
-  const beforeAppInstallpromptHandler = (e: any) => {
-    e.preventDefault();
-    if (!installStatus.isInstalling) {
-      if (!installStatus.isInstallSuccess) {
-        setInstallEvent(e);
-        if (!installStatus.isInstallAllowed) {
-          setInstallStatus(
-            createStatus({
-              isInstallAllowed: true,
-              isInstallCancelled: installStatus.isInstallCancelled,
-            })
-          );
+  const beforeAppInstallpromptHandler = useCallback(
+    (e: any) => {
+      e.preventDefault();
+      if (!installStatus.isInstalling) {
+        if (!installStatus.isInstallSuccess) {
+          setInstallEvent(e);
+          if (!installStatus.isInstallAllowed) {
+            setInstallStatus(
+              createStatus({
+                isInstallAllowed: true,
+                isInstallCancelled: installStatus.isInstallCancelled
+              })
+            );
+          }
         }
       }
-    }
-  };
+    },
+    [
+      installStatus.isInstallAllowed,
+      installStatus.isInstallCancelled,
+      installStatus.isInstalling,
+      installStatus.isInstallSuccess
+    ]
+  );
 
-  const appInstalledHandler = (e: any) => {
-    if (!installStatus.isInstallSuccess) {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        beforeAppInstallpromptHandler
-      );
-      e.preventDefault();
-      setInstallStatus(createStatus({ isInstallSuccess: true }));
-    }
-  };
+  const appInstalledHandler = useCallback(
+    (e: any) => {
+      if (!installStatus.isInstallSuccess) {
+        window.removeEventListener(
+          "beforeinstallprompt",
+          beforeAppInstallpromptHandler
+        );
+        e.preventDefault();
+        setInstallStatus(createStatus({ isInstallSuccess: true }));
+      }
+    },
+    [installStatus.isInstallSuccess, beforeAppInstallpromptHandler]
+  );
 
   useEffect(() => {
     window.addEventListener(
@@ -93,7 +104,7 @@ const PWAInstallerPrompt = ({ render: InstallButton, callback }: Props) => {
       );
       window.removeEventListener("appinstalled", appInstalledHandler);
     };
-  }, []);
+  }, [appInstalledHandler, beforeAppInstallpromptHandler]);
 
   const handleOnInstall = () => {
     setInstallStatus(createStatus({ isInstallWatingConfirm: true }));

@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { intersectionObserverConfig } from "../../../utils/configs";
 import { getFilteredOptions } from "./functions";
@@ -14,7 +14,6 @@ export const useAsyncSelectData = ({
 }: any) => {
   const [input, setInput] = useState("");
   const [showSelect, setShowSelect] = useState(false);
-
   const observerRef = useRef(null);
 
   const fetchData = async (page: number) => {
@@ -41,19 +40,20 @@ export const useAsyncSelectData = ({
     });
 
   useEffect(() => {
+    const currentObserver = observerRef.current;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     }, intersectionObserverConfig);
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (currentObserver) {
+      observer.observe(currentObserver);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (currentObserver) {
+        observer.unobserve(currentObserver);
       }
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);
@@ -114,6 +114,11 @@ export const useSelectData = ({
   const [suggestions, setSuggestions] = useState(options);
   const [loading, setLoading] = useState(false);
 
+  const canClearValue =
+    !disabled &&
+    dependantId &&
+    !options?.some((option: any) => option?.id === value?.id);
+
   const handleBlur = (event: any) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setShowSelect(false);
@@ -121,35 +126,30 @@ export const useSelectData = ({
     }
   };
 
-  const handleSetOptions = async () => {
+  const handleSetOptions = useCallback(async () => {
     if (!refreshOptions) return;
     setLoading(true);
     await refreshOptions(dependantId);
     setLoading(false);
-  };
+  }, [dependantId, refreshOptions]);
 
   useEffect(() => {
     if (!showSelect || !isEmpty(options)) return;
     handleSetOptions();
-  }, [showSelect]);
+  }, [showSelect, handleSetOptions, options]);
 
   useEffect(() => {
     if (typeof dependantId === "undefined") return;
     handleSetOptions();
-  }, [dependantId]);
+  }, [dependantId, handleSetOptions]);
 
   useEffect(() => {
-    const canClearValue =
-      !disabled &&
-      dependantId &&
-      !options?.some((option: any) => option?.id === value?.id);
-
     if (canClearValue) {
       onChange(null);
     }
 
     setSuggestions(options);
-  }, [options]);
+  }, [options, canClearValue, onChange]);
 
   const handleClick = (option: any) => {
     setShowSelect(false);

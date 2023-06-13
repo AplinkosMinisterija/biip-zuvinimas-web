@@ -1,5 +1,5 @@
 import { isEqual } from "lodash";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import {
   Location,
@@ -61,11 +61,19 @@ function App() {
     }
   });
 
+  const updateTokensMutationMutateAsyncFunction =
+    updateTokensMutation.mutateAsync;
+
+  const shouldUpdateTokens = useCallback(async () => {
+    if (!cookies.get("token") && cookies.get("refreshToken")) {
+      await updateTokensMutationMutateAsyncFunction();
+    }
+  }, [updateTokensMutationMutateAsyncFunction]);
+
   const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
     useEGatesSign();
 
-  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } =
-    useCheckAuthMutation();
+  const { mutateAsync: checkAuthMutation } = useCheckAuthMutation();
 
   const eGatesLoginMutation = useMutation(
     (ticket: string) => api.eGatesLogin({ ticket }),
@@ -88,19 +96,13 @@ function App() {
       updateTokensMutation.isLoading
     ].some((loading) => loading);
 
-  const shouldUpdateTokens = async () => {
-    if (!cookies.get("token") && cookies.get("refreshToken")) {
-      await updateTokensMutation.mutateAsync();
-    }
-  };
-
   useEffect(() => {
     (async () => {
       await shouldUpdateTokens();
       checkAuthMutation();
       setInitialLoading(false);
     })();
-  }, [location.pathname]);
+  }, [location.pathname, checkAuthMutation, shouldUpdateTokens]);
 
   useEffect(() => {
     (async () => {
@@ -113,14 +115,14 @@ function App() {
         eGatesMutation();
       }
     })();
-  }, [ticket, eGates]);
+  }, [ticket, eGates, eGatesMutation, eGatesLoginMutation, loggedIn]);
 
   useEffect(() => {
     if (isInvalidProfile) {
       cookies.remove("profileId", { path: "/" });
       navigate("");
     }
-  }, [profileId, loggedIn]);
+  }, [profileId, loggedIn, isInvalidProfile, navigate]);
 
   if (isLoading) {
     return <LoaderComponent />;
@@ -191,7 +193,7 @@ const ProtectedRoute = ({ loggedIn, profileId, location }: RouteProps) => {
     return <Navigate to={slugs.login} replace />;
   }
 
-  if (location?.pathname == slugs.profiles && !!profileId) {
+  if (location?.pathname === slugs.profiles && !!profileId) {
     return <Navigate to={slugs.fishStockings} replace />;
   }
 

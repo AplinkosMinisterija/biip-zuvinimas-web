@@ -6,7 +6,7 @@ import Button from "../buttons/Button";
 import Icon from "./Icon";
 import FishStockingStatusIcon from "./StatusIcon";
 
-interface FishStockingPageTitle {
+interface FishStockingPageTitleProps {
   status?: FishStockingStatus;
 }
 
@@ -21,7 +21,7 @@ const titles = {
 
 const FishStockingPageTitle = ({
   status = FishStockingStatus.UPCOMING
-}: FishStockingPageTitle) => {
+}: FishStockingPageTitleProps) => {
   const navigate = useNavigate();
   return (
     <Heading>

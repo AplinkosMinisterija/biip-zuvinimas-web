@@ -21,13 +21,11 @@ const FishStockingPage = () => {
     ["fishStocking", id],
     () => getStocking(),
     {
-      enabled: !repeat && !isNew(id),
       onError: () => {
         navigate(slugs.fishStockings);
       }
     }
   );
-
   const getStocking = async () => {
     if (isNew(id) && repeat) {
       return await api.getFishStocking(repeat!);

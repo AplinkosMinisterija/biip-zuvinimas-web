@@ -1,7 +1,7 @@
 import { map } from "lodash";
 import { useState } from "react";
 import styled from "styled-components";
-import { useAppDispatch, useAppSelector } from "../../state/hooks";
+import { useAppSelector } from "../../state/hooks";
 import { handleSelectProfile } from "../../utils/functions";
 import { useGetCurrentProfile, useLogoutMutation } from "../../utils/hooks";
 import { buttonsTitles } from "../../utils/texts";
@@ -12,7 +12,6 @@ import Icon from "./Icon";
 const UserSwitchMenu = () => {
   const user = useAppSelector((state) => state.user?.userData);
   const currentProfile = useGetCurrentProfile();
-  const dispatch = useAppDispatch();
   const [showSelect, setShowSelect] = useState(false);
 
   const handleBlur = (event: any) => {

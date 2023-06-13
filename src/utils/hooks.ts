@@ -88,7 +88,7 @@ export const useCurrentLocation = () => {
 };
 
 export const useSettings = () => {
-  const { data, isLoading } = useQuery("location", () => api.getSettings(), {
+  const { data, isLoading } = useQuery("setting", () => api.getSettings(), {
     onError: () => {
       handleAlert();
     }
@@ -120,7 +120,9 @@ export const useFishAges = () => {
 export const useGetCurrentProfile = () => {
   const profiles = useAppSelector((state) => state.user.userData.profiles);
   const profileId = cookies.get("profileId");
-  const currentProfile = profiles?.find((profile) => profile.id == profileId);
+  const currentProfile = profiles?.find(
+    (profile) => profile.id.toString() === profileId?.toString()
+  );
   return currentProfile;
 };
 

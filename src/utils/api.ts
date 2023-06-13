@@ -91,7 +91,6 @@ class Api {
 
           if (!isNaN(profileId)) config.headers!["X-Profile"] = profileId;
         }
-        config.url = config.url;
 
         return config;
       },
@@ -482,4 +481,6 @@ class Api {
     });
 }
 
-export default new Api();
+const api = new Api();
+
+export default api;

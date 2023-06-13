@@ -11,7 +11,6 @@ import { buttonsTitles } from "../../utils/texts";
 import { FishStocking } from "../../utils/types";
 import Button from "../buttons/Button";
 import PhotoUploadField from "../fields/PhotoUploadField";
-import Icon from "../other/Icon";
 import FishStockingInfo from "../other/Info";
 import InfoColumn from "../other/InfoColumn";
 import Map from "../other/Map";
@@ -248,80 +247,10 @@ const Row = styled.div`
   }
 `;
 
-const StyledImgRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 4px;
-`;
-
-const StyledImgContainer = styled.div`
-  margin: 16px 0px;
-`;
-
-const StyledImg = styled.img`
-  width: 80px;
-  height: 80px;
-  border-radius: 5px;
-  margin: 0px 8px 0px 0px;
-  cursor: pointer;
-`;
-
 const SignedContainer = styled.div`
   display: flex;
   margin: 40px 0px;
   flex-direction: column;
-`;
-
-const SignedBy = styled.div`
-  font: normal normal 600 1.6rem/22px Manrope;
-  margin-right: 21px;
-  color: #121a55;
-`;
-
-const StyledSignature = styled.img`
-  height: 63px;
-`;
-
-const Modal = styled.div`
-  display: flex;
-  position: fixed;
-  z-index: 401;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.52);
-  justify-content: center;
-  align-items: center;
-`;
-
-const ImageContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin: auto;
-  justify-content: center;
-`;
-
-const ImagePreview = styled.img`
-  max-width: 767px;
-  max-height: 80%;
-  border-radius: 6px;
-  box-shadow: 0px 18px 41px #121a5529;
-  margin-left: 24px;
-  @media ${device.mobileL} {
-    max-width: 80%;
-  }
-`;
-
-const IconContainer = styled.div`
-  cursor: pointer;
-  height: fit-content;
-  width: 24px;
-`;
-const StyledIcon = styled(Icon)`
-  color: #ffffff;
-  font-size: 2.4rem;
 `;
 
 export default FishStockingCompleted;

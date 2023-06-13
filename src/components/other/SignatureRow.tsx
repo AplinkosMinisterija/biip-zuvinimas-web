@@ -28,7 +28,7 @@ const SignatureRow = ({
   signatures,
   disabled,
   errors,
-  municipalityId,
+  municipalityId
 }: SignatureRowProps) => {
   const signatureUsers: { id: string; name: string; users: string[] }[] =
     useSignatureUsers(municipalityId);
@@ -129,7 +129,7 @@ const SignatureRow = ({
                 arrayHelpers.push({
                   organization: "",
                   signedBy: "",
-                  signature: "",
+                  signature: ""
                 });
               }}
             >
@@ -141,11 +141,6 @@ const SignatureRow = ({
     />
   );
 };
-
-const SubRow = styled.div`
-  min-width: 200px;
-  display: flex;
-`;
 
 const Row = styled.div`
   display: grid;
@@ -177,11 +172,6 @@ const DeleteIcon = styled(Icon)`
   @media ${device.mobileL} {
     margin: 8px 0 16px 0;
   }
-`;
-const InputInnerLabel = styled.div`
-  margin: auto 8px;
-  font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.primary + "8F"};
 `;
 
 export default SignatureRow;

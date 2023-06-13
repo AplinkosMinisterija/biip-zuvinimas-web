@@ -20,7 +20,7 @@ const DefaultLayout = ({
       <Container>
         <PWAInstallerPrompt
           render={({ onClick }) => <InstallButton onClick={onClick} />}
-          callback={(data) => console.log(data)}
+          callback={(data) => {}}
         />
         <NavBar />
         <Content onScroll={onScroll} maxWidth={maxWidth}>

@@ -93,19 +93,20 @@ const NariaiPage = () => {
   const observerRef = useRef(null);
 
   useEffect(() => {
+    const currentObserver = observerRef.current;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     }, intersectionObserverConfig);
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (currentObserver) {
+      observer.observe(currentObserver);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (currentObserver) {
+        observer.unobserve(currentObserver);
       }
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);

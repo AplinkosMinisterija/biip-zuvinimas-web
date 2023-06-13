@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { device } from "../../styles";
 import { FishStocking, Tenant, User } from "../../utils/types";
-import Button from "../buttons/Button";
 import Icon from "../other/Icon";
 import AdditionalInfo from "./AdditionalInfo";
 
@@ -34,38 +33,35 @@ const FishStockingInfo = ({
           {fishStocking?.location?.name ||
             tenant?.name ||
             `${user?.firstName} ${user?.lastName}`}
-          {/* {`${user?.tenantUnit || ""}`.trim().length > 0 && (
-            <TenantUnit>{user.tenantUnit}</TenantUnit>
-          )} */}
         </Location>
       </HeaderRow>
       <InfoPeaceRow>
         {info?.map((items, index) => {
-          if (index < 3) {
-            return (
-              <InfoPeacePair
-                user={!!user}
-                tenant={!!tenant}
-                key={`fish_stocking_info_${index}`}
-              >
-                {items?.map((item, index) => {
-                  if (!item) return;
+          if (index >= 3) return <></>;
 
-                  return (
-                    <InfoConainer key={index}>
-                      <InfoPaceContainer user={!!user} tenant={!!tenant}>
-                        <StyledIcon name={item?.type!} />
-                        <InfoPeaceColumn>
-                          <Label>{item?.label}</Label>
-                          <InfoPeaceLabel>{item?.value}</InfoPeaceLabel>
-                        </InfoPeaceColumn>
-                      </InfoPaceContainer>
-                    </InfoConainer>
-                  );
-                })}
-              </InfoPeacePair>
-            );
-          }
+          return (
+            <InfoPeacePair
+              user={!!user}
+              tenant={!!tenant}
+              key={`fish_stocking_info_${index}`}
+            >
+              {items?.map((item, index) => {
+                if (!item) return <></>;
+
+                return (
+                  <InfoConainer key={index}>
+                    <InfoPaceContainer user={!!user} tenant={!!tenant}>
+                      <StyledIcon name={item?.type!} />
+                      <InfoPeaceColumn>
+                        <Label>{item?.label}</Label>
+                        <InfoPeaceLabel>{item?.value}</InfoPeaceLabel>
+                      </InfoPeaceColumn>
+                    </InfoPaceContainer>
+                  </InfoConainer>
+                );
+              })}
+            </InfoPeacePair>
+          );
         })}
       </InfoPeaceRow>
       {additionalInfo ? <AdditionalInfo fishStocking={fishStocking!} /> : null}
@@ -96,22 +92,11 @@ const Container = styled.div`
   background-repeat: no-repeat;
 `;
 
-const StyledButton = styled(Button)`
-  min-width: 155px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 const InfoConainer = styled.div`
   position: relative;
   top: 0;
 `;
 
-const TenantUnit = styled.div`
-  font-size: 1.6rem;
-`;
 const HeaderRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -178,15 +163,6 @@ const InfoPeaceColumn = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   width: 100%;
-`;
-
-const BackButton = styled(Icon)`
-  color: white;
-  font-size: 2.3rem;
-`;
-
-const BackButtonContainer = styled.div`
-  cursor: pointer;
 `;
 
 const InfoPeaceLabel = styled.span`

@@ -5,7 +5,7 @@ import Compress from "react-image-file-resizer";
 import { toast } from "react-toastify";
 import Cookies from "universal-cookie";
 import { FilterConfig } from "../components/other/DynamicFilter/Filter";
-import { actions, UserReducerProps } from "../state/user/reducer";
+import { UserReducerProps } from "../state/user/reducer";
 import api from "./api";
 import { FishStockingStatus } from "./constants";
 import { fishStockingStatusLabels, validationTexts } from "./texts";
@@ -46,7 +46,7 @@ export const validateFileTypes = (
 ) => {
   for (let i = 0; i < files.length; i++) {
     const availableType = availableMimeTypes.find(
-      (type) => type == files[i].type
+      (type) => type === files[i].type
     );
     if (!availableType) return false;
   }
@@ -123,7 +123,7 @@ export const handleGetCurrentUser = async () => {
 };
 
 export const handleSelectProfile = (profileId: ProfileId) => {
-  if (cookies.get("profileId") == profileId) return;
+  if (cookies.get("profileId")?.toString() === profileId?.toString()) return;
 
   cookies.set("profileId", `${profileId}`, { path: "/" });
 
@@ -146,7 +146,9 @@ export const handleSetProfile = (profiles?: Profile[]) => {
   }
 
   if (profileId) {
-    const hasProfile = profiles?.some((profile) => profile.id == profileId);
+    const hasProfile = profiles?.some(
+      (profile) => profile.id.toString() === profileId.toString()
+    );
 
     if (hasProfile) {
       handleSelectProfile(profileId);
