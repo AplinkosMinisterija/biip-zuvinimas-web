@@ -64,7 +64,6 @@ const AsyncMultiSelect = ({
 }: SelectFieldProps) => {
   const {
     loading,
-    handleScroll,
     suggestions,
     handleInputChange,
     handleToggleSelect,
@@ -104,7 +103,6 @@ const AsyncMultiSelect = ({
         loading={loading}
         showSelect={showSelect}
         handleClick={handleClick}
-        handleScroll={handleScroll}
       />
     </FieldWrapper>
   );

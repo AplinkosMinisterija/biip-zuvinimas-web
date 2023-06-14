@@ -1,14 +1,18 @@
+import { map } from "lodash";
 import { useState } from "react";
 import styled from "styled-components";
 import { device } from "../../styles";
-import {compressImageSize, handleAlert, validateFileTypes} from "../../utils/functions";
+import {
+  compressImageSize,
+  handleAlert,
+  validateFileTypes
+} from "../../utils/functions";
 import { inputLabels } from "../../utils/texts";
 import { FileProps } from "../../utils/types";
 import Icon from "../other/Icon";
 import Loader from "../other/Loader";
 import Modal from "../other/Modal";
 import PhotoField from "./PhotoField";
-import {map} from "lodash";
 
 export interface PhotoUploadFieldProps {
   name: string;
@@ -50,9 +54,9 @@ const PhotoUploadField = ({
         const compressedObj = await compressImageSize(file);
 
         return new File([compressedObj] as BlobPart[], file.name, {
-          type: file.type,
+          type: file.type
         });
-      })
+      });
       const compressedFiles = await Promise.all(promises);
       setLoading(true);
       await onUpload(compressedFiles);
@@ -80,7 +84,7 @@ const PhotoUploadField = ({
   return (
     <Container>
       {photos.map((photo: File | FileProps | any, index: number) => {
-        if (!photo) return;
+        if (!photo) return <></>;
 
         return (
           <div key={`photoUploadField-${index}`}>

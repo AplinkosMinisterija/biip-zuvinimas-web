@@ -1,10 +1,11 @@
 import { useMediaQuery } from "@material-ui/core";
 import { isEmpty } from "lodash";
 import { useCallback, useEffect, useState } from "react";
+import { useMutation } from "react-query";
 import styled from "styled-components";
 import { device } from "../../styles";
 import api from "../../utils/api";
-import { handleResponse } from "../../utils/functions";
+import { handleAlert } from "../../utils/functions";
 import { buttonsTitles, Url } from "../../utils/texts";
 import Button from "../buttons/Button";
 import Icon from "./Icon";
@@ -26,14 +27,10 @@ const Map = ({
   onSave,
   onClose,
   value,
-  queryString = "",
   display,
   iframeRef
 }: MapProps) => {
   const [showModal, setShowModal] = useState(false);
-
-  const [locations, setLocations] = useState<any[]>([]);
-  const [popUploading, setPopUpLoading] = useState(false);
   const [geom, setGeom] = useState<any[]>();
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery(device.mobileL);
@@ -49,36 +46,45 @@ const Map = ({
     );
   };
 
-  const handleGetLocations = async (location: any) => {
-    setGeom(location);
-    setPopUpLoading(true);
-    return await handleResponse({
-      endpoint: () =>
-        api.getLocations({
-          geom: JSON.stringify(location)
-        }),
-      onSuccess: (data) => {
-        setLocations(data);
-        setPopUpLoading(false);
+  const locationMutation = useMutation(
+    (location: any) =>
+      api.getLocations({
+        geom: JSON.stringify(location)
+      }),
+    {
+      onError: () => {
+        handleAlert();
       }
-    });
-  };
+    }
+  );
+  const locationMutationMutateAsync = locationMutation.mutateAsync;
+  const handleGetLocations = useCallback(
+    async (location: any) => {
+      setGeom(location);
+      locationMutationMutateAsync(location);
+    },
+    [locationMutationMutateAsync]
+  );
 
-  const handleSaveGeom = useCallback((event: any) => {
-    if (!event?.data?.mapIframeMsg) return;
 
-    const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
-    if (!userObjects) return;
+  const handleSaveGeom = useCallback(
+    (event: any) => {
+      if (!event?.data?.mapIframeMsg) return;
 
-    if (isEmpty(userObjects.features)) return;
+      const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
+      if (!userObjects) return;
 
-    handleGetLocations(userObjects);
-  }, []);
+      if (isEmpty(userObjects.features)) return;
+
+      handleGetLocations(userObjects);
+    },
+    [handleGetLocations]
+  );
 
   useEffect(() => {
     window.addEventListener("message", handleSaveGeom);
     return () => window.removeEventListener("message", handleSaveGeom);
-  }, []);
+  }, [handleSaveGeom]);
 
   return (
     <>
@@ -107,21 +113,20 @@ const Map = ({
           {geom && (
             <MapModal>
               <ModalContainer>
-                {popUploading ? (
+                {locationMutation.isLoading ? (
                   <LoaderComponent />
                 ) : (
                   <>
                     <IconContainer
                       onClick={() => {
-                        setLocations([]);
                         setGeom(undefined);
                       }}
                     >
                       <StyledIcon name="close" />
                     </IconContainer>
                     <ItemContainer>
-                      {!isEmpty(locations)
-                        ? locations.map((location) => (
+                      {!isEmpty(locationMutation.data)
+                        ? locationMutation?.data?.map((location) => (
                             <Item>
                               <TitleContainer>
                                 <Title>{location?.name}</Title>
@@ -129,7 +134,6 @@ const Map = ({
                               </TitleContainer>
                               <Button
                                 onClick={() => {
-                                  setLocations([]);
                                   setGeom(undefined);
                                   onSave && onSave(geom, location);
                                 }}
@@ -167,12 +171,6 @@ const Container = styled.div<{ display: boolean }>`
   width: 100%;
   height: 100%;
   display: ${({ display }) => (display ? "flex" : "none")};
-`;
-
-const IMG = styled.img`
-  width: 50px;
-  height: 25px;
-  margin-bottom: -5px;
 `;
 
 const IconContainer = styled.div`
@@ -307,15 +305,6 @@ const StyledIconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const InfoCard = styled.div`
-  position: absolute;
-  bottom: 0;
-  padding: 16px;
-  width: 100%;
-  background: #f7d19b;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 `;
 
 export default Map;

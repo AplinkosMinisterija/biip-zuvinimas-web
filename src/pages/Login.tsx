@@ -1,28 +1,28 @@
-import { Formik } from "formik";
-import { useState } from "react";
+import { useFormik } from "formik";
+import { useMutation } from "react-query";
 import styled from "styled-components";
 import Button from "../components/buttons/Button";
 import PasswordField from "../components/fields/PasswordField";
 import TextField from "../components/fields/TextField";
 import { LoginLayout } from "../components/Layouts/Login";
-import { useAppDispatch } from "../state/hooks";
-import { actions } from "../state/user/reducer";
 import api from "../utils/api";
+import { handleAlert, handleUpdateTokens } from "../utils/functions";
+import { useCheckAuthMutation, useEGatesSign } from "../utils/hooks";
 import {
-  handleEGatesSign,
-  handleGetCurrentUser,
-  handleResponse,
-  handleUpdateTokens
-} from "../utils/functions";
-import { buttonLabels, formLabels, inputLabels } from "../utils/texts";
+  buttonLabels,
+  formLabels,
+  inputLabels,
+  validationTexts
+} from "../utils/texts";
 import { loginSchema } from "../utils/validations";
 
-export const Login = () => {
-  const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
-  const [eLoading, setELoading] = useState(false);
+interface LoginProps {
+  email: string;
+  password: string;
+}
 
-  const handleSubmit = async ({
+export const Login = () => {
+  const onSubmit = async ({
     email,
     password
   }: {
@@ -30,89 +30,98 @@ export const Login = () => {
     password: string;
   }) => {
     const params = { email, password };
-    setLoading(true);
-
-    await handleResponse({
-      endpoint: () => api.login(params),
-      onSuccess: handleSuccess
-    });
+    loginMutation.mutateAsync(params);
   };
 
-  const handleSuccess = async (data: any) => {
-    handleUpdateTokens(data);
-    const currentUserData = await handleGetCurrentUser(true);
-    if (currentUserData) {
-      dispatch(actions.setUser(currentUserData));
+  const loginMutation = useMutation((params: LoginProps) => api.login(params), {
+    onError: ({ response }: any) => {
+      const text = validationTexts[response?.data?.type];
+
+      if (text) {
+        return setErrors({ password: text });
+      }
+
+      handleAlert();
+    },
+    onSuccess: (data) => {
+      handleUpdateTokens(data);
+      checkAuthMutation();
     }
-    setLoading(false);
-  };
+  });
 
-  const handleEGateSIgn = async () => {
-    setELoading(true);
-    await handleEGatesSign();
-    setELoading(false);
+  const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
+    useEGatesSign();
+
+  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } =
+    useCheckAuthMutation();
+
+  const loading = [loginMutation.isLoading, checkAuthLoading].some(
+    (loading) => loading
+  );
+
+  const { values, errors, setFieldValue, handleSubmit, setErrors } = useFormik({
+    initialValues: {
+      email: "",
+      password: ""
+    },
+    validateOnChange: false,
+    validationSchema: loginSchema,
+    onSubmit
+  });
+
+  const handleType = (field: string, value: string) => {
+    setFieldValue(field, value);
+    setErrors({});
   };
 
   return (
     <LoginLayout>
-      <Formik
-        validationSchema={loginSchema}
-        initialValues={{ email: "", password: "" }}
-        validateOnChange={false}
+      <FormContainer
         onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSubmit();
+          }
+        }}
       >
-        {({ values, errors, setFieldValue, handleSubmit }) => (
-          <FormContainer
-            onSubmit={handleSubmit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSubmit();
-              }
-            }}
-          >
-            <H1>{formLabels.login}</H1>
-            {
-              //process.env.NODE_ENV !== "production" && (
-              <InnerContainer>
-                <TextField
-                  label={inputLabels.email}
-                  type="email"
-                  value={values.email}
-                  error={errors.email}
-                  onChange={(e) => setFieldValue("email", e)}
-                />
-                <PasswordField
-                  label={inputLabels.password}
-                  value={values.password}
-                  error={errors.password}
-                  onChange={(e) => setFieldValue("password", e)}
-                />
-                <ButtonContainer>
-                  <StyledButton loading={loading} type="submit">
-                    {buttonLabels.login}
-                  </StyledButton>
-                </ButtonContainer>
-
-                <OrContainer>
-                  <Or>
-                    <Separator />
-                    <SeparatorLabelContainer>
-                      <SeparatorLabel> {buttonLabels.or}</SeparatorLabel>
-                    </SeparatorLabelContainer>
-                  </Or>
-                </OrContainer>
-              </InnerContainer>
-            }
-            <StyledButton
-              loading={eLoading}
-              type="button"
-              onClick={handleEGateSIgn}
-            >
-              {buttonLabels.eLogin}
+        <H1>{formLabels.login}</H1>
+        <InnerContainer>
+          <TextField
+            label={inputLabels.email}
+            type="email"
+            value={values.email}
+            error={errors.email}
+            onChange={(e) => handleType("email", e)}
+          />
+          <PasswordField
+            label={inputLabels.password}
+            value={values.password}
+            error={errors.password}
+            onChange={(e) => handleType("password", e)}
+          />
+          <ButtonContainer>
+            <StyledButton loading={loading} type="submit">
+              {buttonLabels.login}
             </StyledButton>
-          </FormContainer>
-        )}
-      </Formik>
+          </ButtonContainer>
+
+          <OrContainer>
+            <Or>
+              <Separator />
+              <SeparatorLabelContainer>
+                <SeparatorLabel> {buttonLabels.or}</SeparatorLabel>
+              </SeparatorLabelContainer>
+            </Or>
+          </OrContainer>
+        </InnerContainer>
+        <StyledButton
+          loading={eGatesSignLoading}
+          type="button"
+          onClick={() => eGatesMutation()}
+        >
+          {buttonLabels.eLogin}
+        </StyledButton>
+      </FormContainer>
     </LoginLayout>
   );
 };

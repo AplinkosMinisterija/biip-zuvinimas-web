@@ -6,7 +6,7 @@ export enum RolesTypes {
 
 export enum ServerErrors {
   USER_NOT_FOUND = `Email not found.`,
-  WRONG_PASSWORD = "Wrong password.",
+  WRONG_PASSWORD = "WRONG_PASSWORD",
   USER_EXIST = "User already exists.",
   WRONG_OLD_PASSWORD = "Wrong old password.",
   PARAMETERS_VALIDATION_ERROR = "Parameters validation error!",

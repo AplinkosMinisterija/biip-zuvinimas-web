@@ -1,7 +1,6 @@
-import { useMediaQuery } from "@material-ui/core";
 import { ArrayHelpers } from "formik";
 import { differenceWith, filter } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { device } from "../../styles";
 import { default as NumericTextField } from "../fields/NumericTextField";
@@ -15,7 +14,7 @@ export interface FishRow {
   weight: string | number;
 }
 
-export interface FishStickingRegistrationFishRow {
+export interface FishStickingRegistrationFishRowProps {
   fishTypes: { label: string; id: string }[];
   fishAges: { label: string; id: string }[];
   item: FishRow;
@@ -52,10 +51,9 @@ const FishStickingRegistrationFishRow = ({
   errors,
   allFishSelections,
   disabled
-}: FishStickingRegistrationFishRow) => {
-  const isMobile = useMediaQuery(device.mobileL);
+}: FishStickingRegistrationFishRowProps) => {
   const { fishType, fishAge, weight, amount } = item;
-  const getAvailableFishTypes = () => {
+  const getAvailableFishTypes = useCallback(() => {
     if (item?.fishAge?.id) {
       const batchesWithTheSameAge = filter(allFishSelections, (batch) => {
         if (batch?.fishAge?.id === item?.fishAge?.id && batch?.fishType?.id) {
@@ -72,9 +70,9 @@ const FishStickingRegistrationFishRow = ({
       );
     }
     return fishTypes;
-  };
+  }, [fishTypes, allFishSelections, item?.fishAge?.id]);
 
-  const getAvailableFishAges = () => {
+  const getAvailableFishAges = useCallback(() => {
     if (item?.fishType?.id) {
       const batchesWithTheSameAge = filter(allFishSelections, (batch) => {
         if (batch.fishType?.id === item.fishType?.id && batch.fishAge?.value) {
@@ -89,7 +87,7 @@ const FishStickingRegistrationFishRow = ({
       );
     }
     return fishAges;
-  };
+  }, [fishAges, allFishSelections, item.fishType?.id]);
 
   const [availableFishTypes, setAvailableFishTypes] = useState(
     getAvailableFishTypes()
@@ -101,12 +99,19 @@ const FishStickingRegistrationFishRow = ({
   useEffect(() => {
     setAvailableFishTypes(getAvailableFishTypes());
     setAvailableFishAges(getAvailableFishAges());
-  }, []);
+  }, [getAvailableFishAges, getAvailableFishTypes]);
 
   useEffect(() => {
     setAvailableFishTypes(getAvailableFishTypes());
     setAvailableFishAges(getAvailableFishAges());
-  }, [fishType, fishAge, allFishSelections, fishTypes]);
+  }, [
+    fishType,
+    fishAge,
+    allFishSelections,
+    fishTypes,
+    getAvailableFishAges,
+    getAvailableFishTypes
+  ]);
 
   return (
     <Row showDelete={showDelete} key={index}>

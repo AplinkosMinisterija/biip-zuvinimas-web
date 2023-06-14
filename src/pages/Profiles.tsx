@@ -4,14 +4,15 @@ import { LoginLayout } from "../components/Layouts/Login";
 import Icon from "../components/other/Icon";
 import Loader from "../components/other/Loader";
 import ProfileItem from "../components/other/ProfileItem";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
-import { handleLogout, handleSelectProfile } from "../utils/functions";
+import { useAppSelector } from "../state/hooks";
+import { handleSelectProfile } from "../utils/functions";
+import { useLogoutMutation } from "../utils/hooks";
 import { buttonsTitles, formLabels } from "../utils/texts";
 
 const Profiles = () => {
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state?.user?.userData);
   const [loading, setLoading] = useState(false);
+  const { mutateAsync } = useLogoutMutation();
 
   const handleSelect = (profileId: string) => {
     setLoading(true);
@@ -37,7 +38,7 @@ const Profiles = () => {
             />
           </InnerContainer>
         ))}
-        <Row onClick={() => handleLogout(dispatch)}>
+        <Row onClick={() => mutateAsync()}>
           <StyledIcon name="exit" />
           <BackButton> {buttonsTitles.logout}</BackButton>
         </Row>

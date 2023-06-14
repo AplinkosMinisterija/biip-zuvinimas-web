@@ -52,14 +52,7 @@ const LocationInput = ({
             <StyledOptionhIcon name={"map"} />
             <Options>{inputLabels.selectFromMap}</Options>
           </OptionRowContainer>
-          {/* <OptionRowContainer
-            onClick={() => {
-              setShowSelect(false);
-            }}
-          >
-            <StyledOptionhIcon name={"current"} />
-            <Options>{inputLabels.currentLocation}</Options>
-          </OptionRowContainer> */}
+
           {!isEmpty(recentLocations) && (
             <>
               <HistoryTitle>Paskutinės paieškos</HistoryTitle>
@@ -118,78 +111,10 @@ const StyledIcon = styled(Icon)`
   margin-right: 8px;
 `;
 
-const InputContainer = styled.div<{
-  error: boolean;
-  height: number;
-  disabled: boolean;
-}>`
-  display: flex;
-  height: ${({ height }) => (height ? `${height}px` : `40px`)};
-  background-color: white;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid
-    ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
-  opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
-
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "text")};
-  :focus-within {
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 4px ${({ theme }) => `${theme.colors.primary}33`};
-  }
-`;
-
-const TextInput = styled.input<{ readOnly: boolean; selectedValue: boolean }>`
-  border: none;
-  padding: 0 12px;
-  width: 100%;
-  height: 100%;
-
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "text")};
-
-  background-color: white;
-  font-size: 1.6rem;
-  color: ${({ theme }) => theme.colors.label};
-
-  &:focus {
-    outline: none;
-  }
-
-  [type="number"] {
-    -moz-appearance: textfield;
-  }
-  ::-webkit-inner-spin-button,
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-input-placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
-  }
-  ::-moz-placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
-  }
-  ::-ms-placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
-  }
-  ::placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
-  }
-`;
 const StyledOptionhIcon = styled(Icon)`
   margin: 0px 30px;
   font-size: 1.9rem;
   color: #13c9e7;
-`;
-
-const Container = styled.div`
-  display: block;
 `;
 
 const HistoryTitle = styled.div`
@@ -217,90 +142,6 @@ const OptionRowContainer = styled.div`
   &:hover {
     background-color: #f3f3f7;
   }
-`;
-
-const SearchContainer = styled.div<{ disabled: boolean }>`
-  position: relative;
-  width: 100%;
-  opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
-`;
-
-const Input = styled.input`
-  border: none;
-  width: 100%;
-
-  :focus {
-    outline: none;
-  }
-  background-color: ${({ theme }) => theme.colors.input};
-  font-size: 1.6rem;
-  color: ${({ theme }) => theme.colors.label};
-
-  [type="number"] {
-    -moz-appearance: textfield;
-  }
-  ::-webkit-inner-spin-button,
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
-  }
-  ::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
-  }
-  ::-ms-placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
-  }
-  ::placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
-  }
-  :focus {
-    outline: none;
-  }
-`;
-
-const Label = styled.label`
-  text-align: left;
-  font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.label};
-  opacity: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const LabelContainer = styled.div`
-  display: flex;
-  align-items: center;
-  height: 2.4rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const SubLabel = styled.div`
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #0b1f518f;
-  max-width: 130px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 2rem;
-`;
-
-const ErrormMessage = styled.label<{ visible: boolean }>`
-  display: inline-block;
-  width: 100%;
-  color: ${({ theme }) => theme.colors.error};
-  font-size: 1.4rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  visibility: ${({ visible }) => (visible ? "visible" : "hidden")};
 `;
 
 export default LocationInput;

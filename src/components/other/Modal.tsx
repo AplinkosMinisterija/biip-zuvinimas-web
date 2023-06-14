@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { device } from "../../styles";
 interface ModalProps {
@@ -8,21 +8,23 @@ interface ModalProps {
 }
 
 const Modal = ({ visible, children, onClose }: ModalProps) => {
-  const handleCloseOnEscape = (event: any) => {
-    if (event.key === "Escape") {
-      onClose && onClose();
-    }
-  };
+  const handleCloseOnEscape = useCallback(
+    (event: any) => {
+      if (event.key === "Escape") {
+        onClose && onClose();
+      }
+    },
+    [onClose]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleCloseOnEscape);
     return () => window.removeEventListener("keydown", handleCloseOnEscape);
-  }, [visible]);
+  }, [visible, handleCloseOnEscape]);
 
   if (!visible) {
     return <React.Fragment />;
   }
-
   return (
     <ModalContainer
       onClick={(e) => {

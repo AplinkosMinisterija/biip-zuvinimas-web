@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useQuery } from "react-query";
+import { useNavigate, useParams } from "react-router";
 import { useSearchParams } from "react-router-dom";
 import Done from "../components/forms/Done";
 import RegistrationForm from "../components/forms/Registration";
@@ -8,73 +8,38 @@ import DefaultLayout from "../components/Layouts/Default";
 import LoaderComponent from "../components/other/LoaderComponent";
 import api from "../utils/api";
 import { FishStockingStatus } from "../utils/constants";
-import { handleResponse, isNew } from "../utils/functions";
+import { isNew } from "../utils/functions";
 import { slugs } from "../utils/routes";
-import { FishStocking } from "../utils/types";
 
 const FishStockingPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [fishStocking, setFishStocking] = useState<FishStocking>();
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
-  const navigate = useNavigate();
-  const location = useLocation();
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  const getRepeatedStocking = async () => {
-    if (isNew(id!) && repeat) {
-      setLoading(true);
-      await handleResponse({
-        endpoint: () => api.getFishStocking(repeat),
-        onError: () => {
-          navigate(slugs.fishStockings);
-        },
-        onSuccess: (item: FishStocking) => {
-          const { eventTime, ...rest } = item;
-          setFishStocking(rest);
-          setLoading(false);
-        }
-      });
-
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const getStocking = async () => {
-    const isRepeatedStocking = await getRepeatedStocking();
-
-    if (isRepeatedStocking) return;
-
-    if (isNew(id!)) {
-      setFishStocking(undefined);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
-    await handleResponse({
-      endpoint: () => api.getFishStocking(id!),
+  const { data: fishStocking, isLoading } = useQuery(
+    ["fishStocking", id],
+    () => getStocking(),
+    {
       onError: () => {
         navigate(slugs.fishStockings);
-      },
-      onSuccess: (item: FishStocking) => {
-        setFishStocking(item);
-        setLoading(false);
       }
-    });
+    }
+  );
+  const getStocking = async () => {
+    if (isNew(id) && repeat) {
+      return await api.getFishStocking(repeat!);
+    }
+
+    if (isNew(id)) return;
+
+    return api.getFishStocking(id!);
   };
 
-  useEffect(() => {
-    getStocking();
-  }, [location.pathname]);
-
-  if (loading) return <LoaderComponent />;
+  if (isLoading) return <LoaderComponent />;
 
   const renderForm = () => {
-    if (isNew(id!)) {
+    if (isNew(id!) || !fishStocking) {
       return <RegistrationForm fishStocking={fishStocking!} />;
     }
 

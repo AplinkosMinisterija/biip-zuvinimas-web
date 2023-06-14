@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation } from "react-query";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import Cookies from "universal-cookie";
@@ -7,11 +8,10 @@ import { useAppSelector } from "../../state/hooks";
 import { device } from "../../styles";
 import api from "../../utils/api";
 
-import { handleResponse } from "../../utils/functions";
+import { handleAlert } from "../../utils/functions";
 import { useIsFreelancer } from "../../utils/hooks";
 import { slugs } from "../../utils/routes";
 import { Url } from "../../utils/texts";
-import { FishStocking } from "../../utils/types";
 import FishStockingTag from "./FishStockingTag";
 import Icon from "./Icon";
 import LoaderComponent from "./LoaderComponent";
@@ -19,14 +19,13 @@ import FishStockingStatusIcon from "./StatusIcon";
 
 const DisplayMap = () => {
   const cookies = new Cookies();
-  const [currentStocking, setCurrentStocking] = useState<FishStocking>();
   const [loading, setLoading] = useState(true);
   const isFreelancer = useIsFreelancer();
   const iframeRef = useRef<any>(null);
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.user?.userData);
 
-  const src = `${Url.FISH_STOCKING}&${
+  const src = `${Url.FISH_STOCKING}?${
     !isFreelancer ? `tenantId=${cookies.get("profileId")}` : `userId=${user.id}`
   }`;
 
@@ -34,43 +33,46 @@ const DisplayMap = () => {
     setLoading(false);
   };
 
-  const [popUploading, setPopUpLoading] = useState(false);
-  const handleSaveGeom = useCallback(async (event: any) => {
-    const stocking = event?.data?.mapIframeMsg?.click[0];
-    if (!stocking) return;
-
-    setPopUpLoading(true);
-
-    await handleResponse({
-      endpoint: () => api.getFishStocking(stocking.id),
-
-      onSuccess: (item: FishStocking) => {
-        setCurrentStocking(item);
+  const fishStockingMutation = useMutation(
+    (id: string) => api.getFishStocking(id),
+    {
+      onError: () => {
+        handleAlert();
       }
-    });
+    }
+  );
 
-    setPopUpLoading(false);
-  }, []);
+  const currentStocking = fishStockingMutation?.data!;
+  const fishStockingMutationMutateAsync = fishStockingMutation.mutateAsync;
+  const handleSaveGeom = useCallback(
+    async (event: any) => {
+      const stocking = event?.data?.mapIframeMsg?.click[0];
+      if (!stocking?.id) return;
+
+      await fishStockingMutationMutateAsync(stocking.id);
+    },
+    [fishStockingMutationMutateAsync]
+  );
 
   useEffect(() => {
     window.addEventListener("message", handleSaveGeom);
     return () => window.removeEventListener("message", handleSaveGeom);
-  }, []);
+  }, [handleSaveGeom]);
 
   return (
     <>
       {loading ? <LoaderComponent /> : null}
       <MapContainer>
-        {currentStocking && (
+        {fishStockingMutation.data && (
           <MapModal>
             <ModalContainer>
-              {popUploading ? (
+              {fishStockingMutation.isLoading ? (
                 <LoaderComponent />
               ) : (
                 <>
                   <IconContainer
                     onClick={() => {
-                      setCurrentStocking(undefined);
+                      fishStockingMutation.reset();
                     }}
                   >
                     <StyledIcon name="close" />
@@ -169,10 +171,6 @@ const FirstRowFirstColumn = styled.div`
   display: flex;
 `;
 
-const FirstRowSecondColumn = styled.div`
-  display: flex;
-`;
-
 const SecondRow = styled.div`
   display: flex;
   color: #121a55;
@@ -204,12 +202,6 @@ const CalendarIcon = styled(Icon)`
   vertical-align: middle;
   margin-right: 10px;
   font-size: 1.8rem;
-`;
-
-const StyledIoLocationSharp = styled(Icon)`
-  margin: 0px 10px 0px 20px;
-  color: #13c9e7;
-  font-size: 2rem;
 `;
 
 const IconContainer = styled.div`
@@ -293,12 +285,6 @@ const ItemContainer = styled.div`
   flex-direction: column;
   gap: 12px;
   margin-top: 20px;
-`;
-
-const Item = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export default DisplayMap;

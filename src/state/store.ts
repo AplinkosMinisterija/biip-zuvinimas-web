@@ -8,12 +8,12 @@ import { UserReducer } from "./user/reducer";
 const persistConfig = {
   key: "speciesConfig",
   storage,
-  whitelist: ["filters", "user"],
+  whitelist: ["filters", "user"]
 };
 
 const reducers = combineReducers({
   user: UserReducer.reducer,
-  filters: Filters.reducer,
+  filters: Filters.reducer
 });
 
 const persistedReducer = persistReducer(persistConfig, reducers);
@@ -21,13 +21,15 @@ const persistedReducer = persistReducer(persistConfig, reducers);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) => [
-    ...getDefaultMiddleware({ serializableCheck: false }),
-  ],
+    ...getDefaultMiddleware({ serializableCheck: false })
+  ]
 });
 
 let persistor = persistStore(store);
 
-export default { store, persistor };
+const reduxData = { store, persistor };
+
+export default reduxData;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

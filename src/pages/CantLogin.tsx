@@ -5,7 +5,7 @@ import {
   buttonLabels,
   buttonsTitles,
   descriptions,
-  formLabels,
+  formLabels
 } from "../utils/texts";
 
 export const CantLogin = () => {
@@ -62,12 +62,4 @@ const H1 = styled.h1`
 
 const Email = styled.a`
   color: ${({ theme }) => theme.colors.primary};
-`;
-
-const InnerContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 `;

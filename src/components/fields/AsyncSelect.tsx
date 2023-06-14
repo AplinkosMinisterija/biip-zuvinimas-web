@@ -42,7 +42,6 @@ const AsyncSelectField = ({
   showError = true,
   className,
   padding,
-  hasOptionKey = true,
   optionsKey = "rows",
   onChange,
   name,
@@ -55,21 +54,22 @@ const AsyncSelectField = ({
 }: AsyncSelectFieldProps) => {
   const {
     loading,
-    handleScroll,
     suggestions,
     handleInputChange,
     handleToggleSelect,
     input,
     showSelect,
+
     handleBlur,
-    handleClick
+    handleClick,
+    observerRef
   } = useAsyncSelectData({
     setSuggestionsFromApi,
     disabled,
     onChange,
     dependantId,
     optionsKey,
-    hasOptionKey
+    name
   });
   return (
     <FieldWrapper
@@ -94,7 +94,7 @@ const AsyncSelectField = ({
 
       <OptionsContainer
         loading={loading}
-        handleScroll={handleScroll}
+        observerRef={observerRef}
         values={suggestions}
         getOptionLabel={getOptionLabel}
         showSelect={showSelect}

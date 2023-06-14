@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import { useNavigatorOnLine } from "../../utils/hooks";
 
 const NetworkStatusIndicator = () => {

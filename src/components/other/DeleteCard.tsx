@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { device } from "../../styles";
 import Button, { ButtonColors } from "../buttons/Button";
@@ -27,18 +27,21 @@ const DeleteCard = ({
 }: DeleteCardProps) => {
   const cardRef = useRef<any>(null);
 
-  const handleClickOutside = (event: any) => {
-    if (cardRef?.current && !cardRef.current.contains(event.target)) {
-      onSetClose(false);
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: any) => {
+      if (cardRef?.current && !cardRef.current.contains(event.target)) {
+        onSetClose(false);
+      }
+    },
+    [onSetClose]
+  );
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutside, true);
     return () => {
       document.removeEventListener("click", handleClickOutside, true);
     };
-  }, []);
+  }, [handleClickOutside]);
 
   return (
     <Container ref={cardRef}>

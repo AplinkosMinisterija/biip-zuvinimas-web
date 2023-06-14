@@ -7,7 +7,7 @@ export const loginSchema = Yup.object().shape({
   email: Yup.string()
     .required(validationTexts.requireText)
     .email(validationTexts.badEmailFormat),
-  password: Yup.string().required(validationTexts.requireText),
+  password: Yup.string().required(validationTexts.requireText)
 });
 
 export const validateNewTenantUser = Yup.object().shape({
@@ -37,7 +37,7 @@ export const validateNewTenantUser = Yup.object().shape({
     .trim()
     .test("validatePersonalCode", validationTexts.personalCode, (value) => {
       return personalCode.validate(value!).isValid;
-    }),
+    })
 });
 
 export const validateUpdateTenantUser = Yup.object().shape({});
@@ -49,7 +49,7 @@ export const validateMyProfile = Yup.object().shape({
   phone: Yup.string()
     .required(validationTexts.requireText)
     .trim()
-    .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+    .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat)
 });
 
 export const validateFishStocking = Yup.object().shape({
@@ -61,11 +61,9 @@ export const validateFishStocking = Yup.object().shape({
     .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
   batches: Yup.array().of(
     Yup.object().shape({
-      fishType: Yup.object()
-        .required(validationTexts.requiredSelect)
-        .nullable(),
-      fishAge: Yup.object().required(validationTexts.requiredSelect).nullable(),
-      amount: Yup.string().required(validationTexts.requireText),
+      fishType: Yup.object().required(validationTexts.requireSelect).nullable(),
+      fishAge: Yup.object().required(validationTexts.requireSelect).nullable(),
+      amount: Yup.string().required(validationTexts.requireText)
     })
   ),
   fishOriginCompanyName: Yup.string().when(
@@ -81,18 +79,16 @@ export const validateFishStocking = Yup.object().shape({
       fishOrigin?.[0] === FishOriginTypes.CAUGHT
         ? schema.required(validationTexts.requireText)
         : schema
-  ),
+  )
 });
 
 export const validateFreelancerFishStocking = Yup.object().shape({
   location: Yup.object().required(validationTexts.requireText),
   batches: Yup.array().of(
     Yup.object().shape({
-      fishType: Yup.object()
-        .required(validationTexts.requiredSelect)
-        .nullable(),
-      fishAge: Yup.object().required(validationTexts.requiredSelect).nullable(),
-      amount: Yup.string().required(validationTexts.requireText),
+      fishType: Yup.object().required(validationTexts.requireSelect).nullable(),
+      fishAge: Yup.object().required(validationTexts.requireSelect).nullable(),
+      amount: Yup.string().required(validationTexts.requireText)
     })
   ),
   fishOriginCompanyName: Yup.string().when(
@@ -108,7 +104,7 @@ export const validateFreelancerFishStocking = Yup.object().shape({
       fishOrigin?.[0] === FishOriginTypes.CAUGHT
         ? schema.required(validationTexts.requireText)
         : schema
-  ),
+  )
 });
 
 export const validateFishStockingReview = Yup.object().shape({
@@ -118,13 +114,13 @@ export const validateFishStockingReview = Yup.object().shape({
   veterinaryApprovalNo: Yup.string().required(validationTexts.requireText),
   batches: Yup.array().of(
     Yup.object().shape({
-      reviewAmount: Yup.string().required(validationTexts.requireText),
+      reviewAmount: Yup.string().required(validationTexts.requireText)
     })
   ),
   signatures: Yup.array().of(
     Yup.object().shape({
       organization: Yup.string().required(validationTexts.requireText),
-      signedBy: Yup.string().required(validationTexts.requireText),
+      signedBy: Yup.string().required(validationTexts.requireText)
     })
-  ),
+  )
 });

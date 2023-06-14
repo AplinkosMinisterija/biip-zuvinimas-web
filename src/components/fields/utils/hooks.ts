@@ -1,6 +1,7 @@
 import { isEmpty } from "lodash";
-import { useEffect, useState } from "react";
-import { handleResponse } from "../../../utils/functions";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useInfiniteQuery } from "react-query";
+import { intersectionObserverConfig } from "../../../utils/configs";
 import { getFilteredOptions } from "./functions";
 
 export const useAsyncSelectData = ({
@@ -8,15 +9,54 @@ export const useAsyncSelectData = ({
   disabled,
   onChange,
   dependantId,
-  optionsKey,
-  hasOptionKey
+  name,
+  optionsKey
 }: any) => {
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [suggestions, setSuggestions] = useState<any>([]);
-  const [hasMore, setHasMore] = useState(false);
   const [input, setInput] = useState("");
   const [showSelect, setShowSelect] = useState(false);
+  const observerRef = useRef(null);
+
+  const fetchData = async (page: number) => {
+    const data = await setSuggestionsFromApi(input, page, dependantId);
+
+    if (data?.[optionsKey]) {
+      return {
+        data: data?.[optionsKey],
+        page: data.page < data.totalPages ? data.page + 1 : undefined
+      };
+    }
+
+    return {
+      data,
+      page: undefined
+    };
+  };
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
+    useInfiniteQuery([name, input], ({ pageParam }) => fetchData(pageParam), {
+      getNextPageParam: (lastPage) => lastPage.page,
+      enabled: !isEmpty(input),
+      cacheTime: 60000
+    });
+
+  useEffect(() => {
+    const currentObserver = observerRef.current;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, intersectionObserverConfig);
+
+    if (currentObserver) {
+      observer.observe(currentObserver);
+    }
+
+    return () => {
+      if (currentObserver) {
+        observer.unobserve(currentObserver);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);
 
   const handleBlur = (event: any) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -28,80 +68,34 @@ export const useAsyncSelectData = ({
   const handleClick = (option: any) => {
     setShowSelect(false);
     setInput("");
-    setSuggestions([]);
-    setCurrentPage(1);
     onChange(option);
   };
 
-  useEffect(() => {
-    if (isEmpty(suggestions) && showSelect) {
-      handleLoadData("", 1);
-    }
-  }, [showSelect]);
-
-  useEffect(() => {
-    if (!dependantId) return;
-
-    handleLoadData("", 1);
-  }, [dependantId]);
-
-  const handleLoadData = async (
-    input: string,
-    page: number,
-    lazyLoading = false
-  ) => {
-    if (input.length < 2) return setSuggestions([]);
-
-    setLoading(true);
-    handleResponse({
-      endpoint: () => setSuggestionsFromApi(input, page, dependantId),
-      onSuccess: (response: any) => {
-        setCurrentPage(response.page);
-        const data = hasOptionKey ? response?.[optionsKey] : response;
-
-        setSuggestions(lazyLoading ? [...suggestions, data] : data);
-        setHasMore(response?.page < response?.totalPages);
-        setLoading(false);
-      }
-    });
-  };
-
-  const handleScroll = async (e: any) => {
-    const element = e.currentTarget;
-    const isTheBottom =
-      Math.abs(
-        element.scrollHeight - element.clientHeight - element.scrollTop
-      ) < 1;
-
-    if (isTheBottom && hasMore && !loading) {
-      handleLoadData(input, currentPage + 1, true);
-    }
-  };
-
   const handleToggleSelect = () => {
-    !disabled && input.length > 2 && setShowSelect(!showSelect);
+    !disabled && !isEmpty(input) && setShowSelect(!showSelect);
   };
 
   const handleInputChange = (input: string) => {
-    if (input.length > 2) {
-      setShowSelect(true);
-      handleLoadData(input, 1);
-    } else {
-      setShowSelect(false);
-      setSuggestions([]);
-    }
+    setShowSelect(!isEmpty(input));
     setInput(input);
   };
 
+  const suggestions = data
+    ? data.pages
+        .flat()
+        .map((item) => item?.data)
+        .flat()
+    : [];
+
   return {
-    loading,
+    loading: isFetching,
     suggestions,
-    handleScroll,
     input,
     handleInputChange,
     handleToggleSelect,
     showSelect,
     handleBlur,
+    observerRef,
     handleClick
   };
 };
@@ -120,6 +114,11 @@ export const useSelectData = ({
   const [suggestions, setSuggestions] = useState(options);
   const [loading, setLoading] = useState(false);
 
+  const canClearValue =
+    !disabled &&
+    dependantId &&
+    !options?.some((option: any) => option?.id === value?.id);
+
   const handleBlur = (event: any) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setShowSelect(false);
@@ -127,35 +126,30 @@ export const useSelectData = ({
     }
   };
 
-  const handleSetOptions = async () => {
+  const handleSetOptions = useCallback(async () => {
     if (!refreshOptions) return;
     setLoading(true);
     await refreshOptions(dependantId);
     setLoading(false);
-  };
+  }, [dependantId, refreshOptions]);
 
   useEffect(() => {
     if (!showSelect || !isEmpty(options)) return;
     handleSetOptions();
-  }, [showSelect]);
+  }, [showSelect, handleSetOptions, options]);
 
   useEffect(() => {
     if (typeof dependantId === "undefined") return;
     handleSetOptions();
-  }, [dependantId]);
+  }, [dependantId, handleSetOptions]);
 
   useEffect(() => {
-    const canClearValue =
-      !disabled &&
-      dependantId &&
-      !options?.some((option: any) => option?.id === value?.id);
-
     if (canClearValue) {
       onChange(null);
     }
 
     setSuggestions(options);
-  }, [options]);
+  }, [options, canClearValue, onChange]);
 
   const handleClick = (option: any) => {
     setShowSelect(false);
@@ -166,9 +160,7 @@ export const useSelectData = ({
   const handleOnChange = (input: string) => {
     if (!options) return;
 
-    if (input) {
-      setShowSelect(true);
-    }
+    setShowSelect(!!input);
     setInputValue(input);
     setSuggestions(getFilteredOptions(options, input, getOptionLabel));
   };

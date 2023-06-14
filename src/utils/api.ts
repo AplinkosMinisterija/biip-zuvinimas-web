@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance, AxiosResponse } from "axios";
-import { FishStocking, Tenant, User } from "./types";
+import { FishStocking, FishType, Tenant, TenantUser, User } from "./types";
 
 import { isEmpty } from "lodash";
 import Cookies from "universal-cookie";
@@ -91,7 +91,6 @@ class Api {
 
           if (!isNaN(profileId)) config.headers!["X-Profile"] = profileId;
         }
-        config.url = config.url;
 
         return config;
       },
@@ -102,13 +101,8 @@ class Api {
   }
 
   errorWrapper = async (endpoint: () => Promise<AxiosResponse<any, any>>) => {
-    try {
-      const { data } = await endpoint();
-
-      return data;
-    } catch (e: any) {
-      return { error: e.response.data };
-    }
+    const res = await endpoint();
+    return res.data;
   };
 
   getAll = async ({
@@ -125,7 +119,7 @@ class Api {
     scope,
     geom,
     fields,
-    id,
+    id
   }: GetAll) => {
     const config = {
       params: {
@@ -141,8 +135,8 @@ class Api {
         ...(!!geom && { geom }),
         ...(!!query && { query }),
         ...(!!scope && { scope }),
-        ...(!!fields && { fields }),
-      },
+        ...(!!fields && { fields })
+      }
     };
 
     return this.errorWrapper(() =>
@@ -165,7 +159,7 @@ class Api {
     geom,
     fields,
     id,
-    responseType,
+    responseType
   }: GetAll) => {
     const config = {
       params: {
@@ -181,9 +175,9 @@ class Api {
         ...(!!geom && { geom }),
         ...(!!query && { query }),
         ...(!!scope && { scope }),
-        ...(!!fields && { fields }),
+        ...(!!fields && { fields })
       },
-      ...(!!responseType && { responseType }),
+      ...(!!responseType && { responseType })
     };
 
     return this.errorWrapper(() =>
@@ -195,8 +189,8 @@ class Api {
     const config = {
       params: {
         ...(!!populate && { populate }),
-        ...(!!scope && { scope }),
-      },
+        ...(!!scope && { scope })
+      }
     };
 
     return this.errorWrapper(() =>
@@ -206,7 +200,7 @@ class Api {
 
   update = async ({ resource, id, params }: UpdateOne) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.patch(`/api/${resource}${id ? `/${id}` : ""}`, params)
+      this.AuthApiAxios.patch(`/api/${resource}/${id ? `/${id}` : ""}`, params)
     );
   };
 
@@ -240,124 +234,126 @@ class Api {
   refreshToken = async () => {
     return this.authApi({
       resource: Resources.REFRESH_TOKEN,
-      params: { token: cookies.get("refreshToken") },
+      params: { token: cookies.get("refreshToken") }
     });
   };
 
   login = async (params: any) => {
     return this.authApi({
       resource: Resources.LOGIN,
-      params,
+      params
     });
   };
 
   eGatesSign = async () => {
     return this.authApi({
-      resource: Resources.E_GATES_SIGN,
+      resource: Resources.E_GATES_SIGN
     });
   };
 
   eGatesLogin = async (params: any) => {
     return this.authApi({
       resource: Resources.E_GATES_LOGIN,
-      params,
+      params
     });
   };
 
-  tenantUsers = async ({ page }: TableList): Promise<User> =>
+  tenantUsers = async ({
+    page
+  }: TableList): Promise<GetAllResponse<TenantUser>> =>
     await this.get({
       resource: Resources.TENANT_USERS,
       populate: [Resources.USER],
       page,
       pageSize: "12",
-      query: JSON.stringify({ tenant: parseInt(cookies.get("profileId")) }),
+      query: JSON.stringify({ tenant: parseInt(cookies.get("profileId")) })
     });
 
   createTenantUser = async (params: any): Promise<User> => {
     return await this.create({
       resource: Resources.INVITE_USER,
-      params,
+      params
     });
   };
   updateTenantUser = async (params: any, id?: string): Promise<User> => {
     return await this.update({
       resource: Resources.TENANT_USERS,
       params,
-      id,
+      id
     });
   };
 
   deleteTenantUser = async (id: string): Promise<User> =>
     await this.delete({
       resource: Resources.TENANT_USERS,
-      id,
+      id
     });
 
   updateProfile = async (id: string, params: any): Promise<User> =>
     await this.update({
       resource: Resources.USERS,
       params,
-      id,
+      id
     });
 
   updateMyProfile = async (params: any): Promise<User> =>
     await this.update({
       resource: Resources.ME,
-      params,
+      params
     });
 
-  getFishTypes = async (): Promise<User> =>
+  getFishTypes = async (): Promise<GetAllResponse<FishType>> =>
     await this.get({
       resource: Resources.FISH_TYPES,
-      pageSize: "999",
+      pageSize: "999"
     });
 
   getMunicipalities = async (): Promise<any> =>
     await this.get({
       resource: Resources.MUNICIPALITIES,
-      pageSize: "999",
+      pageSize: "999"
     });
 
-  getFishAges = async (): Promise<User> =>
+  getFishAges = async (): Promise<GetAllResponse<any>> =>
     await this.get({
       resource: Resources.FISH_AGES,
-      pageSize: "999",
+      pageSize: "999"
     });
 
   getLocations = async ({
     search = "",
     page,
-    geom,
-  }: TableList): Promise<User> =>
+    geom
+  }: TableList): Promise<any[]> =>
     await this.get({
       resource: Resources.LOCATION,
       search,
       geom,
-      page,
+      page
     });
-  geUsersByTenant = async (): Promise<GetAllResponse<User>> =>
+  geUsersByTenant = async (): Promise<User[]> =>
     await this.getAll({
-      resource: Resources.USERS,
+      resource: Resources.USERS
     });
 
   geSignatureUsers = async (
     municipalityId: string
-  ): Promise<GetAllResponse<User>> =>
+  ): Promise<{ id: string; name: string; users: string[] }[]> =>
     await this.get({
       resource: Resources.SIGNATURE_USERS,
-      municipalityId,
+      municipalityId
     });
 
   getTenants = async ({ filter, page }: TableList): Promise<Tenant> =>
     await this.get({
       resource: Resources.TENANTS,
       filter,
-      page,
+      page
     });
 
   getFishStockings = async ({
     filter,
-    page,
+    page
   }: TableList): Promise<GetAllResponse<FishStocking>> =>
     await this.get({
       resource: Resources.FISH_STOCKING,
@@ -367,11 +363,11 @@ class Api {
         "reviewedBy",
         "assignedTo",
         "status",
-        "location",
+        "location"
       ],
       filter,
       page,
-      pageSize: "12",
+      pageSize: "12"
     });
 
   getFishStocking = async (id: string): Promise<FishStocking> =>
@@ -385,57 +381,58 @@ class Api {
         "status",
         "location",
         "geom",
+        "stockingCustomer",
         "images",
         "fishOriginReservoir",
-        "assignedToInspector",
+        "assignedToInspector"
       ],
-      id,
+      id
     });
 
   registerFishStocking = async (params: any): Promise<FishStocking> =>
     await this.create({
       resource: Resources.FISH_STOCKING_REGISTER,
-      params,
+      params
     });
 
   updateFishStocking = async (params: any, id: string): Promise<FishStocking> =>
     await this.update({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,
-      id,
+      id
     });
 
   deleteFishStocking = async (id: string): Promise<FishStocking> =>
     await this.delete({
       resource: Resources.FISH_STOCKING,
-      id,
+      id
     });
 
   cancelFishStocking = async (id: string): Promise<FishStocking> =>
     await this.update({
       resource: Resources.FISH_STOCKING_CANCEL,
-      id,
+      id
     });
 
   reviewFishStocking = async (params: any): Promise<FishStocking> =>
     await this.create({
       resource: Resources.FISH_STOCKING_REVIEW,
-      params,
+      params
     });
   getSettings = async (): Promise<any> =>
     await this.get({
-      resource: Resources.SETTINGS,
+      resource: Resources.SETTINGS
     });
 
   getRecentLocations = async (): Promise<any> =>
     await this.get({
-      resource: Resources.RECENT_LOCATIONS,
+      resource: Resources.RECENT_LOCATIONS
     });
 
   deletePhoto = async (id: string): Promise<any> =>
     await this.delete({
       resource: Resources.PHOTOS,
-      id,
+      id
     });
 
   uploadFiles = async (
@@ -445,7 +442,7 @@ class Api {
     if (isEmpty(files)) return [];
 
     const config = {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": "multipart/form-data" }
     };
 
     try {
@@ -467,7 +464,7 @@ class Api {
         return {
           id: file.id,
           name: file.name,
-          url: file?.url,
+          url: file?.url
         };
       });
     } catch (e: any) {
@@ -480,8 +477,10 @@ class Api {
       resource: Resources.EXCEL,
       filter,
       pageSize,
-      responseType: "blob",
+      responseType: "blob"
     });
 }
 
-export default new Api();
+const api = new Api();
+
+export default api;

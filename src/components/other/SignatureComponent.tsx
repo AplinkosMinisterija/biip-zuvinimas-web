@@ -187,16 +187,5 @@ const StyledButton = styled(Button)`
   }
   padding: 4px;
 `;
-const CheckBoxLabel = styled.div`
-  font: normal normal medium 1.4rem/19px Manrope;
-  color: #121a55;
-  margin-left: 10px;
-  width: 80%;
-`;
-
-const CheckBoxRow = styled.div`
-  display: flex;
-  margin: 30px auto;
-`;
 
 export default SignatureComponent;

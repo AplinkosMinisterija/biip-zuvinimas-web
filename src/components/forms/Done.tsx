@@ -11,7 +11,6 @@ import { buttonsTitles } from "../../utils/texts";
 import { FishStocking } from "../../utils/types";
 import Button from "../buttons/Button";
 import PhotoUploadField from "../fields/PhotoUploadField";
-import Icon from "../other/Icon";
 import FishStockingInfo from "../other/Info";
 import InfoColumn from "../other/InfoColumn";
 import Map from "../other/Map";
@@ -29,12 +28,11 @@ const locale = {
   vet_no_1: "Vet. patvirtinimo įsakymo nr.",
   waybill_no: "Važtaraščio nr.",
   fish_origin_company: "Žuvivaisos įmonės pavadinimas",
-  fish_origin_reservoir: "Vandens telkinio pavadinimas",
+  fish_origin_reservoir: "Vandens telkinio pavadinimas"
 };
 
 const FishStockingCompleted = ({
-  fishStocking,
-  disabled,
+  fishStocking
 }: FishStockingCompletedProps) => {
   const status = fishStocking?.status;
   const navigate = useNavigate();
@@ -42,7 +40,7 @@ const FishStockingCompleted = ({
 
   const showAdditionalInfo = ![
     FishStockingStatus.NOT_FINISHED,
-    FishStockingStatus.CANCELED,
+    FishStockingStatus.CANCELED
   ].includes(status!);
 
   const fishStocker =
@@ -55,7 +53,7 @@ const FishStockingCompleted = ({
       {
         type: "location",
         value: fishStocking?.location?.municipality?.name,
-        label: "Įžuvinimo vieta",
+        label: "Įžuvinimo vieta"
       },
       {
         type: "date",
@@ -63,26 +61,26 @@ const FishStockingCompleted = ({
           new Date(fishStocking?.reviewTime || fishStocking.eventTime!),
           "yyyy-MM-dd HH:mm"
         ),
-        label: "Data",
+        label: "Data"
       },
       {
         type: "phone",
         value: fishStocking.phone,
-        label: "Telefonas",
-      },
+        label: "Telefonas"
+      }
     ],
     [
       {
         type: "info",
         value: `${fishStocking.location?.name}, ${fishStocking.location?.cadastral_id}`,
-        label: "Telkinys",
+        label: "Telkinys"
       },
       {
         type: "user",
         value: `${fishStocker?.firstName} ${fishStocker?.lastName}`,
-        label: "Atsakingas asmuo",
-      },
-    ],
+        label: "Atsakingas asmuo"
+      }
+    ]
   ];
   if (showAdditionalInfo) {
     info.push([
@@ -91,15 +89,15 @@ const FishStockingCompleted = ({
         value: fishStocking.containerWaterTemp
           ? fishStocking.containerWaterTemp + "\u00b0C"
           : "Nežinoma temperatūra",
-        label: "Vandens temperatūra taroje",
+        label: "Vandens temperatūra taroje"
       },
       {
         type: "water",
         value: fishStocking.waterTemp
           ? fishStocking.waterTemp + "\u00b0C"
           : "Nežinoma temperatūra",
-        label: "Vandens temperatūra telkinyje",
-      },
+        label: "Vandens temperatūra telkinyje"
+      }
     ]);
   }
 
@@ -182,8 +180,8 @@ const FishStockingCompleted = ({
                 navigate({
                   pathname: slugs.newFishStockings,
                   search: createSearchParams({
-                    repeat: fishStocking?.id!.toString(),
-                  }).toString(),
+                    repeat: fishStocking?.id!.toString()
+                  }).toString()
                 });
               }}
             >
@@ -249,80 +247,10 @@ const Row = styled.div`
   }
 `;
 
-const StyledImgRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 4px;
-`;
-
-const StyledImgContainer = styled.div`
-  margin: 16px 0px;
-`;
-
-const StyledImg = styled.img`
-  width: 80px;
-  height: 80px;
-  border-radius: 5px;
-  margin: 0px 8px 0px 0px;
-  cursor: pointer;
-`;
-
 const SignedContainer = styled.div`
   display: flex;
   margin: 40px 0px;
   flex-direction: column;
-`;
-
-const SignedBy = styled.div`
-  font: normal normal 600 1.6rem/22px Manrope;
-  margin-right: 21px;
-  color: #121a55;
-`;
-
-const StyledSignature = styled.img`
-  height: 63px;
-`;
-
-const Modal = styled.div`
-  display: flex;
-  position: fixed;
-  z-index: 401;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.52);
-  justify-content: center;
-  align-items: center;
-`;
-
-const ImageContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin: auto;
-  justify-content: center;
-`;
-
-const ImagePreview = styled.img`
-  max-width: 767px;
-  max-height: 80%;
-  border-radius: 6px;
-  box-shadow: 0px 18px 41px #121a5529;
-  margin-left: 24px;
-  @media ${device.mobileL} {
-    max-width: 80%;
-  }
-`;
-
-const IconContainer = styled.div`
-  cursor: pointer;
-  height: fit-content;
-  width: 24px;
-`;
-const StyledIcon = styled(Icon)`
-  color: #ffffff;
-  font-size: 2.4rem;
 `;
 
 export default FishStockingCompleted;

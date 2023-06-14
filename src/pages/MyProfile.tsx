@@ -1,20 +1,15 @@
 import styled from "styled-components";
 
 import { Form, Formik } from "formik";
-import { isEmpty } from "lodash";
-import { useState } from "react";
+import { useMutation } from "react-query";
 import Button, { ButtonColors } from "../components/buttons/Button";
 import TextField from "../components/fields/TextField";
 import DefaultLayout from "../components/Layouts/Default";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
-import { actions } from "../state/user/reducer";
+import { useAppSelector } from "../state/hooks";
 import { device } from "../styles";
 import api from "../utils/api";
-import {
-  handleGetCurrentUser,
-  handleResponse,
-  handleSuccess
-} from "../utils/functions";
+import { handleAlert, handleSuccess } from "../utils/functions";
+import { useCheckAuthMutation } from "../utils/hooks";
 import {
   buttonsTitles,
   descriptions,
@@ -23,30 +18,33 @@ import {
 } from "../utils/texts";
 import { validateMyProfile } from "../utils/validations";
 
+interface ProfileProps {
+  email?: string;
+  phone?: string;
+}
+
 const MyProfile = () => {
-  const dispatch = useAppDispatch();
-
   const user = useAppSelector((state) => state.user?.userData);
-  const [loading, setLoading] = useState(false);
 
-  const updateMyProfile = async (data: { email?: string; phone?: string }) => {
-    if (isEmpty(data)) return;
-    setLoading(true);
-    await handleResponse({
-      endpoint: () => api.updateMyProfile(data),
-      onSuccess: async () => {
-        const currentUserData = await handleGetCurrentUser();
-        if (currentUserData) {
-          handleSuccess(toasts.profileUpdated);
-          dispatch(actions.setUser(currentUserData));
-        }
-        setLoading(false);
-      },
+  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } =
+    useCheckAuthMutation();
+
+  const profileMutation = useMutation(
+    (data: ProfileProps) => api.updateMyProfile(data),
+    {
       onError: () => {
-        setLoading(false);
+        handleAlert();
+      },
+      onSuccess: () => {
+        checkAuthMutation();
+        handleSuccess(toasts.profileUpdated);
       }
-    });
-  };
+    }
+  );
+
+  const isLoading = [checkAuthLoading, profileMutation.isLoading].some(
+    (loading) => loading
+  );
 
   const initialValues = {
     firstName: user?.firstName,
@@ -62,7 +60,10 @@ const MyProfile = () => {
           enableReinitialize={true}
           initialValues={initialValues}
           onSubmit={(values) =>
-            updateMyProfile({ email: values.email, phone: values.phone })
+            profileMutation.mutateAsync({
+              email: values.email,
+              phone: values.phone
+            })
           }
           validateOnChange={false}
           validationSchema={validateMyProfile}
@@ -122,7 +123,7 @@ const MyProfile = () => {
                     {buttonsTitles.clear}
                   </Button>
                   <Button
-                    loading={loading}
+                    loading={isLoading}
                     variant={ButtonColors.PRIMARY}
                     type="submit"
                   >
