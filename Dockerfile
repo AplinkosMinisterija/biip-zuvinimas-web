@@ -15,6 +15,7 @@ RUN yarn build
 
 # Caddy
 FROM caddy:2.6-alpine
+ENV NODE_ENV=production
 
 COPY ./caddy/Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /app/build /srv
