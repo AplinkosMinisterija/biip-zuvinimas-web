@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { isEqual } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
@@ -200,4 +201,4 @@ const ProtectedRoute = ({ loggedIn, profileId, location }: RouteProps) => {
   return <Outlet />;
 };
 
-export default App;
+export default Sentry.withProfiler(App);
