@@ -70,7 +70,7 @@ function App() {
     }
   }, [updateTokensMutationMutateAsyncFunction]);
 
-  const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
+  const { mutateAsync: eGateSignsMutation, isLoading: eGatesSignLoading } =
     useEGatesSign();
 
   const { mutateAsync: checkAuthMutation } = useCheckAuthMutation();
@@ -115,13 +115,13 @@ function App() {
         eGatesLoginMutationMutateAsync(ticket);
       }
       if (eGates !== undefined) {
-        eGatesMutation();
+        eGateSignsMutation();
       }
     })();
   }, [
     ticket,
     eGates,
-    eGatesMutation,
+    eGateSignsMutation,
     eGatesLoginMutationMutateAsync,
     loggedIn
   ]);
