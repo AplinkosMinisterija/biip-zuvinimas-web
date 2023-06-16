@@ -46,7 +46,8 @@ export const Login = () => {
     onSuccess: (data) => {
       handleUpdateTokens(data);
       checkAuthMutation();
-    }
+    },
+    retry: false
   });
 
   const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
