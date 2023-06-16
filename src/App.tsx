@@ -105,18 +105,26 @@ function App() {
     })();
   }, [location.pathname, checkAuthMutation, shouldUpdateTokens]);
 
+  const eGatesLoginMutationMutateAsync = eGatesLoginMutation.mutateAsync;
+
   useEffect(() => {
     (async () => {
       if (loggedIn) return;
 
       if (ticket) {
-        eGatesLoginMutation.mutateAsync(ticket);
+        eGatesLoginMutationMutateAsync(ticket);
       }
       if (eGates !== undefined) {
         eGatesMutation();
       }
     })();
-  }, [ticket, eGates, eGatesMutation, eGatesLoginMutation, loggedIn]);
+  }, [
+    ticket,
+    eGates,
+    eGatesMutation,
+    eGatesLoginMutationMutateAsync,
+    loggedIn
+  ]);
 
   useEffect(() => {
     if (isInvalidProfile) {
