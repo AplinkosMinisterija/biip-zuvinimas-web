@@ -83,3 +83,9 @@ export enum ServerErrorCodes {
   NOT_FOUND = "404",
   NO_PERMISSION = "401"
 }
+
+export enum Env {
+  PRODUCTION = "production",
+  STAGING = "staging",
+  DEVELOPMENT = "development"
+}

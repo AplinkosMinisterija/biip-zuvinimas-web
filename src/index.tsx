@@ -19,12 +19,12 @@ const { store, persistor } = redux;
 
 const queryClient = new QueryClient();
 
-process.env.NODE_ENV === "production" &&
-  Sentry.init({
-    dsn: process.env.SENTRY_ENV,
-    integrations: [new BrowserTracing()],
-    tracesSampleRate: 0.4
-  });
+Sentry.init({
+  environment: process.env.NODE_ENV,
+  dsn: process.env.SENTRY_ENV,
+  integrations: [new BrowserTracing()],
+  tracesSampleRate: 0.4
+});
 
 root.render(
   <>
