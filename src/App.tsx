@@ -84,7 +84,8 @@ function App() {
       onSuccess: (data) => {
         handleUpdateTokens(data);
         checkAuthMutation();
-      }
+      },
+      retry: false
     }
   );
 
