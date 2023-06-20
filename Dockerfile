@@ -13,11 +13,20 @@ COPY . .
 # Build and cleanup
 RUN yarn build
 
-# NGINX
-FROM nginx:stable-alpine
+# Caddy stage
+FROM caddy:2.6-alpine
+
+# Set default NODE_ENV
 ENV NODE_ENV=production
 
-COPY --from=build /app/build /usr/share/nginx/html
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Expose port
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD wget -qO- http://localhost/ || exit 1
+
+# Copy Caddyfile
+COPY ./caddy/Caddyfile /etc/caddy/Caddyfile
+
+# Copy built files from the build stage
+COPY --from=build /app/build /srv
