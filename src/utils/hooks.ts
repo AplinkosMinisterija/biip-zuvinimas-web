@@ -157,7 +157,8 @@ export const useEGatesSign = () => {
     },
     onSuccess: ({ url }) => {
       window.location.replace(url);
-    }
+    },
+    retry: false
   });
 
   return { isLoading, mutateAsync };

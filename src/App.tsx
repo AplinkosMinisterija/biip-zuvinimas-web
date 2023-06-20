@@ -70,7 +70,7 @@ function App() {
     }
   }, [updateTokensMutationMutateAsyncFunction]);
 
-  const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
+  const { mutateAsync: eGateSignsMutation, isLoading: eGatesSignLoading } =
     useEGatesSign();
 
   const { mutateAsync: checkAuthMutation } = useCheckAuthMutation();
@@ -84,7 +84,8 @@ function App() {
       onSuccess: (data) => {
         handleUpdateTokens(data);
         checkAuthMutation();
-      }
+      },
+      retry: false
     }
   );
 
@@ -104,18 +105,26 @@ function App() {
     })();
   }, [location.pathname, checkAuthMutation, shouldUpdateTokens]);
 
+  const eGatesLoginMutationMutateAsync = eGatesLoginMutation.mutateAsync;
+
   useEffect(() => {
     (async () => {
       if (loggedIn) return;
 
       if (ticket) {
-        eGatesLoginMutation.mutateAsync(ticket);
+        eGatesLoginMutationMutateAsync(ticket);
       }
       if (eGates !== undefined) {
-        eGatesMutation();
+        eGateSignsMutation();
       }
     })();
-  }, [ticket, eGates, eGatesMutation, eGatesLoginMutation, loggedIn]);
+  }, [
+    ticket,
+    eGates,
+    eGateSignsMutation,
+    eGatesLoginMutationMutateAsync,
+    loggedIn
+  ]);
 
   useEffect(() => {
     if (isInvalidProfile) {
