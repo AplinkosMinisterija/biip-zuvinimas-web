@@ -1,5 +1,6 @@
 # BĮIP Žuvinimas WEB
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/AplinkosMinisterija/biip-zuvinimas-web/badge)](https://securityscorecards.dev/viewer/?platform=github.com&org={AplinkosMinisterija}&repo={biip-zuvinimas-web})
 [![License](https://img.shields.io/github/license/AplinkosMinisterija/biip-zuvinimas-web)](https://github.com/AplinkosMinisterija/biip-zuvinimas-web/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/AplinkosMinisterija/biip-zuvinimas-web)](https://github.com/AplinkosMinisterija/biip-zuvinimas-web/issues)
 [![GitHub stars](https://img.shields.io/github/stars/AplinkosMinisterija/biip-zuvinimas-web)](https://github.com/AplinkosMinisterija/biip-zuvinimas-web/stargazers)
@@ -11,8 +12,8 @@ Ministerija.
 
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
-  - [Installation](#installation)
-  - [Usage](#usage)
+    - [Installation](#installation)
+    - [Usage](#usage)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
@@ -22,7 +23,8 @@ Ministerija.
 The BĮIP Žuvinimas WEB is designed to provide information and functionalities related to fish stocking activities. It
 aims to support the management and conservation of fish populations, as well as the sustainability of fishing practices.
 
-This is a client application that utilizes the [BĮIP Žuvinimas API](https://github.com/AplinkosMinisterija/biip-zuvinimas-api).
+This is a client application that utilizes
+the [BĮIP Žuvinimas API](https://github.com/AplinkosMinisterija/biip-zuvinimas-api).
 
 Key features of the WEB include:
 
