@@ -1,5 +1,5 @@
 import { isEqual } from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "react-query";
 import {
   Location,
@@ -45,6 +45,7 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const routes = useFilteredRoutes();
+  const navigateRef = useRef(navigate);
 
   const isInvalidProfile =
     !profiles?.map((profile) => profile?.id?.toString()).includes(profileId) &&
@@ -127,11 +128,14 @@ function App() {
   ]);
 
   useEffect(() => {
-    if (isInvalidProfile) {
-      cookies.remove("profileId", { path: "/" });
-      navigate("");
-    }
-  }, [profileId, loggedIn, isInvalidProfile, navigate]);
+    if (!isInvalidProfile) return;
+
+    cookies.remove("profileId", { path: "/" });
+
+    if (!navigateRef?.current) return;
+
+    navigateRef?.current("");
+  }, [profileId, loggedIn, isInvalidProfile]);
 
   if (isLoading) {
     return <LoaderComponent />;

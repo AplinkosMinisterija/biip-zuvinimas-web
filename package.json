@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "https://dev.internalapi.biip.lt/zuvinimasnew",
+  "proxy": "https://staging.internalapi.biip.lt/zuvinimasnew",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.12.4",
