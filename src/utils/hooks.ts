@@ -184,7 +184,7 @@ export const useFishStockingCallbacks = () => {
 export const useCheckAuthMutation = () => {
   const dispatch = useAppDispatch();
 
-  const checkAuth = useMutation(handleGetCurrentUser, {
+  const { mutateAsync, isLoading } = useMutation(handleGetCurrentUser, {
     onError: ({ response }: any) => {
       if (isEqual(response.status, ServerErrorCodes.NO_PERMISSION)) {
         clearCookies();
@@ -204,7 +204,7 @@ export const useCheckAuthMutation = () => {
     retry: 5
   });
 
-  return { isLoading: checkAuth.isLoading, mutateAsync: checkAuth.mutateAsync };
+  return { isLoading, mutateAsync };
 };
 
 export const useLogoutMutation = () => {
