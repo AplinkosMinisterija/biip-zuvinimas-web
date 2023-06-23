@@ -102,12 +102,13 @@ export const handleUpdateTokens = (data: UpdateTokenProps) => {
   if (token) {
     cookies.set("token", `${token}`, {
       path: "/",
-      expires: new Date(new Date().getTime() + 60 * 60 * 24 * 1000)
+      // expires: new Date(new Date().getTime() + 60 * 60 * 24 * 1000)
+      maxAge: 31536000
     });
   }
 
   if (refreshToken) {
-    cookies.set("refreshToken", `${refreshToken}`, { path: "/" });
+    cookies.set("refreshToken", `${refreshToken}`, { path: "/", maxAge: 31536000 });
   }
 };
 
