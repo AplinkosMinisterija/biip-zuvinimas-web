@@ -102,13 +102,14 @@ export const handleUpdateTokens = (data: UpdateTokenProps) => {
   if (token) {
     cookies.set("token", `${token}`, {
       path: "/",
-      expires: new Date(new Date().getTime() + 60 * 60 * 24 * 1000*30),
+      expires: new Date(new Date().getTime() + 60 * 60 * 24 * 1000),
     });
   }
 
   if (refreshToken) {
     cookies.set("refreshToken", `${refreshToken}`, {
       path: "/",
+      expires: new Date(new Date().getTime() + 60 * 60 * 24 * 1000*30),
     });
   }
 };
