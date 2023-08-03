@@ -131,8 +131,8 @@ export const toasts = {
 
 const mapsHost = process.env.REACT_APP_MAPS_HOST || "https://dev.maps.biip.lt";
 export const Url = {
-  DRAW: `${mapsHost}/zuvinimas/draw?v={{100000/1000}}`,
-  FISH_STOCKING: `${mapsHost}/zuvinimas?v={{100000/1000}}`
+  DRAW: `${mapsHost}/zuvinimas/draw`,
+  FISH_STOCKING: `${mapsHost}/zuvinimas`
 };
 export const queryStrings = {
   draw: "?basemap_selector=true&draw_edit_prop=true&draw_geom=[Point]&draw=true&draw_panel=true&autosave=true"
