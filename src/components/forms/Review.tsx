@@ -109,7 +109,7 @@ const Review = ({
         return {
           id: batch.id,
           reviewAmount: batch.reviewAmount,
-          reviewWeight: batch.reviewAmount
+          reviewWeight: batch.reviewWeight
         };
       })
     };
