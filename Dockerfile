@@ -10,6 +10,17 @@ RUN yarn install --frozen-lockfile
 # Copy source
 COPY . .
 
+# Docker build args and environment variables
+ARG ENVIRONMENT
+ARG VERSION
+ARG REACT_APP_ENVIRONMENT=${ENVIRONMENT}
+ARG REACT_APP_VERSION=${VERSION}
+
+# Set env variables
+ARG REACT_APP_MAPS_HOST=
+ARG REACT_APP_SENTRY_DSN=
+ARG NODE_ENV=production
+
 # Build and cleanup
 RUN yarn build
 
