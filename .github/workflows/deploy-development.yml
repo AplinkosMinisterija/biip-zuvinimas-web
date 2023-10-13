@@ -14,3 +14,8 @@ jobs:
     with:
       environment: Development
       docker-image: ghcr.io/AplinkosMinisterija/biip-zuvinimas-web
+      enable-sentry: true
+      build-args: |
+        NODE_ENV=development
+        REACT_APP_SENTRY_DSN=https://0385edf7f78f4ad4a511abae516ae3e8@sentry.biip.lt/7
+        REACT_APP_MAPS_HOST=https://dev.maps.biip.lt
