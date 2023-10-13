@@ -66,7 +66,6 @@ const Map = ({
     [locationMutationMutateAsync]
   );
 
-
   const handleSaveGeom = useCallback(
     (event: any) => {
       if (!event?.data?.mapIframeMsg) return;
@@ -151,6 +150,7 @@ const Map = ({
           )}
 
           <StyledIframe
+            allow="geolocation *"
             ref={iframeRef}
             src={src}
             width={"100%"}
