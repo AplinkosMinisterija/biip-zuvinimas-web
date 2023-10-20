@@ -39,6 +39,7 @@ import LoaderComponent from "../other/LoaderComponent";
 import Modal from "../other/Modal";
 import FishStockingPageTitle from "../other/PageTitle";
 import Map from "../other/RegistrationMap";
+import {useSearchParams} from "react-router-dom";
 
 const cookies = new Cookies();
 
@@ -80,6 +81,8 @@ const RegistrationForm = ({
   const user = useAppSelector((state) => state?.user?.userData);
   const [showModal, setShowModal] = useState(false);
   const users = useAssignedToUsers();
+  const [searchParams] = useSearchParams();
+  const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
 
   const callBacks = useFishStockingCallbacks();
 
@@ -121,7 +124,9 @@ const RegistrationForm = ({
     fishStocking?.assignedTo || fishStocking?.createdBy || null;
 
   const initialValues: any = {
-    eventTime: null,
+    eventTime: fishStocking?.eventTime && !repeat
+      ? new Date(fishStocking.eventTime)
+      : null,
     fishOriginCompanyName: fishStocking?.fishOriginCompanyName || "",
     assignedTo: fishStocking?.assignedTo || user || undefined,
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,
