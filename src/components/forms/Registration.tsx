@@ -120,10 +120,8 @@ const RegistrationForm = ({
   const assignedTo =
     fishStocking?.assignedTo || fishStocking?.createdBy || null;
 
-  const initialValues: FishStocking = {
-    eventTime: fishStocking?.eventTime
-      ? new Date(fishStocking.eventTime)
-      : new Date(new Date().setDate(new Date().getDate() + minTime + 1)),
+  const initialValues: any = {
+    eventTime: null,
     fishOriginCompanyName: fishStocking?.fishOriginCompanyName || "",
     assignedTo: fishStocking?.assignedTo || user || undefined,
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,

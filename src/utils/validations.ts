@@ -54,7 +54,8 @@ export const validateMyProfile = Yup.object().shape({
 
 export const validateFishStocking = Yup.object().shape({
   location: Yup.object().required(validationTexts.requireText),
-  assignedTo: Yup.object().required(validationTexts.requireText).nullable(),
+    eventTime: Yup.date().required(validationTexts.requireText),
+    assignedTo: Yup.object().required(validationTexts.requireText).nullable(),
   phone: Yup.string()
     .required(validationTexts.requireText)
     .trim()
@@ -84,6 +85,7 @@ export const validateFishStocking = Yup.object().shape({
 
 export const validateFreelancerFishStocking = Yup.object().shape({
   location: Yup.object().required(validationTexts.requireText),
+    eventTime: Yup.date().required(validationTexts.requireText),
   batches: Yup.array().of(
     Yup.object().shape({
       fishType: Yup.object().required(validationTexts.requireSelect).nullable(),
