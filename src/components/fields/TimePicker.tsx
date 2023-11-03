@@ -61,7 +61,7 @@ const TimePicker = ({
     >
       <StyledTextInput
         readOnly={true}
-        showError={false}
+        showError={true}
         label={label}
         padding={padding}
         value={value ? format(new Date(value), "HH:mm") : ""}
