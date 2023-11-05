@@ -266,7 +266,6 @@ class Api {
       populate: [Resources.USER],
       page,
       pageSize: "12",
-      query: JSON.stringify({ tenant: parseInt(cookies.get("profileId")) })
     });
 
   createTenantUser = async (params: any): Promise<User> => {
