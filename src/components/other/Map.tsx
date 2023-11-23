@@ -8,23 +8,30 @@ import Icon from "./Icon";
 import LoaderComponent from "./LoaderComponent";
 
 export interface MapProps {
-  height?: string;
-  onSave?: (geom: any, data: any) => void;
-  onClose?: () => void;
-  error?: string;
-  queryString?: string;
-  value?: string;
+  height: string;
+  value: string;
   display: boolean;
+
 }
 
-const Map = ({ height, onSave, onClose, value, display }: MapProps) => {
+const Map = ({ height, value, display }: MapProps) => {
   const [showModal, setShowModal] = useState(false);
-
   const [loading, setLoading] = useState(true);
   const iframeRef = useRef<any>(null);
   const isMobile = useMediaQuery(device.mobileL);
 
-  const src = `${Url.DRAW}`;
+
+  const getMapUrl = () => {
+    const url = new URL(Url.DRAW);
+    const params = new URLSearchParams(url.search);
+    params.append("preview", "true");
+    url.search = params.toString();
+    return url.href;
+  };
+
+  const src = getMapUrl();
+
+
 
   const handleLoadMap = () => {
     setLoading(false);
@@ -45,10 +52,6 @@ const Map = ({ height, onSave, onClose, value, display }: MapProps) => {
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              if (!!onClose) {
-                return onClose();
-              }
-
               setShowModal(!showModal);
             }}
           >
@@ -63,7 +66,7 @@ const Map = ({ height, onSave, onClose, value, display }: MapProps) => {
             ref={iframeRef}
             src={src}
             width={"100%"}
-            height={showModal ? "100%" : `${height || "230px"}`}
+            height={showModal ? "100%" : `${height}`}
             style={{ border: 0 }}
             allowFullScreen={true}
             onLoad={handleLoadMap}
