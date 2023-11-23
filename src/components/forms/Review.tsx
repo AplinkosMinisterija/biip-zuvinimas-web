@@ -24,7 +24,7 @@ import ApproveFishRow from "../other/ApproveFishRow";
 import DeleteCard from "../other/DeleteCard";
 import Modal from "../other/Modal";
 import FishStockingPageTitle from "../other/PageTitle";
-import Map from "../other/PreviewMap";
+import PreviewMap from "../other/PreviewMap";
 import SignatureRow from "../other/SignatureRow";
 
 export interface FishStockingFactFormProps {
@@ -333,7 +333,7 @@ const Review = ({
                   />
                 </Modal>
               </StyledForm>
-              <Map
+              <PreviewMap
                 display={!isMobile}
                 value={fishStocking.geom}
                 height="100%"

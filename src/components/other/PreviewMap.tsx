@@ -11,7 +11,7 @@ export interface MapProps {
 
 }
 
-const Map = ({ height, value, display }: MapProps) => {
+const PreviewMap = ({ height, value, display }: MapProps) => {
   const [loading, setLoading] = useState(true);
   const iframeRef = useRef<any>(null);
 
@@ -85,4 +85,4 @@ const StyledIframe = styled.iframe<{
 
 
 
-export default Map;
+export default PreviewMap;
