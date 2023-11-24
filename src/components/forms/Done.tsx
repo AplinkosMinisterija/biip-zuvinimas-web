@@ -13,8 +13,8 @@ import Button from "../buttons/Button";
 import PhotoUploadField from "../fields/PhotoUploadField";
 import FishStockingInfo from "../other/Info";
 import InfoColumn from "../other/InfoColumn";
-import Map from "../other/Map";
 import FishStockingPageTitle from "../other/PageTitle";
+import PreviewMap from "../other/PreviewMap";
 import SignatureList from "../other/SignatureList";
 import FishStockingTable from "../other/Table";
 import { fishOrigins } from "./Registration";
@@ -190,7 +190,7 @@ const FishStockingCompleted = ({
           </ButtonRow>
         </FishStockingMobile>
       </Container>
-      <Map display={!isMobile} value={fishStocking.geom} height="100%" />
+      <PreviewMap display={!isMobile} value={fishStocking.geom} height="100%" />
     </InnerContainer>
   );
 };

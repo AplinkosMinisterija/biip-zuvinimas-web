@@ -22,9 +22,9 @@ import TextAreaField from "../fields/TextAreaField";
 import TextField from "../fields/TextField";
 import ApproveFishRow from "../other/ApproveFishRow";
 import DeleteCard from "../other/DeleteCard";
-import Map from "../other/Map";
 import Modal from "../other/Modal";
 import FishStockingPageTitle from "../other/PageTitle";
+import PreviewMap from "../other/PreviewMap";
 import SignatureRow from "../other/SignatureRow";
 
 export interface FishStockingFactFormProps {
@@ -333,7 +333,7 @@ const Review = ({
                   />
                 </Modal>
               </StyledForm>
-              <Map
+              <PreviewMap
                 display={!isMobile}
                 value={fishStocking.geom}
                 height="100%"
