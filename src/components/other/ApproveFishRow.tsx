@@ -66,7 +66,7 @@ const FishStockingApproveFishRow = ({
           name={`batches.${index}.reviewWeight`}
           value={item.reviewWeight}
           onChange={(e) => setFieldValue(`batches.${index}.reviewWeight`, e)}
-          label="Svoris"
+          label="Bendras svoris"
           showError={false}
           wholeNumber={false}
           right={<InputInnerLabel>kg</InputInnerLabel>}

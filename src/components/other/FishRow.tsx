@@ -153,7 +153,7 @@ const FishStickingRegistrationFishRow = ({
         name={`batches.${index}.weight`}
         value={weight}
         onChange={(e) => setFieldValue(`batches.${index}.weight`, e)}
-        label="Svoris"
+        label="Bendras svoris"
         showError={false}
         wholeNumber={false}
         right={<InputInnerLabel>kg</InputInnerLabel>}
