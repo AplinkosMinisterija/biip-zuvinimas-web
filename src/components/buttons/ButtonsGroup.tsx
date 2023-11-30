@@ -61,19 +61,6 @@ const Container = styled.div`
   }
 `;
 
-const LabelContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  align-items: flex-start;
-  padding-bottom: 4px;
-`;
-
-const Label = styled.div`
-  font-size: 1.4rem;
-  color: #231f20;
-`;
-
 const StyledButton = styled.button<{
   left: boolean;
   right: boolean;
@@ -111,13 +98,6 @@ const StyledButton = styled.button<{
   border-bottom-left-radius: ${({ left }) => (left ? "4px" : 0)};
   border-top-right-radius: ${({ right }) => (right ? "4px" : 0)};
   border-bottom-right-radius: ${({ right }) => (right ? "4px" : 0)};
-`;
-
-const ErrorMessage = styled.label`
-  position: relative;
-  color: ${({ theme }) => theme.colors.error};
-  font-size: 1.4rem;
-  margin-left: 8px;
 `;
 
 export default ButtonsGroup;

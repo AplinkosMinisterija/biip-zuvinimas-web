@@ -78,7 +78,7 @@ export const theme: Theme = {
 export const GlobalStyle = createGlobalStyle`
   *{
     box-sizing: border-box;
-    font-family: Atkinson Hyperlegible;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
   }
   html { 
     font-size: 62.5%; 

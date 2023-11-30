@@ -7,7 +7,7 @@ import { Resources } from "./constants";
 const cookies = new Cookies();
 
 interface GetAll {
-  resource: string;
+  resource?: string;
   page?: number;
   populate?: string[];
   municipalityId?: string;
@@ -75,6 +75,7 @@ interface Create {
 
 class Api {
   private AuthApiAxios: AxiosInstance;
+  private readonly proxy: string = "/api";
 
   constructor() {
     this.AuthApiAxios = Axios.create();
@@ -86,9 +87,9 @@ class Api {
         }
         const token = cookies.get("token");
         const profileId = cookies.get("profileId");
+        config.url = this.proxy + config.url;
         if (token) {
           config.headers!.Authorization = "Bearer " + token;
-
           if (!isNaN(profileId)) config.headers!["X-Profile"] = profileId;
         }
 
@@ -105,8 +106,7 @@ class Api {
     return res.data;
   };
 
-  getAll = async ({
-    resource,
+  getCommonConfigs = ({
     page,
     populate,
     sort,
@@ -119,9 +119,9 @@ class Api {
     scope,
     geom,
     fields,
-    id
+    responseType
   }: GetAll) => {
-    const config = {
+    return {
       params: {
         pageSize: pageSize || 10,
         page: page || 1,
@@ -135,53 +135,23 @@ class Api {
         ...(!!geom && { geom }),
         ...(!!query && { query }),
         ...(!!scope && { scope }),
-        ...(!!fields && { fields })
+        ...(!!fields && { fields }),
+        ...(!!responseType && { responseType })
       }
     };
+  };
 
+  getAll = async ({ resource, id, ...rest }: GetAll) => {
+    const config = this.getCommonConfigs(rest);
     return this.errorWrapper(() =>
-      this.AuthApiAxios.get(`/api/${resource}${id ? `/${id}` : ""}/all`, config)
+      this.AuthApiAxios.get(`/${resource}${id ? `/${id}` : ""}/all`, config)
     );
   };
 
-  get = async ({
-    resource,
-    page,
-    populate,
-    sort,
-    filter,
-    pageSize,
-    search,
-    municipalityId,
-    query,
-    searchFields,
-    scope,
-    geom,
-    fields,
-    id,
-    responseType
-  }: GetAll) => {
-    const config = {
-      params: {
-        pageSize: pageSize || 10,
-        page: page || 1,
-        ...(!!populate && { populate }),
-        ...(!!searchFields && { searchFields }),
-        ...(!!search && { search }),
-        ...(!!municipalityId && { municipalityId }),
-        ...(!!geom && { geom }),
-        ...(!!filter && { filter }),
-        ...(!!sort && { sort }),
-        ...(!!geom && { geom }),
-        ...(!!query && { query }),
-        ...(!!scope && { scope }),
-        ...(!!fields && { fields })
-      },
-      ...(!!responseType && { responseType })
-    };
-
+  get = async ({ resource, id, ...rest }: GetAll) => {
+    const config = this.getCommonConfigs(rest);
     return this.errorWrapper(() =>
-      this.AuthApiAxios.get(`/api/${resource}${id ? `/${id}` : ""}`, config)
+      this.AuthApiAxios.get(`/${resource}${id ? `/${id}` : ""}`, config)
     );
   };
 
@@ -194,40 +164,40 @@ class Api {
     };
 
     return this.errorWrapper(() =>
-      this.AuthApiAxios.get(`/api/${resource}${id ? `/${id}` : ""}`, config)
+      this.AuthApiAxios.get(`/${resource}${id ? `/${id}` : ""}`, config)
     );
   };
 
   update = async ({ resource, id, params }: UpdateOne) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.patch(`/api/${resource}/${id ? `/${id}` : ""}`, params)
+      this.AuthApiAxios.patch(`/${resource}/${id ? `/${id}` : ""}`, params)
     );
   };
 
   delete = async ({ resource, id }: Delete) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.delete(`/api/${resource}/${id}`)
+      this.AuthApiAxios.delete(`/${resource}/${id}`)
     );
   };
   create = async ({ resource, id, params }: Create) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.post(`/api/${resource}${id ? `/${id}` : ""}`, params)
+      this.AuthApiAxios.post(`/${resource}${id ? `/${id}` : ""}`, params)
     );
   };
 
   checkAuth = async (): Promise<User> => {
-    return this.errorWrapper(() => this.AuthApiAxios.get("/api/auth/me"));
+    return this.errorWrapper(() => this.AuthApiAxios.get("/auth/me"));
   };
 
   logout = async () => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.post("/api/auth/users/logout")
+      this.AuthApiAxios.post("/auth/users/logout")
     );
   };
 
   authApi = async ({ resource, params }: AuthApiProps) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.post(`/api/${resource}`, params || {})
+      this.AuthApiAxios.post(`/${resource}`, params || {})
     );
   };
 
@@ -265,7 +235,7 @@ class Api {
       resource: Resources.TENANT_USERS,
       populate: [Resources.USER],
       page,
-      pageSize: "12",
+      pageSize: "12"
     });
 
   createTenantUser = async (params: any): Promise<User> => {
@@ -451,7 +421,7 @@ class Api {
           formData.append("fishStocking", fishStockingId);
           formData.append("file", file);
           const { data } = await this.AuthApiAxios.post(
-            `/api/${Resources.PHOTOS}`,
+            `/${Resources.PHOTOS}`,
             formData,
             config
           );

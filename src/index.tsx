@@ -23,12 +23,12 @@ const root = ReactDOM.createRoot(
 );
 const { store, persistor } = redux;
 const queryClient = new QueryClient();
-const env = process.env;
+const env = import.meta.env;
 
-if (env.REACT_APP_SENTRY_DSN) {
+if (env.VITE_SENTRY_DSN) {
   Sentry.init({
-    environment: env.REACT_APP_ENVIRONMENT,
-    dsn: env.REACT_APP_SENTRY_DSN,
+    environment: env.VITE_ENVIRONMENT,
+    dsn: env.VITE_SENTRY_DSN,
     integrations: [
       new Sentry.BrowserTracing({
         routingInstrumentation: Sentry.reactRouterV6Instrumentation(
@@ -41,8 +41,8 @@ if (env.REACT_APP_SENTRY_DSN) {
       })
     ],
     tracesSampleRate: 1,
-    release: env.REACT_APP_VERSION,
-    tracePropagationTargets: [env.REACT_APP_MAPS_HOST!]
+    release: env.VITE_VERSION,
+    tracePropagationTargets: [env.VITE_MAPS_HOST!]
   });
 }
 
