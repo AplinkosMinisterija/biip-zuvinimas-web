@@ -46,6 +46,7 @@
     "vite-plugin-pwa": "^0.17.2",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^0.34.6",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.5.4",
     "workbox-broadcast-update": "^6.5.4",
@@ -62,6 +63,7 @@
     "yup": "^1.0.2"
   },
   "scripts": {
+    "test": "vitest",
     "start": "vite --port 8080",
     "build": "tsc && vite build",
     "serve": "vite preview",
