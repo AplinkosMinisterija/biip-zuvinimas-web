@@ -1,14 +1,14 @@
-import { FieldArray } from "formik";
-import { find } from "lodash";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { useSignatureUsers } from "../../utils/hooks";
-import { buttonsTitles } from "../../utils/texts";
-import SimpleButton from "../buttons/SimpleButton";
-import NumericTextField from "../fields/NumericTextField";
-import SuggestionsSelect from "../fields/SuggestionsSelect";
-import Icon from "../other/Icon";
-import SignatureField from "./Signature";
+import { FieldArray } from 'formik';
+import { find } from 'lodash';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { useSignatureUsers } from '../../utils/hooks';
+import { buttonsTitles } from '../../utils/texts';
+import SimpleButton from '../buttons/SimpleButton';
+import NumericTextField from '../fields/NumericTextField';
+import SuggestionsSelect from '../fields/SuggestionsSelect';
+import Icon from '../other/Icon';
+import SignatureField from './Signature';
 
 export interface SignatureRowProps {
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
@@ -20,7 +20,7 @@ export interface SignatureRowProps {
     phone?: string;
     signedBy?: any;
   }[];
-  municipalityId: string;
+  municipalityId?: string;
 }
 
 const SignatureRow = ({
@@ -28,7 +28,7 @@ const SignatureRow = ({
   signatures,
   disabled,
   errors,
-  municipalityId
+  municipalityId,
 }: SignatureRowProps) => {
   const signatureUsers: { id: string; name: string; users: string[] }[] =
     useSignatureUsers(municipalityId);
@@ -46,7 +46,7 @@ const SignatureRow = ({
             });
             const users = signatureUser?.users || [];
 
-            const organization = signatureUser?.name || "";
+            const organization = signatureUser?.name || '';
 
             return (
               <Row key={index}>
@@ -64,10 +64,7 @@ const SignatureRow = ({
                   value={organization}
                   error={error?.organization}
                   onSelect={(value) => {
-                    setFieldValue(
-                      `signatures.${index}.organization`,
-                      value?.id
-                    );
+                    setFieldValue(`signatures.${index}.organization`, value?.id);
                   }}
                   onChange={(value) => {
                     setFieldValue(`signatures.${index}.organization`, value);
@@ -84,10 +81,7 @@ const SignatureRow = ({
                   getOptionLabel={(option) => option.fullName}
                   options={users}
                   onSelect={(value) => {
-                    setFieldValue(
-                      `signatures.${index}.signedBy`,
-                      value?.fullName
-                    );
+                    setFieldValue(`signatures.${index}.signedBy`, value?.fullName);
                   }}
                   onChange={(value) => {
                     setFieldValue(`signatures.${index}.signedBy`, value);
@@ -115,10 +109,8 @@ const SignatureRow = ({
                     setFieldValue(`signatures.${index}.signature`, e);
                   }}
                 />
-                <DeleteButton
-                  onClick={() => arrayHelpers.remove(Number(index))}
-                >
-                  <DeleteIcon name={"delete"} />
+                <DeleteButton onClick={() => arrayHelpers.remove(Number(index))}>
+                  <DeleteIcon name={'delete'} />
                 </DeleteButton>
               </Row>
             );
@@ -127,9 +119,9 @@ const SignatureRow = ({
             <SimpleButton
               onClick={() => {
                 arrayHelpers.push({
-                  organization: "",
-                  signedBy: "",
-                  signature: ""
+                  organization: '',
+                  signedBy: '',
+                  signature: '',
                 });
               }}
             >
