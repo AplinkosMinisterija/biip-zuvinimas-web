@@ -40,4 +40,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD wget -
 COPY ./caddy/Caddyfile /etc/caddy/Caddyfile
 
 # Copy built files from the build stage
-COPY --from=build /app/build /srv
+COPY --from=build /app/dist /srv
