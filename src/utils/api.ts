@@ -422,7 +422,7 @@ class Api {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
-          ...(!isNaN(profileId) && { 'X-Profile': profileId }),
+          ...(profileId && !isNaN(profileId) && { 'X-Profile': profileId }),
           body: JSON.stringify(filter),
         },
       },
