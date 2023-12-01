@@ -1,5 +1,5 @@
 {
-  "name": "zuvinimas",
+  "name": "biip-zuvinimas-web",
   "version": "0.1.0",
   "private": true,
   "prettier": "@aplinkosministerija/biip-prettier-config",
@@ -72,10 +72,7 @@
     "prepare": "husky install"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "@aplinkosministerija/eslint-config-biip-react"
-    ]
+    "extends": "@aplinkosministerija/eslint-config-biip-react"
   },
   "browserslist": {
     "production": [
