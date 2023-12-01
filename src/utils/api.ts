@@ -1,4 +1,5 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { isNaN } from 'lodash';
 import { FishStocking, FishType, Tenant, TenantUser, User } from './types';
 
 import { isEmpty } from 'lodash';
@@ -421,7 +422,7 @@ class Api {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
-          ...(profileId && !isNaN(profileId) && { 'X-Profile': profileId }),
+          ...(!isNaN(profileId) && { 'X-Profile': profileId }),
           body: JSON.stringify(filter),
         },
       },
