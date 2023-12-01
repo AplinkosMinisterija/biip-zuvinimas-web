@@ -35,7 +35,6 @@
     "react-resize-detector": "^8.0.4",
     "react-router": "^6.10.0",
     "react-router-dom": "^6.10.0",
-    "react-scripts": "^5.0.1",
     "react-signature-canvas": "^1.0.6",
     "react-toastify": "^9.1.2",
     "redux-persist": "^6.0.0",
