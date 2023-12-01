@@ -1,19 +1,13 @@
-import { isEmpty } from "lodash";
-import { useState } from "react";
-import styled from "styled-components";
-import { useRecentLocations } from "../../utils/hooks";
-import { inputLabels } from "../../utils/texts";
-import Icon from "../other/Icon";
-import FieldWrapper from "./components/FieldWrapper";
-import TextFieldInput from "./components/TextFieldInput";
+import { isEmpty } from 'lodash';
+import { useState } from 'react';
+import styled from 'styled-components';
+import { useRecentLocations } from '../../utils/hooks';
+import { inputLabels } from '../../utils/texts';
+import Icon from '../other/Icon';
+import FieldWrapper from './components/FieldWrapper';
+import TextFieldInput from './components/TextFieldInput';
 
-const LocationInput = ({
-  onChange,
-  error,
-  disabled,
-  value,
-  handleSelectMap
-}: any) => {
+const LocationInput = ({ onChange, error, disabled, value, handleSelectMap }: any) => {
   const [showSelect, setShowSelect] = useState(false);
 
   const recentLocations = useRecentLocations();
@@ -39,7 +33,7 @@ const LocationInput = ({
         value={value}
         readOnly={true}
         disabled={disabled}
-        rightIcon={<StyledIcon name={"Searchlocation"} />}
+        rightIcon={<StyledIcon name={'Searchlocation'} />}
       />
       {showSelect && !disabled ? (
         <OptionsContainer>
@@ -49,7 +43,7 @@ const LocationInput = ({
               handleSelectMap();
             }}
           >
-            <StyledOptionhIcon name={"map"} />
+            <StyledOptionhIcon name={'map'} />
             <Options>{inputLabels.selectFromMap}</Options>
           </OptionRowContainer>
 
@@ -62,12 +56,12 @@ const LocationInput = ({
                     onClick={() => onChange(recentLocation)}
                     key={recentLocation?.cadastral_id}
                   >
-                    <StyledOptionhIcon name={"Searchlocation"} />
+                    <StyledOptionhIcon name={'Searchlocation'} />
 
                     <Options>
                       {recentLocation?.name}
-                      {", "}
-                      {recentLocation?.municipality?.name}{" "}
+                      {', '}
+                      {recentLocation?.municipality?.name}{' '}
                     </Options>
                   </OptionRowContainer>
                 );
@@ -118,7 +112,8 @@ const StyledOptionhIcon = styled(Icon)`
 `;
 
 const HistoryTitle = styled.div`
-  font: normal normal 600 12px/40px Manrope;
+  font-size: 1.2rem;
+  line-height: 40px;
   letter-spacing: 0.48px;
   color: #b3b5c4;
   margin-left: 23px;
@@ -126,7 +121,8 @@ const HistoryTitle = styled.div`
 
 const Options = styled.div`
   cursor: pointer;
-  font: normal normal 500 1.6rem/38px Manrope;
+  font-size: 1.6rem;
+  line-height: 38px;
   color: #0b1f51;
   border: none;
   white-space: nowrap;

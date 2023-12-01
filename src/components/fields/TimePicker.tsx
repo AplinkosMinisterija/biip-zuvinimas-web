@@ -1,13 +1,13 @@
-import { format } from "date-fns";
-import lt from "date-fns/locale/lt";
-import { useState } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import styled from "styled-components";
-import TextField from "../fields/TextField";
-import Icon from "../other/Icon";
+import { format } from 'date-fns';
+import lt from 'date-fns/locale/lt';
+import { useState } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import styled from 'styled-components';
+import TextField from '../fields/TextField';
+import Icon from '../other/Icon';
 
-registerLocale("lt", lt);
+registerLocale('lt', lt);
 
 export interface TimepickerProps {
   label?: string;
@@ -30,7 +30,7 @@ const TimePicker = ({
   padding,
   className,
   minDate,
-  maxDate
+  maxDate,
 }: TimepickerProps) => {
   const [open, setOpen] = useState(false);
 
@@ -64,15 +64,14 @@ const TimePicker = ({
         showError={true}
         label={label}
         padding={padding}
-        value={value ? format(new Date(value), "HH:mm") : ""}
+        value={value ? format(new Date(value), 'HH:mm') : ''}
         error={error}
-        rightIcon={<TimeIcon name={"time"} />}
+        rightIcon={<TimeIcon name={'time'} />}
         disabled={disabled}
       />
       {open && !disabled ? (
         <DatePicker
           locale="lt"
-          //@ts-ignore
           filterTime={filterTime}
           open={open}
           showTimeSelect
@@ -129,7 +128,9 @@ const TimeContainer = styled.div`
     text-align: start !important;
   }
   .react-datepicker__time-list-item {
-    font: normal normal 500 1.6rem/22px Manrope !important;
+    font-weight: 600 !important;
+    font-size: 1.6rem !important;
+    line-height: 22px !important;
     color: #121a55 !important;
   }
   .react-datepicker__time-list-item--disabled {
