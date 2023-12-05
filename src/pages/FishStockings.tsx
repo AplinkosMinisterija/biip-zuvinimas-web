@@ -1,42 +1,35 @@
-import { useMediaQuery } from "@material-ui/core";
-import { isEmpty } from "lodash";
-import React, { useEffect, useRef } from "react";
-import { useInfiniteQuery } from "react-query";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router";
-import styled from "styled-components";
-import Button from "../components/buttons/Button";
-import DefaultLayout from "../components/Layouts/Default";
-import DisplayMap from "../components/other/DisplayMap";
-import DynamicFilter from "../components/other/DynamicFilter";
-import { FilterInputTypes } from "../components/other/DynamicFilter/Filter";
-import EventItem from "../components/other/EventItem";
-import LoaderComponent from "../components/other/LoaderComponent";
-import { actions } from "../state/filters/reducer";
-import { useAppSelector } from "../state/hooks";
-import { RootState } from "../state/store";
-import { device } from "../styles";
-import api from "../utils/api";
-import { intersectionObserverConfig } from "../utils/configs";
-import {
-  getFishStockingStatusOptions,
-  mapFishStockingsRequestParams
-} from "../utils/functions";
-import { useFishTypes, useMunicipalities } from "../utils/hooks";
-import { slugs } from "../utils/routes";
-import {
-  buttonsTitles,
-  descriptions,
-  fishStockingsFiltersLabels
-} from "../utils/texts";
-import { FishStockingFilters, FishType, Municipality } from "../utils/types";
+import { useMediaQuery } from '@material-ui/core';
+import { isEmpty } from 'lodash';
+import React, { useEffect, useRef } from 'react';
+import { useInfiniteQuery } from 'react-query';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
+import styled from 'styled-components';
+import Button from '../components/buttons/Button';
+import DefaultLayout from '../components/Layouts/Default';
+import DisplayMap from '../components/other/DisplayMap';
+import DynamicFilter from '../components/other/DynamicFilter';
+import { FilterInputTypes } from '../components/other/DynamicFilter/Filter';
+import EventItem from '../components/other/EventItem';
+import LoaderComponent from '../components/other/LoaderComponent';
+import { actions } from '../state/filters/reducer';
+import { useAppSelector } from '../state/hooks';
+import { RootState } from '../state/store';
+import { device } from '../styles';
+import api from '../utils/api';
+import { intersectionObserverConfig } from '../utils/configs';
+import { getFishStockingStatusOptions, mapFishStockingsRequestParams } from '../utils/functions';
+import { useFishTypes, useMunicipalities } from '../utils/hooks';
+import { slugs } from '../utils/routes';
+import { buttonsTitles, descriptions, fishStockingsFiltersLabels } from '../utils/texts';
+import { FishStockingFilters, FishType, Municipality } from '../utils/types';
 
 const rowConfig = [
-  ["locationName"],
-  ["municipality"],
-  ["eventTimeFrom", "eventTimeTo"],
-  ["fishTypes"],
-  ["status"]
+  ['locationName'],
+  ['municipality'],
+  ['eventTimeFrom', 'eventTimeTo'],
+  ['fishTypes'],
+  ['status'],
 ];
 
 interface FilterConfig {
@@ -47,38 +40,38 @@ interface FilterConfig {
 const filterConfig = ({ municipalities, fishTypes }: FilterConfig) => ({
   eventTimeFrom: {
     label: fishStockingsFiltersLabels.dateFrom,
-    key: "eventTimeFrom",
-    inputType: FilterInputTypes.date
+    key: 'eventTimeFrom',
+    inputType: FilterInputTypes.date,
   },
   eventTimeTo: {
     label: fishStockingsFiltersLabels.dateTo,
-    key: "eventTimeTo",
-    inputType: FilterInputTypes.date
+    key: 'eventTimeTo',
+    inputType: FilterInputTypes.date,
   },
   fishTypes: {
     label: fishStockingsFiltersLabels.fishes,
-    key: "fishTypes",
+    key: 'fishTypes',
     inputType: FilterInputTypes.multiselect,
-    options: fishTypes
+    options: fishTypes,
   },
   municipality: {
     label: fishStockingsFiltersLabels.municipality,
-    key: "municipality",
+    key: 'municipality',
     inputType: FilterInputTypes.singleSelect,
     options: municipalities,
-    optionLabel: (option: any) => `${option?.name}`
+    optionLabel: (option: any) => `${option?.name}`,
   },
   locationName: {
     label: fishStockingsFiltersLabels.locationName,
-    key: "locationName",
-    inputType: FilterInputTypes.text
+    key: 'locationName',
+    inputType: FilterInputTypes.text,
   },
   status: {
     label: fishStockingsFiltersLabels.status,
-    key: "status",
+    key: 'status',
     inputType: FilterInputTypes.multiselect,
-    options: getFishStockingStatusOptions()
-  }
+    options: getFishStockingStatusOptions(),
+  },
 });
 const FishStockings = () => {
   const isMobile = useMediaQuery(device.mobileL);
@@ -87,9 +80,7 @@ const FishStockings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const filters = useAppSelector(
-    (state: RootState) => state.filters.fishStocking
-  );
+  const filters = useAppSelector((state: RootState) => state.filters.fishStocking);
 
   const handleFilterStockings = (filters: FishStockingFilters) => {
     dispatch(actions.setFishStocking(filters));
@@ -98,27 +89,23 @@ const FishStockings = () => {
   const getStockings = async (page: number) => {
     const fishStockings = await api.getFishStockings({
       filter: mapFishStockingsRequestParams(filters),
-      page: page
+      page: page,
     });
 
     return {
       data: fishStockings.rows,
-      page:
-        fishStockings.page < fishStockings.totalPages
-          ? fishStockings.page + 1
-          : undefined
+      page: fishStockings.page < fishStockings.totalPages ? fishStockings.page + 1 : undefined,
     };
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
-    useInfiniteQuery(
-      ["fishStockings", filters],
-      ({ pageParam }) => getStockings(pageParam),
-      {
-        getNextPageParam: (lastPage) => lastPage.page,
-        cacheTime: 60000
-      }
-    );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery(
+    ['fishStockings', filters],
+    ({ pageParam }) => getStockings(pageParam),
+    {
+      getNextPageParam: (lastPage) => lastPage.page,
+      cacheTime: 60000,
+    },
+  );
 
   const observerRef = useRef<any>(null);
 
@@ -173,19 +160,15 @@ const FishStockings = () => {
           return (
             <React.Fragment key={pageIndex}>
               {page.data.map((fishStocking, index) => (
-                <>
+                <div key={fishStocking.id}>
                   <EventItem
-                    key={fishStocking.id}
                     fishStocking={fishStocking}
-                    onClick={() =>
-                      navigate(slugs.fishStocking(`${fishStocking?.id}`))
-                    }
+                    onClick={() => navigate(slugs.fishStocking(`${fishStocking?.id}`))}
                   />
-                  {pageIndex === data.pages.length - 1 &&
-                    index === page.data.length - 1 && (
-                      <div ref={observerRef}></div>
-                    )}
-                </>
+                  {pageIndex === data.pages.length - 1 && index === page.data.length - 1 && (
+                    <div ref={observerRef}></div>
+                  )}
+                </div>
               ))}
             </React.Fragment>
           );
@@ -243,7 +226,8 @@ const Invisible = styled.div`
 
 const Description = styled.div`
   text-align: center;
-  font: normal normal medium 1.6rem/26px Manrope;
+  font-size: 1.6rem;
+  line-height: 26px;
   letter-spacing: 0px;
   color: #7a7e9f;
   width: 70%;

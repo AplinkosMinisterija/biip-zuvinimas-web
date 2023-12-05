@@ -1,8 +1,8 @@
-import { map } from "lodash";
-import { useState } from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import Icon from "../other/Icon";
+import { map } from 'lodash';
+import { useState } from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import Icon from '../other/Icon';
 
 interface SImpleSelectProps {
   value?: { slug: string; title: string };
@@ -23,7 +23,7 @@ const SimpleSelect = ({
   onChange,
   iconRight,
   iconleft,
-  showLabel
+  showLabel,
 }: SImpleSelectProps) => {
   const [showSelect, setShowSelect] = useState(false);
   const handleBlur = (event: any) => {
@@ -44,9 +44,7 @@ const SimpleSelect = ({
           <>
             <OptionButton onClick={() => setShowSelect(!showSelect)}>
               {iconleft ? <MenuIcon name={iconleft} /> : null}
-              {showLabel ? (
-                <OptionLabel>{getOptionLabel(value) || ""}</OptionLabel>
-              ) : null}
+              {showLabel ? <OptionLabel>{getOptionLabel(value) || ''}</OptionLabel> : null}
               {iconRight ? <MenuIcon name={iconRight} /> : null}
             </OptionButton>
             {showSelect ? (
@@ -100,7 +98,9 @@ const OptionContainer = styled.div`
 
 const Option = styled.div`
   padding: 0px 16px;
-  font: normal normal 500 1.6rem/36px Manrope;
+  font-weight: 500;
+  font-size: 1.6rem;
+  line-height: 36px;
   &:hover {
     background: #f3f3f7 0% 0% no-repeat padding-box;
   }
@@ -114,7 +114,9 @@ const OptionButton = styled.div`
 `;
 
 const OptionLabel = styled.span`
-  font: normal normal 600 16px/40px Manrope;
+  font-weight: 600;
+  font-size: 1.6rem;
+  line-height: 40px;
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
   position: relative;

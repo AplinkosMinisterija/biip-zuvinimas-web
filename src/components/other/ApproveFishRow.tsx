@@ -1,9 +1,9 @@
-import { ArrayHelpers, FormikErrors } from "formik";
-import React from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { FishType } from "../../utils/types";
-import NumericTextField from "../fields/NumericTextField";
+import { ArrayHelpers, FormikErrors } from 'formik';
+import React from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { FishType } from '../../utils/types';
+import NumericTextField from '../fields/NumericTextField';
 
 interface itemProps {
   id: string;
@@ -23,6 +23,7 @@ export interface FishStockingApproveFishRowProps {
   last?: boolean;
   showBottomLabel?: boolean;
   disabled?: boolean;
+  key?: string;
 }
 
 const FishStockingApproveFishRow = ({
@@ -32,11 +33,11 @@ const FishStockingApproveFishRow = ({
   last = false,
   showBottomLabel = true,
   disabled,
-  setFieldValue
-}: FishStockingApproveFishRowProps &
-  React.HTMLAttributes<HTMLInputElement>) => {
+  key,
+  setFieldValue,
+}: FishStockingApproveFishRowProps & React.HTMLAttributes<HTMLInputElement>) => {
   function capitalizeFirstLetter(string: string) {
-    if (!string) return "";
+    if (!string) return '';
 
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -45,7 +46,7 @@ const FishStockingApproveFishRow = ({
   const fishAge = capitalizeFirstLetter(item.fishAge?.label);
 
   return (
-    <Row key={index}>
+    <Row key={key}>
       <FishInfo last={last}>
         <FishName>{fishName}</FishName>
         <FishAge>{fishAge}</FishAge>
@@ -59,7 +60,7 @@ const FishStockingApproveFishRow = ({
           error={errors?.reviewAmount}
           showError={false}
           right={<InputInnerLabel>vnt</InputInnerLabel>}
-          bottomLabel={showBottomLabel && item.planned ? item.planned : ""}
+          bottomLabel={showBottomLabel && item.planned ? item.planned : ''}
           disabled={disabled}
         />
         <StyledNumericTextInput
@@ -113,7 +114,7 @@ const FishName = styled.span`
 const FishAge = styled.span`
   text-align: left;
   font: 600 1.4rem;
-  color: ${({ theme }) => theme.colors.primary + "8F"};
+  color: ${({ theme }) => theme.colors.primary + '8F'};
   opacity: 1;
   @media ${device.mobileL} {
     margin: 10px 10px 0px 0px;
@@ -133,7 +134,7 @@ const Inputs = styled.div`
 const InputInnerLabel = styled.div`
   margin: auto 8px;
   font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.primary + "8F"};
+  color: ${({ theme }) => theme.colors.primary + '8F'};
 `;
 
 const StyledNumericTextInput = styled(NumericTextField)`

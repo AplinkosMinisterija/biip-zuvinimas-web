@@ -1,4 +1,3 @@
-import { eachYearOfInterval } from "date-fns/esm";
 import styled from "styled-components";
 import Icon from "../other/Icon";
 

@@ -1,11 +1,11 @@
-import { ArrayHelpers } from "formik";
-import { differenceWith, filter } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { default as NumericTextField } from "../fields/NumericTextField";
-import SelectField from "../fields/SelectField";
-import Icon from "../other/Icon";
+import { ArrayHelpers } from 'formik';
+import { differenceWith, filter } from 'lodash';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { default as NumericTextField } from '../fields/NumericTextField';
+import SelectField from '../fields/SelectField';
+import Icon from '../other/Icon';
 
 export interface FishRow {
   fishType: { label: string; id: string };
@@ -21,9 +21,7 @@ export interface FishStickingRegistrationFishRowProps {
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
   handleChange: {
     (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
+    <T = string | React.ChangeEvent<any>>(field: T): T extends React.ChangeEvent<any>
       ? void
       : (e: string | React.ChangeEvent<any>) => void;
   };
@@ -38,6 +36,7 @@ export interface FishStickingRegistrationFishRowProps {
     weight: string | number;
   }[];
   disabled?: boolean;
+  key?: string;
 }
 
 const FishStickingRegistrationFishRow = ({
@@ -50,7 +49,8 @@ const FishStickingRegistrationFishRow = ({
   index,
   errors,
   allFishSelections,
-  disabled
+  disabled,
+  key,
 }: FishStickingRegistrationFishRowProps) => {
   const { fishType, fishAge, weight, amount } = item;
   const getAvailableFishTypes = useCallback(() => {
@@ -66,7 +66,7 @@ const FishStickingRegistrationFishRow = ({
       return differenceWith(
         fishTypes,
         typesWithTheSameAge,
-        (type1: any, type2: any) => type1?.id === type2?.id
+        (type1: any, type2: any) => type1?.id === type2?.id,
       );
     }
     return fishTypes;
@@ -83,18 +83,14 @@ const FishStickingRegistrationFishRow = ({
       return differenceWith(
         fishAges,
         agesWithTheSameType,
-        (type1: any, type2: any) => type1?.id === type2?.id
+        (type1: any, type2: any) => type1?.id === type2?.id,
       );
     }
     return fishAges;
   }, [fishAges, allFishSelections, item.fishType?.id]);
 
-  const [availableFishTypes, setAvailableFishTypes] = useState(
-    getAvailableFishTypes()
-  );
-  const [availableFishAges, setAvailableFishAges] = useState(
-    getAvailableFishAges()
-  );
+  const [availableFishTypes, setAvailableFishTypes] = useState(getAvailableFishTypes());
+  const [availableFishAges, setAvailableFishAges] = useState(getAvailableFishAges());
 
   useEffect(() => {
     setAvailableFishTypes(getAvailableFishTypes());
@@ -110,17 +106,17 @@ const FishStickingRegistrationFishRow = ({
     allFishSelections,
     fishTypes,
     getAvailableFishAges,
-    getAvailableFishTypes
+    getAvailableFishTypes,
   ]);
 
   return (
-    <Row showDelete={showDelete} key={index}>
+    <Row showDelete={showDelete} key={key}>
       <SelectField
         name={`batches.${index}.fishType`}
         value={fishType}
         onChange={(e: any) => setFieldValue(`batches.${index}.fishType`, e)}
         options={availableFishTypes}
-        getOptionLabel={(option: any) => option?.label || ""}
+        getOptionLabel={(option: any) => option?.label || ''}
         label="Žuvų rūšis"
         error={errors?.fishType}
         showError={false}
@@ -133,7 +129,7 @@ const FishStickingRegistrationFishRow = ({
           setFieldValue(`batches.${index}.fishAge`, e);
         }}
         options={availableFishAges}
-        getOptionLabel={(option: any) => option?.label || ""}
+        getOptionLabel={(option: any) => option?.label || ''}
         label="Amžius"
         error={errors?.fishAge}
         showError={false}
@@ -161,7 +157,7 @@ const FishStickingRegistrationFishRow = ({
       />
       {showDelete && !disabled && (
         <DeleteButton onClick={() => arrayHelpers.remove(index)}>
-          <DeleteIcon name={"delete"} />
+          <DeleteIcon name={'delete'} />
         </DeleteButton>
       )}
     </Row>
@@ -171,8 +167,7 @@ const FishStickingRegistrationFishRow = ({
 const Row = styled.div<{ showDelete: boolean }>`
   display: grid;
   align-items: center;
-  grid-template-columns: 1fr 1fr 1fr 1fr ${({ showDelete }) =>
-      showDelete ? "50px" : ""};
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ showDelete }) => (showDelete ? '50px' : '')};
   margin-bottom: 12px;
   gap: 12px;
   width: 100%;
@@ -205,7 +200,7 @@ const DeleteIcon = styled(Icon)`
 const InputInnerLabel = styled.div`
   margin: auto 8px;
   font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.primary + "8F"};
+  color: ${({ theme }) => theme.colors.primary + '8F'};
 `;
 
 export default FishStickingRegistrationFishRow;

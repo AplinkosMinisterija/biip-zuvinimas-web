@@ -1,7 +1,7 @@
-import { isEmpty } from "lodash";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { FishStocking } from "../../utils/types";
+import { isEmpty } from 'lodash';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { FishStocking } from '../../utils/types';
 
 interface AdditionalInfoProps {
   fishStocking: FishStocking;
@@ -22,14 +22,11 @@ const AdditionalInfo = ({ fishStocking }: AdditionalInfoProps) => {
                   ? e?.reviewAmount
                   : e?.amount || e?.amount === 0
                   ? e?.amount
-                  : null
+                  : null,
               )
-              ?.reduce(
-                (previousValue: any, currentValue: any) =>
-                  previousValue + currentValue
-              )
+              ?.reduce((previousValue: any, currentValue: any) => previousValue + currentValue)
               ?.toString()
-              ?.replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+              ?.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}{' '}
             vnt.
           </FishTotalAmount>
         )}
@@ -39,17 +36,21 @@ const AdditionalInfo = ({ fishStocking }: AdditionalInfoProps) => {
 };
 
 const BottomLabel = styled.div`
-  font: normal normal 600 1.6rem/22px Manrope;
+  font-weight: 600;
+  font-size: 1.6rem;
+  line-height: 22px;
   letter-spacing: 0.64px;
   color: #b3b5c4;
 `;
 
 const FishTotalAmount = styled.div`
-  font: normal normal bold 2.4rem/40px Manrope;
+  font-weight: bold;
+  font-size: 2.4rem;
+  line-height: 40px;
   letter-spacing: 0px;
   color: #ffffff;
   @media ${device.mobileL} {
-    font: normal normal 600 1.6rem/22px Manrope;
+    font-size: 1.6rem;
   }
 `;
 

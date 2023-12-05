@@ -1,14 +1,14 @@
-import { useMediaQuery } from "@material-ui/core";
-import React from "react";
-import styled from "styled-components";
-import { FishStocking } from "../../utils/types";
+import { useMediaQuery } from '@material-ui/core';
+import React from 'react';
+import styled from 'styled-components';
+import { FishStocking } from '../../utils/types';
 
 interface FishStockingTableProps {
   fishStocking: FishStocking;
 }
 
 const FishStockingTable = ({ fishStocking }: FishStockingTableProps) => {
-  const isMobile = useMediaQuery("(max-width:350px)");
+  const isMobile = useMediaQuery('(max-width:350px)');
   return (
     <Table>
       <MobileTable>
@@ -41,24 +41,18 @@ const FishStockingTable = ({ fishStocking }: FishStockingTableProps) => {
               </Td>
               <Td>
                 {batch.amount || batch.amount === 0
-                  ? batch.amount
-                      .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-                  : "-"}
+                  ? batch.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+                  : '-'}
               </Td>
               <Td>
                 {batch.reviewAmount || batch.reviewAmount === 0
-                  ? batch.reviewAmount
-                      .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-                  : "-"}
+                  ? batch.reviewAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+                  : '-'}
               </Td>
               <Td>
                 {batch.reportedAmount || batch.reportedAmount === 0
-                  ? batch.reportedAmount
-                      .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-                  : "-"}
+                  ? batch.reportedAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+                  : '-'}
               </Td>
             </TdTr>
             {index !== fishStocking.batches.length - 1 && <Hr />}
@@ -70,18 +64,22 @@ const FishStockingTable = ({ fishStocking }: FishStockingTableProps) => {
 };
 
 const Th = styled.div`
-  font: normal normal 600 1.2rem/17px Manrope;
+  font-weight: 600;
+  font-size: 1.2rem;
+  line-height: 17px;
   color: #121a558a;
   flex: 1;
   text-align: end;
   @media (max-width: 350px) {
-    font: normal normal 600 1.6rem/22px Manrope;
+    font-size: 1.6rem;
+    line-height: 22px;
     text-align: start;
   }
 `;
 
 const Td = styled.div`
-  font: normal normal 600 1.6rem/22px Manrope;
+  font-size: 1.6rem;
+  line-height: 22px;
   letter-spacing: 0px;
   color: #121a55;
   flex: 1;

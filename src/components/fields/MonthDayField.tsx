@@ -65,7 +65,7 @@ const MonthDayField = ({
     const { month, day } = getMonthAndDay(input);
 
     if (regex.test(input)) {
-      if (input[1] == "-") {
+      if (input[1] === "-") {
         return onChange(`0${month[0]}-`);
       }
 

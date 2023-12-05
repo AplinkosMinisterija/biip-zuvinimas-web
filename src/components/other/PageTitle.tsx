@@ -1,26 +1,26 @@
-import { useNavigate } from "react-router";
-import styled from "styled-components";
-import { FishStockingStatus } from "../../utils/constants";
-import { buttonsTitles } from "../../utils/texts";
-import Button from "../buttons/Button";
-import Icon from "./Icon";
-import FishStockingStatusIcon from "./StatusIcon";
+import { useNavigate } from 'react-router';
+import styled from 'styled-components';
+import { FishStockingStatus } from '../../utils/constants';
+import { buttonsTitles } from '../../utils/texts';
+import Button from '../buttons/Button';
+import Icon from './Icon';
+import FishStockingStatusIcon from './StatusIcon';
 
 interface FishStockingPageTitleProps {
   status?: FishStockingStatus;
 }
 
 const titles = {
-  [FishStockingStatus.UPCOMING]: "Būsimas įžuvinimas",
-  [FishStockingStatus.ONGOING]: "Šiandien vykstantis įžuvinimas",
-  [FishStockingStatus.CANCELED]: "Atšaukta",
-  [FishStockingStatus.FINISHED]: "Ižuvinta",
-  [FishStockingStatus.INSPECTED]: "Ižuvinta",
-  [FishStockingStatus.NOT_FINISHED]: "Neužbaigta"
+  [FishStockingStatus.UPCOMING]: 'Būsimas įžuvinimas',
+  [FishStockingStatus.ONGOING]: 'Šiandien vykstantis įžuvinimas',
+  [FishStockingStatus.CANCELED]: 'Atšaukta',
+  [FishStockingStatus.FINISHED]: 'Įžuvinta',
+  [FishStockingStatus.INSPECTED]: 'Įžuvinta',
+  [FishStockingStatus.NOT_FINISHED]: 'Neužbaigta',
 };
 
 const FishStockingPageTitle = ({
-  status = FishStockingStatus.UPCOMING
+  status = FishStockingStatus.UPCOMING,
 }: FishStockingPageTitleProps) => {
   const navigate = useNavigate();
   return (

@@ -1,21 +1,21 @@
-import { format } from "date-fns";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useMutation } from "react-query";
-import { useNavigate } from "react-router";
-import styled from "styled-components";
-import Cookies from "universal-cookie";
-import { useAppSelector } from "../../state/hooks";
-import { device } from "../../styles";
-import api from "../../utils/api";
+import { format } from 'date-fns';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMutation } from 'react-query';
+import { useNavigate } from 'react-router';
+import styled from 'styled-components';
+import Cookies from 'universal-cookie';
+import { useAppSelector } from '../../state/hooks';
+import { device } from '../../styles';
+import api from '../../utils/api';
 
-import { handleAlert } from "../../utils/functions";
-import { useIsFreelancer } from "../../utils/hooks";
-import { slugs } from "../../utils/routes";
-import { Url } from "../../utils/texts";
-import FishStockingTag from "./FishStockingTag";
-import Icon from "./Icon";
-import LoaderComponent from "./LoaderComponent";
-import FishStockingStatusIcon from "./StatusIcon";
+import { handleAlert } from '../../utils/functions';
+import { useIsFreelancer } from '../../utils/hooks';
+import { slugs } from '../../utils/routes';
+import { Url } from '../../utils/texts';
+import FishStockingTag from './FishStockingTag';
+import Icon from './Icon';
+import LoaderComponent from './LoaderComponent';
+import FishStockingStatusIcon from './StatusIcon';
 
 const DisplayMap = () => {
   const cookies = new Cookies();
@@ -26,23 +26,20 @@ const DisplayMap = () => {
   const user = useAppSelector((state) => state.user?.userData);
 
   const src = `${Url.FISH_STOCKING}?${
-    !isFreelancer ? `tenantId=${cookies.get("profileId")}` : `userId=${user.id}`
+    !isFreelancer ? `tenantId=${cookies.get('profileId')}` : `userId=${user.id}`
   }`;
 
   const handleLoadMap = () => {
     setLoading(false);
   };
 
-  const fishStockingMutation = useMutation(
-    (id: string) => api.getFishStocking(id),
-    {
-      onError: () => {
-        handleAlert();
-      }
-    }
-  );
+  const fishStockingMutation = useMutation((id: string) => api.getFishStocking(id), {
+    onError: () => {
+      handleAlert();
+    },
+  });
 
-  const currentStocking = fishStockingMutation?.data!;
+  const currentStocking = fishStockingMutation?.data;
   const fishStockingMutationMutateAsync = fishStockingMutation.mutateAsync;
   const handleSaveGeom = useCallback(
     async (event: any) => {
@@ -51,12 +48,12 @@ const DisplayMap = () => {
 
       await fishStockingMutationMutateAsync(stocking.id);
     },
-    [fishStockingMutationMutateAsync]
+    [fishStockingMutationMutateAsync],
   );
 
   useEffect(() => {
-    window.addEventListener("message", handleSaveGeom);
-    return () => window.removeEventListener("message", handleSaveGeom);
+    window.addEventListener('message', handleSaveGeom);
+    return () => window.removeEventListener('message', handleSaveGeom);
   }, [handleSaveGeom]);
 
   return (
@@ -79,31 +76,28 @@ const DisplayMap = () => {
                   </IconContainer>
                   <ItemContainer>
                     <Container
-                      onClick={() =>
-                        navigate(slugs.fishStocking(`${currentStocking.id}`))
-                      }
+                      onClick={() => navigate(slugs.fishStocking(`${currentStocking?.id}`))}
                     >
                       <FishStockingStatusIconContainer>
-                        <FishStockingStatusIcon
-                          status={currentStocking.status!}
-                        />
+                        <FishStockingStatusIcon status={currentStocking?.status} />
                       </FishStockingStatusIconContainer>
                       <Content>
                         <FirstRow>
                           <FishStockerLabel>
-                            {`${currentStocking.assignedTo?.firstName} ${currentStocking.assignedTo?.lastName}`}
+                            {currentStocking?.assignedTo
+                              ? `${currentStocking.assignedTo?.firstName} ${currentStocking.assignedTo?.lastName}`
+                              : 'Nežinomas žuvintojas'}
                           </FishStockerLabel>
-                          <FishStockingTag status={currentStocking.status!} />
+                          <FishStockingTag status={currentStocking?.status} />
                         </FirstRow>
-                        <SecondRow>{currentStocking.location?.name}</SecondRow>
+                        <SecondRow>{currentStocking?.location?.name}</SecondRow>
                         <ThirdRow>
                           <FirstRowFirstColumn>
-                            <CalendarIcon name={"calendar"} />
+                            <CalendarIcon name={'calendar'} />
                             <DateText>
-                              {format(
-                                new Date(currentStocking.eventTime!),
-                                "yyyy-MM-dd H:m"
-                              )}
+                              {currentStocking?.eventTime
+                                ? format(new Date(currentStocking?.eventTime), 'yyyy-MM-dd HH:mm')
+                                : 'Nežinoma data'}
                             </DateText>
                           </FirstRowFirstColumn>
                         </ThirdRow>
@@ -120,8 +114,8 @@ const DisplayMap = () => {
           <StyledIframe
             ref={iframeRef}
             src={src}
-            width={"100%"}
-            height={"100%"}
+            width={'100%'}
+            height={'100%'}
             style={{ border: 0 }}
             allowFullScreen={true}
             onLoad={handleLoadMap}
@@ -134,7 +128,7 @@ const DisplayMap = () => {
   );
 };
 
-const MapContainer = styled.div<{}>`
+const MapContainer = styled.div`
   width: 100%;
   height: 100%;
 `;
@@ -194,7 +188,9 @@ const DateText = styled.span`
   color: ${({ theme }) => theme.colors.tertiary};
   vertical-align: middle;
   white-space: nowrap;
-  font: normal normal 600 14px/19px Manrope;
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 19px;
 `;
 
 const CalendarIcon = styled(Icon)`
@@ -240,7 +236,7 @@ top: 0;
   overflow-y: auto;
 `;
 
-const InnerContainer = styled.div<{}>`
+const InnerContainer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;

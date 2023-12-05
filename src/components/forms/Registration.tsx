@@ -1,45 +1,42 @@
-import { useMediaQuery } from "@material-ui/core";
-import { FieldArray, Form, Formik } from "formik";
-import { useRef, useState } from "react";
-import { useMutation } from "react-query";
-import { useParams } from "react-router";
-import styled from "styled-components";
-import Cookies from "universal-cookie";
-import { useAppSelector } from "../../state/hooks";
-import { device } from "../../styles";
-import api from "../../utils/api";
-import { FishOriginTypes } from "../../utils/constants";
-import { getLocationList, getTenantsList, isNew } from "../../utils/functions";
+import { useMediaQuery } from '@material-ui/core';
+import { FieldArray, Form, Formik } from 'formik';
+import { useRef, useState } from 'react';
+import { useMutation } from 'react-query';
+import { useParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
+import Cookies from 'universal-cookie';
+import { useAppSelector } from '../../state/hooks';
+import { device } from '../../styles';
+import api from '../../utils/api';
+import { FishOriginTypes } from '../../utils/constants';
+import { getLocationList, getTenantsList, isNew } from '../../utils/functions';
 import {
   useAssignedToUsers,
   useFishAges,
   useFishStockingCallbacks,
   useFishTypes,
   useIsFreelancer,
-  useSettings
-} from "../../utils/hooks";
-import { buttonsTitles, formLabels, queryStrings } from "../../utils/texts";
-import { FishStocking } from "../../utils/types";
-import {
-  validateFishStocking,
-  validateFreelancerFishStocking
-} from "../../utils/validations";
-import Button, { ButtonColors } from "../buttons/Button";
-import RadioOptions from "../buttons/RadioOptionts";
-import SimpleButton from "../buttons/SimpleButton";
-import AsyncSelectField from "../fields/AsyncSelect";
-import Datepicker from "../fields/DatePicker";
-import LocationInput from "../fields/LocationInput";
-import SelectField from "../fields/SelectField";
-import TextField from "../fields/TextField";
-import TimePicker from "../fields/TimePicker";
-import DeleteCard from "../other/DeleteCard";
-import FishStickingRegistrationFishRow from "../other/FishRow";
-import LoaderComponent from "../other/LoaderComponent";
-import Modal from "../other/Modal";
-import FishStockingPageTitle from "../other/PageTitle";
-import Map from "../other/RegistrationMap";
-import {useSearchParams} from "react-router-dom";
+  useSettings,
+} from '../../utils/hooks';
+import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
+import { FishStocking } from '../../utils/types';
+import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
+import Button, { ButtonColors } from '../buttons/Button';
+import RadioOptions from '../buttons/RadioOptionts';
+import SimpleButton from '../buttons/SimpleButton';
+import AsyncSelectField from '../fields/AsyncSelect';
+import Datepicker from '../fields/DatePicker';
+import LocationInput from '../fields/LocationInput';
+import SelectField from '../fields/SelectField';
+import TextField from '../fields/TextField';
+import TimePicker from '../fields/TimePicker';
+import DeleteCard from '../other/DeleteCard';
+import FishStickingRegistrationFishRow from '../other/FishRow';
+import LoaderComponent from '../other/LoaderComponent';
+import Modal from '../other/Modal';
+import FishStockingPageTitle from '../other/PageTitle';
+import Map from '../other/RegistrationMap';
 
 const cookies = new Cookies();
 
@@ -53,25 +50,25 @@ export interface FishRow {
 export const fishOrigins = [
   {
     value: FishOriginTypes.GROWN,
-    label: "Užaugintos žuvivaisos įmonėje"
+    label: 'Užaugintos žuvivaisos įmonėje',
   },
   {
-    label: "Sugautos vandens telkinyje",
-    value: FishOriginTypes.CAUGHT
-  }
+    label: 'Sugautos vandens telkinyje',
+    value: FishOriginTypes.CAUGHT,
+  },
 ];
 
 const RegistrationForm = ({
   fishStocking,
   renderTabs,
-  disabled
+  disabled,
 }: {
   fishStocking?: FishStocking;
   renderTabs?: JSX.Element;
   disabled?: boolean;
 }) => {
   const [showMap, setShowMap] = useState(false);
-  const [queryString, setQueryString] = useState("");
+  const [queryString, setQueryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
   const fishAges = useFishAges();
   const fishTypes = useFishTypes();
@@ -88,55 +85,49 @@ const RegistrationForm = ({
 
   const createFishStockingMutation = useMutation(
     (params: FishStocking) => api.registerFishStocking(params),
-    { ...callBacks }
+    { ...callBacks },
   );
 
   const updateFishStockingMutation = useMutation(
     (params: FishStocking) => api.updateFishStocking(params, id!),
-    { ...callBacks }
+    { ...callBacks },
   );
 
-  const cancelFishStockingMutation = useMutation(
-    () => api.cancelFishStocking(id!),
-    { ...callBacks }
-  );
+  const cancelFishStockingMutation = useMutation(() => api.cancelFishStocking(id!), {
+    ...callBacks,
+  });
 
-  const deleteFishStockingMutation = useMutation(
-    () => api.deleteFishStocking(id!),
-    { ...callBacks }
-  );
+  const deleteFishStockingMutation = useMutation(() => api.deleteFishStocking(id!), {
+    ...callBacks,
+  });
 
   const submitLoading = [
     createFishStockingMutation.isLoading,
     updateFishStockingMutation.isLoading,
     cancelFishStockingMutation.isLoading,
-    deleteFishStockingMutation.isLoading
+    deleteFishStockingMutation.isLoading,
   ].some((loading) => loading);
 
-  const isCustomer =
-    fishStocking?.stockingCustomer?.id === cookies.get("profileId");
+  const isCustomer = fishStocking?.stockingCustomer?.id === cookies.get('profileId');
 
   const { id } = useParams();
 
   if (loading) return <LoaderComponent />;
 
-  const assignedTo =
-    fishStocking?.assignedTo || fishStocking?.createdBy || null;
+  const assignedTo = fishStocking?.assignedTo || fishStocking?.createdBy || null;
 
   const initialValues: any = {
-    eventTime: fishStocking?.eventTime && !repeat
-      ? new Date(fishStocking.eventTime)
-      : null,
-    fishOriginCompanyName: fishStocking?.fishOriginCompanyName || "",
+    eventTime: fishStocking?.eventTime && !repeat ? new Date(fishStocking.eventTime) : null,
+    fishOriginCompanyName: fishStocking?.fishOriginCompanyName || '',
     assignedTo: fishStocking?.assignedTo || user || undefined,
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,
     stockingCustomer: fishStocking?.stockingCustomer || undefined,
-    phone: fishStocking?.phone || assignedTo?.phone || user?.phone || "",
+    phone: fishStocking?.phone || assignedTo?.phone || user?.phone || '',
     id: 0,
     fishOrigin: fishStocking?.fishOrigin || FishOriginTypes.GROWN,
     location: fishStocking?.location || undefined,
     batches: fishStocking?.batches || [{}],
-    geom: fishStocking?.geom || undefined
+    geom: fishStocking?.geom || undefined,
   };
 
   const handleSubmit = async (values: FishStocking) => {
@@ -150,7 +141,7 @@ const RegistrationForm = ({
       fishOrigin,
       fishOriginCompanyName,
       stockingCustomer,
-      batches
+      batches,
     } = values;
     const params = {
       eventTime,
@@ -162,16 +153,16 @@ const RegistrationForm = ({
       fishOrigin,
       fishOriginCompanyName,
       ...(fishOriginReservoir && {
-        fishOriginReservoir
+        fishOriginReservoir,
       }),
       batches: batches.map((batch) => {
         return {
           amount: batch.amount,
           weight: batch.weight,
           fishType: batch?.fishType?.id,
-          fishAge: batch?.fishAge?.id
+          fishAge: batch?.fishAge?.id,
         };
-      })
+      }),
     };
     await handleCreateOrUpdate(params);
   };
@@ -194,29 +185,28 @@ const RegistrationForm = ({
 
   const getDeleteInfo = () => {
     const canDelete =
+      fishStocking?.eventTime &&
       new Date(new Date().setDate(new Date().getDate() + minTime)) <
-      new Date(fishStocking?.eventTime!);
+        new Date(fishStocking.eventTime);
 
     if (canDelete) {
       return {
         name: buttonsTitles.delete,
-        description: "Ar tikrai norite ištrinti būsimą ižuvinima?",
-        function: handleDelete
+        description: 'Ar tikrai norite ištrinti būsimą įžuvinimą?',
+        function: handleDelete,
       };
     }
 
     return {
       name: buttonsTitles.cancelFishStcoking,
-      description: "Ar tikrai norite atšaukti būsimą ižuvinima?",
-      function: handleCancel
+      description: 'Ar tikrai norite atšaukti būsimą įžuvinimą?',
+      function: handleCancel,
     };
   };
 
   const deleteInfo = getDeleteInfo();
 
-  const validationSchema = isFreelancer
-    ? validateFreelancerFishStocking
-    : validateFishStocking;
+  const validationSchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
 
   return (
     <>
@@ -233,14 +223,14 @@ const RegistrationForm = ({
                 display={!isMobile || !showMap}
                 noValidate={true}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === 'Enter') {
                     handleSubmit();
                   }
                 }}
                 tabIndex={0}
                 onSubmit={handleSubmit}
               >
-                <FishStockingPageTitle status={fishStocking?.status!} />
+                <FishStockingPageTitle status={fishStocking?.status} />
                 {renderTabs}
                 <LocationInput
                   error={errors.location}
@@ -252,37 +242,26 @@ const RegistrationForm = ({
                   }}
                   onChange={(location: any) => {
                     const { geom, ...rest } = location;
-                    iframeRef?.current?.contentWindow?.postMessage(
-                      JSON.stringify({ geom }),
-                      "*"
-                    );
+                    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom }), '*');
 
-                    setFieldValue("geom", geom);
-                    setFieldValue("location", rest);
+                    setFieldValue('geom', geom);
+                    setFieldValue('location', rest);
                   }}
                 />
                 <TimeRow>
                   <Datepicker
                     label="Data"
-                    minDate={
-                      new Date(
-                        new Date().setDate(new Date().getDate() + minTime)
-                      )
-                    }
+                    minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
                     name="eventTime"
                     error={errors.eventTime}
                     value={values.eventTime}
-                    onChange={(e: any) => setFieldValue("eventTime", e)}
+                    onChange={(e: any) => setFieldValue('eventTime', e)}
                     disabled={disabled}
                   />
                   <TimePicker
                     label="Laikas"
-                    minDate={
-                      new Date(
-                        new Date().setDate(new Date().getDate() + minTime)
-                      )
-                    }
-                    onChange={(e: Date) => setFieldValue("eventTime", e)}
+                    minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
+                    onChange={(e: Date) => setFieldValue('eventTime', e)}
                     error={errors.eventTime}
                     value={values.eventTime}
                     disabled={disabled}
@@ -295,9 +274,9 @@ const RegistrationForm = ({
                   value={values.fishOrigin}
                   error={errors.fishOrigin}
                   onChange={(e: any) => {
-                    setFieldValue("fishOrigin", e);
-                    setFieldValue("fishOriginCompanyName", "");
-                    setFieldValue("fishOriginReservoir", "");
+                    setFieldValue('fishOrigin', e);
+                    setFieldValue('fishOriginCompanyName', '');
+                    setFieldValue('fishOriginReservoir', '');
                   }}
                   disabled={disabled}
                 />
@@ -308,9 +287,7 @@ const RegistrationForm = ({
                       name="fishOriginCompanyName"
                       value={values.fishOriginCompanyName}
                       error={errors.fishOriginCompanyName}
-                      onChange={(value) =>
-                        setFieldValue("fishOriginCompanyName", value)
-                      }
+                      onChange={(value) => setFieldValue('fishOriginCompanyName', value)}
                       disabled={disabled}
                     />
                   ) : (
@@ -319,9 +296,7 @@ const RegistrationForm = ({
                       name="fishOriginReservoir"
                       value={values.fishOriginReservoir}
                       error={errors.fishOriginReservoir}
-                      onChange={(value) =>
-                        setFieldValue("fishOriginReservoir", value)
-                      }
+                      onChange={(value) => setFieldValue('fishOriginReservoir', value)}
                       hasOptionKey={false}
                       getOptionValue={(option) => option?.cadastral_id}
                       getOptionLabel={(option) => {
@@ -340,14 +315,12 @@ const RegistrationForm = ({
                       <SelectField
                         label="Vardas ir pavardė"
                         name="assignedTo"
-                        getOptionLabel={(option: any) =>
-                          `${option.firstName} ${option.lastName}`
-                        }
+                        getOptionLabel={(option: any) => `${option.firstName} ${option.lastName}`}
                         value={values.assignedTo}
                         error={errors.assignedTo}
                         onChange={(value: any) => {
-                          setFieldValue("assignedTo", value);
-                          setFieldValue("phone", value?.phone || "");
+                          setFieldValue('assignedTo', value);
+                          setFieldValue('phone', value?.phone || '');
                         }}
                         options={users}
                         disabled={isCustomer}
@@ -361,7 +334,7 @@ const RegistrationForm = ({
                         error={errors.phone}
                         onChange={(e: any) => {
                           if (/^\+?[0-9\s]{0,11}$/.test(e)) {
-                            setFieldValue("phone", e);
+                            setFieldValue('phone', e);
                           }
                         }}
                         disabled={isCustomer}
@@ -381,9 +354,7 @@ const RegistrationForm = ({
                     getOptionLabel={(option: any) => option?.name}
                     value={values.stockingCustomer}
                     error={errors.stockingCustomer}
-                    onChange={(value: any) =>
-                      setFieldValue("stockingCustomer", value)
-                    }
+                    onChange={(value: any) => setFieldValue('stockingCustomer', value)}
                     disabled={disabled}
                   />
                 </Row>
@@ -417,16 +388,16 @@ const RegistrationForm = ({
                           onClick={() => {
                             arrayHelpers.push({
                               type: {
-                                label: "",
-                                id: ""
+                                label: '',
+                                id: '',
                               },
                               age: {
-                                label: "",
-                                id: ""
+                                label: '',
+                                id: '',
                               },
-                              amount: "",
-                              weight: "",
-                              error: false
+                              amount: '',
+                              weight: '',
+                              error: false,
                             });
                           }}
                         >
@@ -447,11 +418,7 @@ const RegistrationForm = ({
                       {deleteInfo.name}
                     </StyledButtons>
                   )}
-                  <StyledButtons
-                    type="submit"
-                    loading={submitLoading}
-                    disabled={isCustomer}
-                  >
+                  <StyledButtons type="submit" loading={submitLoading} disabled={isCustomer}>
                     {buttonsTitles.save}
                   </StyledButtons>
                 </ButtonRow>
@@ -460,12 +427,12 @@ const RegistrationForm = ({
                     agreeLabel={buttonsTitles.yes}
                     declineLabel={buttonsTitles.no}
                     action={deleteInfo.name}
-                    title={""}
+                    title={''}
                     description={deleteInfo.description}
                     onSetClose={() => setShowModal(false)}
                     handleDelete={deleteInfo.function}
                     deleteInProgress={false}
-                    name={""}
+                    name={''}
                   />
                 </Modal>
               </StyledForm>
@@ -475,8 +442,8 @@ const RegistrationForm = ({
                 onClose={() => setShowMap(false)}
                 value={values.geom}
                 onSave={(geom, location) => {
-                  setFieldValue("geom", geom);
-                  setFieldValue("location", location);
+                  setFieldValue('geom', geom);
+                  setFieldValue('location', location);
                   setShowMap(false);
                 }}
                 queryString={queryString}
@@ -494,7 +461,7 @@ const StyledForm = styled(Form)<{ display: boolean }>`
   padding: 32px;
   flex-direction: column;
   gap: 12px;
-  display: ${({ display }) => (display ? "flex" : "none")};
+  display: ${({ display }) => (display ? 'flex' : 'none')};
   overflow-y: auto;
 
   @media ${device.mobileL} {

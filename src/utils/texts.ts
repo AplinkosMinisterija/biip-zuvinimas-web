@@ -129,7 +129,7 @@ export const toasts = {
   profileUpdated: "Profilis atnaujintas"
 };
 
-const mapsHost = process.env.REACT_APP_MAPS_HOST || "https://dev.maps.biip.lt";
+const mapsHost = import.meta.env.VITE_MAPS_HOST || "https://dev.maps.biip.lt";
 export const Url = {
   DRAW: `${mapsHost}/zuvinimas/draw`,
   FISH_STOCKING: `${mapsHost}/zuvinimas`
