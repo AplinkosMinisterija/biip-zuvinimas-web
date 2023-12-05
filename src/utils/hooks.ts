@@ -24,7 +24,9 @@ export const useFilteredRoutes = () => {
 
   return routes.filter((route) => {
     if (!route?.slug) return false;
-    if (route.tenantOwner && profile?.role) {
+    if (route.tenantOwner) {
+      if (!profile?.role) return false;
+
       return [RolesTypes.USER_ADMIN, RolesTypes.OWNER].includes(profile?.role);
     }
 
