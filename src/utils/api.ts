@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { isNaN } from 'lodash';
+import { isFinite } from 'lodash';
 import { FishStocking, FishType, Tenant, TenantUser, User } from './types';
 
 import { isEmpty } from 'lodash';
@@ -93,7 +93,8 @@ class Api {
         config.url = this.proxy + config.url;
         if (token) {
           config.headers!.Authorization = 'Bearer ' + token;
-          if (!isNaN(profileId)) config.headers!['X-Profile'] = profileId;
+
+          if (isFinite(parseInt(profileId))) config.headers!['X-Profile'] = profileId;
         }
 
         return config;
