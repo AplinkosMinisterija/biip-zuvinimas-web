@@ -144,6 +144,7 @@ const FishStickingRegistrationFishRow = ({
         showError={false}
         right={<InputInnerLabel>vnt</InputInnerLabel>}
         disabled={disabled}
+        wholeNumber={true}
       />
       <StyledNumericTextInput
         name={`batches.${index}.weight`}
