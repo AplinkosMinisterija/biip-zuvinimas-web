@@ -1,4 +1,4 @@
-import { FishOriginTypes, FishStockingStatus, RolesTypes } from "./constants";
+import { FishOriginTypes, FishStockingStatus, RolesTypes } from './constants';
 export interface User {
   id?: string;
   firstName?: string;
@@ -32,7 +32,7 @@ export interface TenantUser {
   user: User;
 }
 
-export type ProfileId = "freelancer" | string;
+export type ProfileId = 'freelancer' | string;
 
 export interface Profile {
   id: ProfileId;
@@ -121,7 +121,7 @@ export interface FishStocking {
     name: string;
     municipality: { id: string; name: string };
   };
-  batches: Array<any>;
+  batches: Array<any>; //TODO: type needs to be defined
   assignedTo?: User;
   phone: string;
   reviewedBy?: User;

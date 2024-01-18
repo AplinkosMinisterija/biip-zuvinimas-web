@@ -19,12 +19,7 @@ export interface FishStickingRegistrationFishRowProps {
   fishAges: { label: string; id: string }[];
   item: FishRow;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(field: T): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  };
+  handleDelete: (index: number) => void;
   arrayHelpers: ArrayHelpers;
   showDelete: boolean;
   index: number;
@@ -44,6 +39,7 @@ const FishStickingRegistrationFishRow = ({
   fishAges,
   item,
   setFieldValue,
+  handleDelete,
   arrayHelpers,
   showDelete,
   index,
@@ -157,7 +153,7 @@ const FishStickingRegistrationFishRow = ({
         disabled={disabled}
       />
       {showDelete && !disabled && (
-        <DeleteButton onClick={() => arrayHelpers.remove(index)}>
+        <DeleteButton onClick={() => handleDelete(index)}>
           <DeleteIcon name={'delete'} />
         </DeleteButton>
       )}

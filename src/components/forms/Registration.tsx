@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@material-ui/core';
 import { FieldArray, Form, Formik } from 'formik';
 import { useRef, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -10,7 +10,7 @@ import { useAppSelector } from '../../state/hooks';
 import { device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
-import { getLocationList, getTenantsList, isNew } from '../../utils/functions';
+import { getLocationList, getTenantsList, handleAlert, isNew } from '../../utils/functions';
 import {
   useAssignedToUsers,
   useFishAges,
@@ -20,7 +20,7 @@ import {
   useSettings,
 } from '../../utils/hooks';
 import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
-import { FishStocking } from '../../utils/types';
+import { FishStocking, FishType } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import Button, { ButtonColors } from '../buttons/Button';
 import RadioOptions from '../buttons/RadioOptionts';
@@ -37,26 +37,8 @@ import LoaderComponent from '../other/LoaderComponent';
 import Modal from '../other/Modal';
 import FishStockingPageTitle from '../other/PageTitle';
 import Map from '../other/RegistrationMap';
-
+import { fishOriginOptions } from '../../utils/options';
 const cookies = new Cookies();
-
-export interface FishRow {
-  type: { label: string; id: string };
-  age: { label: string; id: string };
-  amount: string | number;
-  weight: string | number;
-}
-
-export const fishOrigins = [
-  {
-    value: FishOriginTypes.GROWN,
-    label: 'Užaugintos žuvivaisos įmonėje',
-  },
-  {
-    label: 'Sugautos vandens telkinyje',
-    value: FishOriginTypes.CAUGHT,
-  },
-];
 
 const RegistrationForm = ({
   fishStocking,
@@ -71,7 +53,7 @@ const RegistrationForm = ({
   const [queryString, setQueryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
   const fishAges = useFishAges();
-  const fishTypes = useFishTypes();
+  // const fishTypes = useFishTypes();
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
   const iframeRef = useRef<any>(null);
@@ -80,6 +62,13 @@ const RegistrationForm = ({
   const users = useAssignedToUsers();
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
+
+  const { data, isLoading: fihTypesLoading } = useQuery('fishTypes', () => api.getFishTypes(), {
+    onError: () => {
+      handleAlert();
+    },
+  });
+  const fishTypesFullList = data?.rows;
 
   const callBacks = useFishStockingCallbacks();
 
@@ -112,7 +101,7 @@ const RegistrationForm = ({
 
   const { id } = useParams();
 
-  if (loading) return <LoaderComponent />;
+  if (loading || fihTypesLoading) return <LoaderComponent />;
 
   const assignedTo = fishStocking?.assignedTo || fishStocking?.createdBy || null;
 
@@ -128,9 +117,10 @@ const RegistrationForm = ({
     location: fishStocking?.location || undefined,
     batches: fishStocking?.batches || [{}],
     geom: fishStocking?.geom || undefined,
+    fishTypes: fishTypesFullList || [],
   };
 
-  const handleSubmit = async (values: FishStocking) => {
+  const handleSubmit = async (values: any) => {
     const {
       eventTime,
       phone,
@@ -208,6 +198,14 @@ const RegistrationForm = ({
 
   const validationSchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
 
+  const filterFishTypes = (batches: any[]) => {
+    const batchesFishTypesIds = batches.filter((b) => !!b.fishType?.id).map((b) => b.fishType?.id);
+    return (fishTypesFullList || []).filter((fishType) => {
+      const inBatches = batchesFishTypesIds.includes(fishType.id);
+      return !inBatches;
+    });
+  };
+
   return (
     <>
       <Formik
@@ -217,6 +215,7 @@ const RegistrationForm = ({
         validateOnChange={false}
       >
         {({ values, errors, handleSubmit, handleChange, setFieldValue }) => {
+          const filteredFistTypes: FishType[] = filterFishTypes(values.batches || []);
           return (
             <InnerContainer>
               <StyledForm
@@ -253,7 +252,7 @@ const RegistrationForm = ({
                     label="Data"
                     minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
                     name="eventTime"
-                    error={errors.eventTime}
+                    error={errors.eventTime as string}
                     value={values.eventTime}
                     onChange={(e: any) => setFieldValue('eventTime', e)}
                     disabled={disabled}
@@ -262,17 +261,17 @@ const RegistrationForm = ({
                     label="Laikas"
                     minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
                     onChange={(e: Date) => setFieldValue('eventTime', e)}
-                    error={errors.eventTime}
+                    error={errors.eventTime as string}
                     value={values.eventTime}
                     disabled={disabled}
                   />
                 </TimeRow>
                 <RadioOptions
-                  options={fishOrigins}
+                  options={fishOriginOptions}
                   label="Žuvų kilmė"
                   name="fishOrigin"
                   value={values.fishOrigin}
-                  error={errors.fishOrigin}
+                  error={errors.fishOrigin as string}
                   onChange={(e: any) => {
                     setFieldValue('fishOrigin', e);
                     setFieldValue('fishOriginCompanyName', '');
@@ -286,7 +285,7 @@ const RegistrationForm = ({
                       label="Žuvivaisos įmonė"
                       name="fishOriginCompanyName"
                       value={values.fishOriginCompanyName}
-                      error={errors.fishOriginCompanyName}
+                      error={errors.fishOriginCompanyName as string}
                       onChange={(value) => setFieldValue('fishOriginCompanyName', value)}
                       disabled={disabled}
                     />
@@ -295,7 +294,7 @@ const RegistrationForm = ({
                       label="Vandens telkinys"
                       name="fishOriginReservoir"
                       value={values.fishOriginReservoir}
-                      error={errors.fishOriginReservoir}
+                      error={errors.fishOriginReservoir as string}
                       onChange={(value) => setFieldValue('fishOriginReservoir', value)}
                       hasOptionKey={false}
                       getOptionValue={(option) => option?.cadastral_id}
@@ -317,7 +316,7 @@ const RegistrationForm = ({
                         name="assignedTo"
                         getOptionLabel={(option: any) => `${option.firstName} ${option.lastName}`}
                         value={values.assignedTo}
-                        error={errors.assignedTo}
+                        error={errors.assignedTo as string}
                         onChange={(value: any) => {
                           setFieldValue('assignedTo', value);
                           setFieldValue('phone', value?.phone || '');
@@ -331,7 +330,7 @@ const RegistrationForm = ({
                         name="phone"
                         value={values.phone}
                         placeholder=""
-                        error={errors.phone}
+                        error={errors.phone as string}
                         onChange={(e: any) => {
                           if (/^\+?[0-9\s]{0,11}$/.test(e)) {
                             setFieldValue('phone', e);
@@ -353,7 +352,7 @@ const RegistrationForm = ({
                     }
                     getOptionLabel={(option: any) => option?.name}
                     value={values.stockingCustomer}
-                    error={errors.stockingCustomer}
+                    error={errors.stockingCustomer as string}
                     onChange={(value: any) => setFieldValue('stockingCustomer', value)}
                     disabled={disabled}
                   />
@@ -369,10 +368,14 @@ const RegistrationForm = ({
                         return (
                           <FishStickingRegistrationFishRow
                             key={`fish_row_${index}`}
-                            fishTypes={fishTypes}
+                            fishTypes={filteredFistTypes}
                             item={item}
-                            setFieldValue={setFieldValue}
-                            handleChange={handleChange}
+                            setFieldValue={(key, value) => {
+                              setFieldValue(key, value);
+                            }}
+                            handleDelete={(e) => {
+                              arrayHelpers.remove(e);
+                            }}
                             arrayHelpers={arrayHelpers}
                             showDelete={values.batches.length > 1}
                             index={index}
