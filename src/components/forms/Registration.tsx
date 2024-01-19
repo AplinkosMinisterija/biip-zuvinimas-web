@@ -20,7 +20,7 @@ import {
   useSettings,
 } from '../../utils/hooks';
 import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
-import { FishStocking, FishType } from '../../utils/types';
+import { FishStocking, FishType, RegistrationFormValues } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import Button, { ButtonColors } from '../buttons/Button';
 import RadioOptions from '../buttons/RadioOptionts';
@@ -32,7 +32,7 @@ import SelectField from '../fields/SelectField';
 import TextField from '../fields/TextField';
 import TimePicker from '../fields/TimePicker';
 import DeleteCard from '../other/DeleteCard';
-import FishStickingRegistrationFishRow from '../other/FishRow';
+import FishRow from '../other/FishRow';
 import LoaderComponent from '../other/LoaderComponent';
 import Modal from '../other/Modal';
 import FishStockingPageTitle from '../other/PageTitle';
@@ -53,7 +53,6 @@ const RegistrationForm = ({
   const [queryString, setQueryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
   const fishAges = useFishAges();
-  // const fishTypes = useFishTypes();
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
   const iframeRef = useRef<any>(null);
@@ -68,7 +67,8 @@ const RegistrationForm = ({
       handleAlert();
     },
   });
-  const fishTypesFullList = data?.rows;
+
+  const fishTypesFullList = data?.rows || [];
 
   const callBacks = useFishStockingCallbacks();
 
@@ -105,8 +105,8 @@ const RegistrationForm = ({
 
   const assignedTo = fishStocking?.assignedTo || fishStocking?.createdBy || null;
 
-  const initialValues: any = {
-    eventTime: fishStocking?.eventTime && !repeat ? new Date(fishStocking.eventTime) : null,
+  const initialValues: RegistrationFormValues = {
+    eventTime: fishStocking?.eventTime && !repeat ? new Date(fishStocking.eventTime) : undefined,
     fishOriginCompanyName: fishStocking?.fishOriginCompanyName || '',
     assignedTo: fishStocking?.assignedTo || user || undefined,
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,
@@ -117,7 +117,6 @@ const RegistrationForm = ({
     location: fishStocking?.location || undefined,
     batches: fishStocking?.batches || [{}],
     geom: fishStocking?.geom || undefined,
-    fishTypes: fishTypesFullList || [],
   };
 
   const handleSubmit = async (values: any) => {
@@ -148,7 +147,7 @@ const RegistrationForm = ({
       batches: batches.map((batch) => {
         return {
           amount: batch.amount,
-          weight: batch.weight,
+          weight: batch.weight || undefined,
           fishType: batch?.fishType?.id,
           fishAge: batch?.fishAge?.id,
         };
@@ -200,7 +199,7 @@ const RegistrationForm = ({
 
   const filterFishTypes = (batches: any[]) => {
     const batchesFishTypesIds = batches.filter((b) => !!b.fishType?.id).map((b) => b.fishType?.id);
-    return (fishTypesFullList || []).filter((fishType) => {
+    return fishTypesFullList.filter((fishType) => {
       const inBatches = batchesFishTypesIds.includes(fishType.id);
       return !inBatches;
     });
@@ -214,12 +213,12 @@ const RegistrationForm = ({
         validationSchema={validationSchema}
         validateOnChange={false}
       >
-        {({ values, errors, handleSubmit, handleChange, setFieldValue }) => {
+        {({ values, errors, handleSubmit, handleChange, setFieldValue }: any) => {
           const filteredFistTypes: FishType[] = filterFishTypes(values.batches || []);
           return (
             <InnerContainer>
               <StyledForm
-                display={!isMobile || !showMap}
+                $display={!isMobile || !showMap}
                 noValidate={true}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -242,7 +241,6 @@ const RegistrationForm = ({
                   onChange={(location: any) => {
                     const { geom, ...rest } = location;
                     iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom }), '*');
-
                     setFieldValue('geom', geom);
                     setFieldValue('location', rest);
                   }}
@@ -281,7 +279,7 @@ const RegistrationForm = ({
                 />
                 <Row>
                   {values.fishOrigin === FishOriginTypes.GROWN ? (
-                    <StyledTextInput
+                    <TextField
                       label="Žuvivaisos įmonė"
                       name="fishOriginCompanyName"
                       value={values.fishOriginCompanyName}
@@ -325,7 +323,7 @@ const RegistrationForm = ({
                         disabled={isCustomer}
                       />
 
-                      <StyledTextInput
+                      <TextField
                         label="Telefonas"
                         name="phone"
                         value={values.phone}
@@ -366,9 +364,11 @@ const RegistrationForm = ({
                       {values.batches?.map((item, index) => {
                         const fishErrors = errors.batches?.[index];
                         return (
-                          <FishStickingRegistrationFishRow
+                          <FishRow
                             key={`fish_row_${index}`}
+                            index={index}
                             fishTypes={filteredFistTypes}
+                            fishAges={fishAges}
                             item={item}
                             setFieldValue={(key, value) => {
                               setFieldValue(key, value);
@@ -376,32 +376,16 @@ const RegistrationForm = ({
                             handleDelete={(e) => {
                               arrayHelpers.remove(e);
                             }}
-                            arrayHelpers={arrayHelpers}
                             showDelete={values.batches.length > 1}
-                            index={index}
                             errors={fishErrors}
-                            allFishSelections={values.batches}
                             disabled={disabled}
-                            fishAges={fishAges}
                           />
                         );
                       })}
                       {!disabled && (
                         <SimpleButton
                           onClick={() => {
-                            arrayHelpers.push({
-                              type: {
-                                label: '',
-                                id: '',
-                              },
-                              age: {
-                                label: '',
-                                id: '',
-                              },
-                              amount: '',
-                              weight: '',
-                              error: false,
-                            });
+                            arrayHelpers.push({});
                           }}
                         >
                           {buttonsTitles.addFish}
@@ -460,11 +444,11 @@ const RegistrationForm = ({
   );
 };
 
-const StyledForm = styled(Form)<{ display: boolean }>`
+const StyledForm = styled(Form)<{ $display: boolean }>`
   padding: 32px;
   flex-direction: column;
   gap: 12px;
-  display: ${({ display }) => (display ? 'flex' : 'none')};
+  display: ${({ $display }) => ($display ? 'flex' : 'none')};
   overflow-y: auto;
 
   @media ${device.mobileL} {

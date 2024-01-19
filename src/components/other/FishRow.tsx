@@ -1,117 +1,43 @@
-import { ArrayHelpers } from 'formik';
-import { differenceWith, filter } from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { default as NumericTextField } from '../fields/NumericTextField';
 import SelectField from '../fields/SelectField';
 import Icon from '../other/Icon';
+import { RegistrationFormFishRow } from '../../utils/types';
 
-export interface FishRow {
-  fishType: { label: string; id: string };
-  fishAge: { label: string; id: string };
-  amount: string | number;
-  weight: string | number;
-}
-
-export interface FishStickingRegistrationFishRowProps {
+export interface FishRowProps {
   fishTypes: { label: string; id: string }[];
   fishAges: { label: string; id: string }[];
-  item: FishRow;
+  item: RegistrationFormFishRow;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
   handleDelete: (index: number) => void;
-  arrayHelpers: ArrayHelpers;
   showDelete: boolean;
   index: number;
   errors?: any;
-  allFishSelections?: {
-    fishType: any;
-    fishAge: any;
-    amount: string | number;
-    weight: string | number;
-  }[];
   disabled?: boolean;
   key?: string;
 }
 
-const FishStickingRegistrationFishRow = ({
+const FishRow = ({
   fishTypes,
   fishAges,
   item,
   setFieldValue,
   handleDelete,
-  arrayHelpers,
   showDelete,
   index,
   errors,
-  allFishSelections,
   disabled,
-  key,
-}: FishStickingRegistrationFishRowProps) => {
+}: FishRowProps) => {
   const { fishType, fishAge, weight, amount } = item;
-  const getAvailableFishTypes = useCallback(() => {
-    if (item?.fishAge?.id) {
-      const batchesWithTheSameAge = filter(allFishSelections, (batch) => {
-        if (batch?.fishAge?.id === item?.fishAge?.id && batch?.fishType?.id) {
-          return batch;
-        }
-      });
-
-      const typesWithTheSameAge = batchesWithTheSameAge.map((b: any) => b.type);
-
-      return differenceWith(
-        fishTypes,
-        typesWithTheSameAge,
-        (type1: any, type2: any) => type1?.id === type2?.id,
-      );
-    }
-    return fishTypes;
-  }, [fishTypes, allFishSelections, item?.fishAge?.id]);
-
-  const getAvailableFishAges = useCallback(() => {
-    if (item?.fishType?.id) {
-      const batchesWithTheSameAge = filter(allFishSelections, (batch) => {
-        if (batch.fishType?.id === item.fishType?.id && batch.fishAge?.value) {
-          return batch;
-        }
-      });
-      const agesWithTheSameType = batchesWithTheSameAge.map((b: any) => b.age);
-      return differenceWith(
-        fishAges,
-        agesWithTheSameType,
-        (type1: any, type2: any) => type1?.id === type2?.id,
-      );
-    }
-    return fishAges;
-  }, [fishAges, allFishSelections, item.fishType?.id]);
-
-  const [availableFishTypes, setAvailableFishTypes] = useState(getAvailableFishTypes());
-  const [availableFishAges, setAvailableFishAges] = useState(getAvailableFishAges());
-
-  useEffect(() => {
-    setAvailableFishTypes(getAvailableFishTypes());
-    setAvailableFishAges(getAvailableFishAges());
-  }, [getAvailableFishAges, getAvailableFishTypes]);
-
-  useEffect(() => {
-    setAvailableFishTypes(getAvailableFishTypes());
-    setAvailableFishAges(getAvailableFishAges());
-  }, [
-    fishType,
-    fishAge,
-    allFishSelections,
-    fishTypes,
-    getAvailableFishAges,
-    getAvailableFishTypes,
-  ]);
-
   return (
-    <Row showDelete={showDelete} key={key}>
+    <Row $showDelete={showDelete}>
       <SelectField
         name={`batches.${index}.fishType`}
         value={fishType}
         onChange={(e: any) => setFieldValue(`batches.${index}.fishType`, e)}
-        options={availableFishTypes}
+        options={fishTypes}
         getOptionLabel={(option: any) => option?.label || ''}
         label="Žuvų rūšis"
         error={errors?.fishType}
@@ -124,7 +50,7 @@ const FishStickingRegistrationFishRow = ({
         onChange={(e: any) => {
           setFieldValue(`batches.${index}.fishAge`, e);
         }}
-        options={availableFishAges}
+        options={fishAges}
         getOptionLabel={(option: any) => option?.label || ''}
         label="Amžius"
         error={errors?.fishAge}
@@ -161,10 +87,10 @@ const FishStickingRegistrationFishRow = ({
   );
 };
 
-const Row = styled.div<{ showDelete: boolean }>`
+const Row = styled.div<{ $showDelete: boolean }>`
   display: grid;
   align-items: center;
-  grid-template-columns: 1fr 1fr 1fr 1fr ${({ showDelete }) => (showDelete ? '50px' : '')};
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $showDelete }) => ($showDelete ? '50px' : '')};
   margin-bottom: 12px;
   gap: 12px;
   width: 100%;
@@ -200,4 +126,4 @@ const InputInnerLabel = styled.div`
   color: ${({ theme }) => theme.colors.primary + '8F'};
 `;
 
-export default FishStickingRegistrationFishRow;
+export default FishRow;
