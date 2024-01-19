@@ -250,7 +250,7 @@ const RegistrationForm = ({
                     label="Data"
                     minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
                     name="eventTime"
-                    error={errors.eventTime as string}
+                    error={errors.eventTime}
                     value={values.eventTime}
                     onChange={(e: any) => setFieldValue('eventTime', e)}
                     disabled={disabled}
@@ -259,7 +259,7 @@ const RegistrationForm = ({
                     label="Laikas"
                     minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
                     onChange={(e: Date) => setFieldValue('eventTime', e)}
-                    error={errors.eventTime as string}
+                    error={errors.eventTime}
                     value={values.eventTime}
                     disabled={disabled}
                   />
@@ -269,7 +269,7 @@ const RegistrationForm = ({
                   label="Žuvų kilmė"
                   name="fishOrigin"
                   value={values.fishOrigin}
-                  error={errors.fishOrigin as string}
+                  error={errors.fishOrigin}
                   onChange={(e: any) => {
                     setFieldValue('fishOrigin', e);
                     setFieldValue('fishOriginCompanyName', '');
@@ -283,7 +283,7 @@ const RegistrationForm = ({
                       label="Žuvivaisos įmonė"
                       name="fishOriginCompanyName"
                       value={values.fishOriginCompanyName}
-                      error={errors.fishOriginCompanyName as string}
+                      error={errors.fishOriginCompanyName}
                       onChange={(value) => setFieldValue('fishOriginCompanyName', value)}
                       disabled={disabled}
                     />
@@ -292,7 +292,7 @@ const RegistrationForm = ({
                       label="Vandens telkinys"
                       name="fishOriginReservoir"
                       value={values.fishOriginReservoir}
-                      error={errors.fishOriginReservoir as string}
+                      error={errors.fishOriginReservoir}
                       onChange={(value) => setFieldValue('fishOriginReservoir', value)}
                       hasOptionKey={false}
                       getOptionValue={(option) => option?.cadastral_id}
@@ -314,7 +314,7 @@ const RegistrationForm = ({
                         name="assignedTo"
                         getOptionLabel={(option: any) => `${option.firstName} ${option.lastName}`}
                         value={values.assignedTo}
-                        error={errors.assignedTo as string}
+                        error={errors.assignedTo}
                         onChange={(value: any) => {
                           setFieldValue('assignedTo', value);
                           setFieldValue('phone', value?.phone || '');
@@ -328,7 +328,7 @@ const RegistrationForm = ({
                         name="phone"
                         value={values.phone}
                         placeholder=""
-                        error={errors.phone as string}
+                        error={errors.phone}
                         onChange={(e: any) => {
                           if (/^\+?[0-9\s]{0,11}$/.test(e)) {
                             setFieldValue('phone', e);
@@ -350,7 +350,7 @@ const RegistrationForm = ({
                     }
                     getOptionLabel={(option: any) => option?.name}
                     value={values.stockingCustomer}
-                    error={errors.stockingCustomer as string}
+                    error={errors.stockingCustomer}
                     onChange={(value: any) => setFieldValue('stockingCustomer', value)}
                     disabled={disabled}
                   />
