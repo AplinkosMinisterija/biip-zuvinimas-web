@@ -8,9 +8,10 @@ import { useAppSelector } from '../state/hooks';
 import { handleSelectProfile } from '../utils/functions';
 import { useLogoutMutation } from '../utils/hooks';
 import { buttonsTitles, formLabels } from '../utils/texts';
+import { User } from '../utils/types';
 
 const Profiles = () => {
-  const user = useAppSelector((state) => state?.user?.userData);
+  const user: User = useAppSelector((state) => state?.user?.userData);
   const [loading, setLoading] = useState(false);
   const { mutateAsync } = useLogoutMutation();
 
@@ -25,12 +26,12 @@ const Profiles = () => {
     <LoginLayout>
       <Container>
         <Title>{formLabels.selectProfile}</Title>
-        {user.profiles?.map((profile) => (
+        {user?.profiles?.map((profile) => (
           <InnerContainer key={profile?.id}>
             <ProfileItem
               fisher={{
-                name: user?.firstName!,
-                lastName: user?.lastName!,
+                name: user.firstName,
+                lastName: user.lastName,
                 email: profile?.freelancer ? user?.email : profile?.name,
                 freelancer: profile?.freelancer,
               }}

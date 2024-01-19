@@ -23,7 +23,7 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) => [...getDefaultMiddleware({ serializableCheck: false })],
 });
 
-let persistor = persistStore(store);
+const persistor = persistStore(store);
 
 const reduxData = { store, persistor };
 

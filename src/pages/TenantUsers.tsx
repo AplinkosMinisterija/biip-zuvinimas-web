@@ -44,7 +44,7 @@ const cookies = new Cookies();
 const NariaiPage = () => {
   const [open, setOpen] = useState('');
   const currentProfile = useGetCurrentProfile();
-  const [currentUser, setCurrentUser] = useState<User>(initUser);
+  const [currentUser, setCurrentUser] = useState<any>(initUser); //TODO: should be defined another type for form instead of used type that will be returned from api
 
   const fetchTenantUsers = async (page: number) => {
     const tenantUsers = await api.tenantUsers({ page });
@@ -107,7 +107,7 @@ const NariaiPage = () => {
   });
 
   const updateUserMutation = useMutation(
-    (user: User) => api.updateTenantUser({ role: user.role }, user?.id!),
+    (user: User) => api.updateTenantUser({ role: user.role }, user?.id),
     {
       onError: () => {
         handleAlert();
@@ -127,7 +127,7 @@ const NariaiPage = () => {
 
   const createOrUpdateUser = async (user: User) => {
     const params = { ...user, tenant: parseInt(cookies.get('profileId')) };
-    if (!!user.id) {
+    if (user.id) {
       await updateUserMutation.mutateAsync(user);
     } else {
       await createUserMutation.mutateAsync(params);
@@ -312,7 +312,9 @@ const NariaiPage = () => {
               description={'Ar norite pašalinti įmonės darbuotoją'}
               name={`${currentUser?.firstName} ${currentUser?.lastName}`}
               onSetClose={() => setOpen('')}
-              handleDelete={() => deleteUserMutation.mutateAsync(currentUser?.id!)}
+              handleDelete={() =>
+                currentUser?.id ? deleteUserMutation.mutateAsync(currentUser.id) : {}
+              }
               deleteInProgress={deleteUserMutation.isLoading}
             />
           </DeleteCardContainer>
@@ -446,7 +448,7 @@ const PopContainer = styled.div`
   @media ${device.mobileL} {
     border-radius: 0px;
     margin: 0px;
-    width:100%
+    width: 100%;
     max-width: 100%;
     padding: 32px;
   }

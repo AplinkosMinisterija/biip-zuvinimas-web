@@ -7,7 +7,7 @@ import Cookies from 'universal-cookie';
 import { FilterConfig } from '../components/other/DynamicFilter/Filter';
 import { UserReducerProps } from '../state/user/reducer';
 import api from './api';
-import { FishStockingStatus } from './constants';
+import { FishStockingStatus, RolesTypes } from './constants';
 import { fishStockingStatusLabels, validationTexts } from './texts';
 import { FishStockingFilters, FishStockingParams, Profile, ProfileId } from './types';
 
@@ -25,7 +25,7 @@ export const handleResponse = async ({ endpoint, onSuccess, onError }: SetRespon
   }
 
   if (!response || response?.error) {
-    return handleAlert(response?.error?.type!);
+    return handleAlert(response?.error?.type);
   }
 
   return onSuccess(response);
@@ -100,7 +100,12 @@ export const handleUpdateTokens = (data: UpdateTokenProps) => {
 };
 
 export const emptyUser: UserReducerProps = {
-  userData: {},
+  userData: {
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+  },
   loggedIn: false,
 };
 
@@ -179,7 +184,7 @@ export const handleDateRestriction = (filter: FilterConfig, values: any) => {
 };
 
 export const mapFishStockingsRequestParams = (filters: FishStockingFilters) => {
-  let params: FishStockingParams = {};
+  const params: FishStockingParams = {};
   if (filters) {
     (!!filters.eventTimeFrom || !!filters.eventTimeTo) &&
       (params.eventTime = {
