@@ -1,20 +1,15 @@
-import { useFormik } from "formik";
-import { useMutation } from "react-query";
-import styled from "styled-components";
-import Button from "../components/buttons/Button";
-import PasswordField from "../components/fields/PasswordField";
-import TextField from "../components/fields/TextField";
-import { LoginLayout } from "../components/Layouts/Login";
-import api from "../utils/api";
-import { handleAlert, handleUpdateTokens } from "../utils/functions";
-import { useCheckAuthMutation, useEGatesSign } from "../utils/hooks";
-import {
-  buttonLabels,
-  formLabels,
-  inputLabels,
-  validationTexts
-} from "../utils/texts";
-import { loginSchema } from "../utils/validations";
+import { useFormik } from 'formik';
+import { useMutation } from 'react-query';
+import styled from 'styled-components';
+import Button from '../components/buttons/Button';
+import PasswordField from '../components/fields/PasswordField';
+import TextField from '../components/fields/TextField';
+import { LoginLayout } from '../components/Layouts/Login';
+import api from '../utils/api';
+import { handleAlert, handleUpdateTokens } from '../utils/functions';
+import { useCheckAuthMutation, useEGatesSign } from '../utils/hooks';
+import { buttonLabels, formLabels, inputLabels, validationTexts } from '../utils/texts';
+import { loginSchema } from '../utils/validations';
 
 interface LoginProps {
   email: string;
@@ -22,13 +17,7 @@ interface LoginProps {
 }
 
 export const Login = () => {
-  const onSubmit = async ({
-    email,
-    password
-  }: {
-    email: string;
-    password: string;
-  }) => {
+  const onSubmit = async ({ email, password }: { email: string; password: string }) => {
     const params = { email, password };
     loginMutation.mutateAsync(params);
   };
@@ -47,27 +36,23 @@ export const Login = () => {
       handleUpdateTokens(data);
       checkAuthMutation();
     },
-    retry: false
+    retry: false,
   });
 
-  const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } =
-    useEGatesSign();
+  const { mutateAsync: eGatesMutation, isLoading: eGatesSignLoading } = useEGatesSign();
 
-  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } =
-    useCheckAuthMutation();
+  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } = useCheckAuthMutation();
 
-  const loading = [loginMutation.isLoading, checkAuthLoading].some(
-    (loading) => loading
-  );
+  const loading = [loginMutation.isLoading, checkAuthLoading].some((loading) => loading);
 
   const { values, errors, setFieldValue, handleSubmit, setErrors } = useFormik({
     initialValues: {
-      email: "",
-      password: ""
+      email: '',
+      password: '',
     },
     validateOnChange: false,
     validationSchema: loginSchema,
-    onSubmit
+    onSubmit,
   });
 
   const handleType = (field: string, value: string) => {
@@ -80,7 +65,7 @@ export const Login = () => {
       <FormContainer
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === 'Enter') {
             handleSubmit();
           }
         }}
@@ -92,13 +77,13 @@ export const Login = () => {
             type="email"
             value={values.email}
             error={errors.email}
-            onChange={(e) => handleType("email", e)}
+            onChange={(e) => handleType('email', e)}
           />
           <PasswordField
             label={inputLabels.password}
             value={values.password}
             error={errors.password}
-            onChange={(e) => handleType("password", e)}
+            onChange={(e) => handleType('password', e)}
           />
           <ButtonContainer>
             <StyledButton loading={loading} type="submit">
@@ -115,11 +100,7 @@ export const Login = () => {
             </Or>
           </OrContainer>
         </InnerContainer>
-        <StyledButton
-          loading={eGatesSignLoading}
-          type="button"
-          onClick={() => eGatesMutation()}
-        >
+        <StyledButton loading={eGatesSignLoading} type="button" onClick={() => eGatesMutation()}>
           {buttonLabels.eLogin}
         </StyledButton>
       </FormContainer>

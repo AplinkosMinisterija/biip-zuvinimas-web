@@ -1,8 +1,8 @@
-import { useState } from "react";
-import FieldWrapper from "./components/FieldWrapper";
-import OptionsContainer from "./components/OptionsContainer";
-import TextFieldInput from "./components/TextFieldInput";
-import { getFilteredOptions } from "./utils/functions";
+import { useState } from 'react';
+import FieldWrapper from './components/FieldWrapper';
+import OptionsContainer from './components/OptionsContainer';
+import TextFieldInput from './components/TextFieldInput';
+import { getFilteredOptions } from './utils/functions';
 
 export interface SelectFieldProps {
   id?: string;
@@ -98,9 +98,7 @@ const SuggestionsSelect = ({
         onChange={handleOnChange}
         disabled={disabled}
         placeholder={
-          (value && getInputLabel
-            ? getInputLabel(value)
-            : getOptionLabel(value)) || placeholder
+          (value && getInputLabel ? getInputLabel(value) : getOptionLabel(value)) || placeholder
         }
         selectedValue={value}
       />

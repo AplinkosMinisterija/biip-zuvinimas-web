@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import { inputLabels } from "../../utils/texts";
-import Icon from "../other/Icon";
-import FieldWrapper from "./components/FieldWrapper";
-import OptionsContainer from "./components/OptionsContainer";
-import TextFieldInput from "./components/TextFieldInput";
-import { useAsyncSelectData } from "./utils/hooks";
+import styled from 'styled-components';
+import { inputLabels } from '../../utils/texts';
+import Icon from '../other/Icon';
+import FieldWrapper from './components/FieldWrapper';
+import OptionsContainer from './components/OptionsContainer';
+import TextFieldInput from './components/TextFieldInput';
+import { useAsyncSelectData } from './utils/hooks';
 
 export interface AsyncSelectFieldProps {
   id?: string;
@@ -42,7 +42,7 @@ const AsyncSelectField = ({
   showError = true,
   className,
   padding,
-  optionsKey = "rows",
+  optionsKey = 'rows',
   onChange,
   name,
   disabled = false,
@@ -50,7 +50,7 @@ const AsyncSelectField = ({
   getOptionValue = (option) => option.id,
   setSuggestionsFromApi,
   dependantId,
-  placeholder = inputLabels.chooseOption
+  placeholder = inputLabels.chooseOption,
 }: AsyncSelectFieldProps) => {
   const {
     loading,
@@ -62,14 +62,14 @@ const AsyncSelectField = ({
 
     handleBlur,
     handleClick,
-    observerRef
+    observerRef,
   } = useAsyncSelectData({
     setSuggestionsFromApi,
     disabled,
     onChange,
     dependantId,
     optionsKey,
-    name
+    name,
   });
   return (
     <FieldWrapper
@@ -85,7 +85,7 @@ const AsyncSelectField = ({
         value={input}
         name={name}
         error={error}
-        rightIcon={<StyledIcon name={"dropdownArrow"} />}
+        rightIcon={<StyledIcon name={'dropdownArrow'} />}
         onChange={handleInputChange}
         disabled={disabled}
         placeholder={(value && getOptionLabel(value)) || placeholder}

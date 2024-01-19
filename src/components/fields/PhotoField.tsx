@@ -1,9 +1,9 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { FileProps } from "../../utils/types";
-import Icon from "../other/Icon";
-import LoaderComponent from "../other/LoaderComponent";
+import { useState } from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { FileProps } from '../../utils/types';
+import Icon from '../other/Icon';
+import LoaderComponent from '../other/LoaderComponent';
 
 export interface PhotoFieldProps {
   photo: FileProps | File | any;
@@ -24,7 +24,7 @@ const PhotoField = ({
   height = 100,
   isOpen,
   getSrc,
-  onImageClick
+  onImageClick,
 }: PhotoFieldProps) => {
   const [loading, setLoading] = useState(true);
 
@@ -38,12 +38,7 @@ const PhotoField = ({
   };
 
   return (
-    <ImageContainer
-      main={isMain}
-      isOpen={!!isOpen}
-      onClick={onImageClick}
-      key={`photo-${index}`}
-    >
+    <ImageContainer main={isMain} isOpen={!!isOpen} onClick={onImageClick} key={`photo-${index}`}>
       {!isOpen && !disabled && !loading && (
         <StyledCloseIconContainer onClick={handleDeleteClickClick}>
           <StyledCloseIcon name="close" />
@@ -132,9 +127,9 @@ export const StyledImg = styled.img<{
   height: ${({ height }) => `${height}px`};
   object-fit: cover;
   border-radius: 4px;
-  cursor: ${({ isOpen }) => (isOpen ? "block" : "pointer")};
+  cursor: ${({ isOpen }) => (isOpen ? 'block' : 'pointer')};
   opacity: 1;
-  display: ${({ display }) => (display ? "block" : "none")};
+  display: ${({ display }) => (display ? 'block' : 'none')};
   max-width: 100%;
   transition: 0.5s ease;
   backface-visibility: hidden;
@@ -158,7 +153,7 @@ const ImageContainer = styled.div<{
   min-width: 100px;
   min-height: 100px;
   border-radius: 4px;
-  border: ${({ main }) => (main ? "2px solid #FEBC1D" : "none")};
+  border: ${({ main }) => (main ? '2px solid #FEBC1D' : 'none')};
 
   ${({ isOpen }) =>
     !isOpen &&

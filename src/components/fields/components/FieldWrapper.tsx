@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { ErrorMessage } from "../../other/ErrorMessage";
+import styled from 'styled-components';
+import { ErrorMessage } from '../../other/ErrorMessage';
 export interface FieldWrapperProps {
   error?: string;
   showError?: boolean;
@@ -25,14 +25,14 @@ const FieldWrapper = ({
   subLabel,
   bottomLabel,
   secondLabel,
-  children
+  children,
 }: FieldWrapperProps) => {
   return (
     <Container
       tabIndex={-1}
       onBlur={handleBlur}
       className={className}
-      padding={padding || "0"}
+      padding={padding || '0'}
       onClick={onClick}
     >
       <LabelRow>

@@ -1,19 +1,19 @@
-import { useState } from "react";
-import styled from "styled-components";
-import Cookies from "universal-cookie";
-import { FishStockingStatus } from "../../utils/constants";
-import { FishStocking } from "../../utils/types";
-import Registration from "./Registration";
-import Review from "./Review";
+import { useState } from 'react';
+import styled from 'styled-components';
+import Cookies from 'universal-cookie';
+import { FishStockingStatus } from '../../utils/constants';
+import { FishStocking } from '../../utils/types';
+import Registration from './Registration';
+import Review from './Review';
 const tabs = [
-  { label: "Registracijos duomenys", route: FishStockingStatus.UPCOMING },
-  { label: "Faktiniai duomenys", route: FishStockingStatus.ONGOING }
+  { label: 'Registracijos duomenys', route: FishStockingStatus.UPCOMING },
+  { label: 'Faktiniai duomenys', route: FishStockingStatus.ONGOING },
 ];
 const cookies = new Cookies();
 
 const Unfinished = ({ fishStocking }: { fishStocking: FishStocking }) => {
   const [selectedTab, setSelectedTab] = useState(
-    fishStocking?.status || FishStockingStatus.UPCOMING
+    fishStocking?.status || FishStockingStatus.UPCOMING,
   );
 
   const renderTabs = (
@@ -43,7 +43,7 @@ const Unfinished = ({ fishStocking }: { fishStocking: FishStocking }) => {
     <Registration
       disabled={
         fishStocking?.status !== FishStockingStatus.UPCOMING ||
-        fishStocking.stockingCustomer?.id === cookies.get("profileId")
+        fishStocking.stockingCustomer?.id === cookies.get('profileId')
       }
       renderTabs={renderTabs}
       fishStocking={fishStocking}
@@ -52,14 +52,13 @@ const Unfinished = ({ fishStocking }: { fishStocking: FishStocking }) => {
 };
 
 const MenuButton = styled.div<{ isSelected: boolean }>`
-  color: ${({ theme, isSelected }) =>
-    isSelected ? "white" : theme.colors.primary};
+  color: ${({ theme, isSelected }) => (isSelected ? 'white' : theme.colors.primary)};
   font-size: 1.4rem;
   cursor: pointer;
   position: relative;
   padding: 0 0 4px 0;
   background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.primary : "transparent"};
+    isSelected ? theme.colors.primary : 'transparent'};
   padding: 8px 16px;
   border-radius: 24px;
   text-align: center;

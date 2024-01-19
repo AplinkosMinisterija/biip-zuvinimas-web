@@ -1,6 +1,6 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
-declare module "styled-components" {
+declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
 }
 export interface Theme {
@@ -41,38 +41,38 @@ export interface Theme {
 
 export const theme: Theme = {
   colors: {
-    primary: "#121A55",
-    secondary: "#13C9E7",
-    tertiary: "#7A7E9F",
-    transparent: "transparent",
-    danger: "#FE5B78",
-    success: "#4FB922",
+    primary: '#121A55',
+    secondary: '#13C9E7',
+    tertiary: '#7A7E9F',
+    transparent: 'transparent',
+    danger: '#FE5B78',
+    success: '#4FB922',
     hover: {
-      primary: "#13C9E7",
-      secondary: "#13C9E78F",
-      tertiary: "#7A7E9F",
-      danger: "#FE5B78E6",
-      success: "#4FB922B3",
-      transparent: "transparent"
+      primary: '#13C9E7',
+      secondary: '#13C9E78F',
+      tertiary: '#7A7E9F',
+      danger: '#FE5B78E6',
+      success: '#4FB922B3',
+      transparent: 'transparent',
     },
-    tertiaryMedium: "#C6C8D6",
-    tertiaryLight: "#F3F3F7",
-    UPCOMING: "#00cae9",
-    NOT_FINISHED: "#FE5B78",
-    FINISHED: "#60b456",
-    INSPECTED: "#60b456",
-    CANCELED: "#FE5B78",
-    ONGOING: "#FEBC1D",
-    input: "#F3F3F7",
-    border: "#121A553D",
-    label: "#0B1F51",
-    error: "#FE5B78",
-    light: "#f3f3f7",
-    white: "#ffffff",
-    darkerWhite: "#A4A7BD",
-    pending: "#fea700",
-    grey: "#B3B5C4"
-  }
+    tertiaryMedium: '#C6C8D6',
+    tertiaryLight: '#F3F3F7',
+    UPCOMING: '#00cae9',
+    NOT_FINISHED: '#FE5B78',
+    FINISHED: '#60b456',
+    INSPECTED: '#60b456',
+    CANCELED: '#FE5B78',
+    ONGOING: '#FEBC1D',
+    input: '#F3F3F7',
+    border: '#121A553D',
+    label: '#0B1F51',
+    error: '#FE5B78',
+    light: '#f3f3f7',
+    white: '#ffffff',
+    darkerWhite: '#A4A7BD',
+    pending: '#fea700',
+    grey: '#B3B5C4',
+  },
 };
 
 export const GlobalStyle = createGlobalStyle`
@@ -130,5 +130,5 @@ export const GlobalStyle = createGlobalStyle`
 export const device = {
   mobileS: `(max-width: 320px)`,
   mobileM: `(max-width: 425px)`,
-  mobileL: `(max-width: 868px)`
+  mobileL: `(max-width: 868px)`,
 };

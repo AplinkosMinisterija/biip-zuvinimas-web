@@ -1,7 +1,7 @@
-import { find, map } from "lodash";
-import styled from "styled-components";
-import { device } from "../../styles/index";
-import { useSignatureUsers } from "../../utils/hooks";
+import { find, map } from 'lodash';
+import styled from 'styled-components';
+import { device } from '../../styles/index';
+import { useSignatureUsers } from '../../utils/hooks';
 
 const SignatureList = ({ data, municipalityId }: any) => {
   const signatureUsers: { id: string; name: string; users: string[] }[] =
@@ -16,9 +16,8 @@ const SignatureList = ({ data, municipalityId }: any) => {
                 <InfoLabel>
                   {find(
                     signatureUsers,
-                    (signatureUser: any) =>
-                      signatureUser.id === item.organization
-                  )?.name || ""}
+                    (signatureUser: any) => signatureUser.id === item.organization,
+                  )?.name || ''}
                 </InfoLabel>
                 <SubRow>
                   <InfoValue>{item?.signedBy}</InfoValue>
@@ -47,7 +46,7 @@ const Column = styled.div`
 const InfoLabel = styled.span`
   font: 1.4rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.primary + "8A"};
+  color: ${({ theme }) => theme.colors.primary + '8A'};
 `;
 
 const InfoValue = styled.span`

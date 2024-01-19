@@ -1,9 +1,9 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { inputLabels } from "../../utils/texts";
-import FieldWrapper from "../fields/components/FieldWrapper";
-import Modal from "./Modal";
-import SignatureComponent from "./SignatureComponent";
+import { useState } from 'react';
+import styled from 'styled-components';
+import { inputLabels } from '../../utils/texts';
+import FieldWrapper from '../fields/components/FieldWrapper';
+import Modal from './Modal';
+import SignatureComponent from './SignatureComponent';
 
 const SignatureField = ({ value, error, onChange, padding }: any) => {
   const [visible, setVisible] = useState(false);
@@ -11,13 +11,8 @@ const SignatureField = ({ value, error, onChange, padding }: any) => {
   return (
     <>
       <Container>
-        <FieldWrapper
-          label={inputLabels.signature}
-          onClick={() => setVisible(true)}
-        >
-          <InputContainer error={error}>
-            {value && <Sign src={value} />}
-          </InputContainer>
+        <FieldWrapper label={inputLabels.signature} onClick={() => setVisible(true)}>
+          <InputContainer error={error}>{value && <Sign src={value} />}</InputContainer>
         </FieldWrapper>
       </Container>
 
@@ -51,11 +46,10 @@ const InputContainer = styled.div<{
   align-items: center;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid
-    ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
+  border: 1px solid ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
   opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
 
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "text")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'text')};
   :focus-within {
     border-color: ${({ theme }) => theme.colors.primary};
     box-shadow: 0 0 0 4px ${({ theme }) => `${theme.colors.primary}33`};

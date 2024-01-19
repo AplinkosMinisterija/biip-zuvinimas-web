@@ -1,14 +1,13 @@
-import { useRef, useState } from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { Url } from "../../utils/texts";
-import LoaderComponent from "./LoaderComponent";
+import { useRef, useState } from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { Url } from '../../utils/texts';
+import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
   height: string;
   value: string;
   display: boolean;
-
 }
 
 const PreviewMap = ({ height, value, display }: MapProps) => {
@@ -18,7 +17,7 @@ const PreviewMap = ({ height, value, display }: MapProps) => {
   const getMapUrl = () => {
     const url = new URL(Url.DRAW);
     const params = new URLSearchParams(url.search);
-    params.append("preview", "true");
+    params.append('preview', 'true');
     url.search = params.toString();
     return url.href;
   };
@@ -26,10 +25,7 @@ const PreviewMap = ({ height, value, display }: MapProps) => {
   const handleLoadMap = () => {
     setLoading(false);
 
-    iframeRef?.current?.contentWindow?.postMessage(
-      JSON.stringify({ geom: value }),
-      "*"
-    );
+    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
   };
 
   return (
@@ -40,7 +36,7 @@ const PreviewMap = ({ height, value, display }: MapProps) => {
           <StyledIframe
             ref={iframeRef}
             src={src}
-            width={"100%"}
+            width={'100%'}
             height={height}
             style={{ border: 0 }}
             allowFullScreen={true}
@@ -57,10 +53,8 @@ const PreviewMap = ({ height, value, display }: MapProps) => {
 const Container = styled.div<{ display: boolean }>`
   width: 100%;
   height: 100%;
-  display: ${({ display }) => (display ? "flex" : "none")};
+  display: ${({ display }) => (display ? 'flex' : 'none')};
 `;
-
-
 
 const InnerContainer = styled.div<{}>`
   position: relative;
@@ -82,7 +76,5 @@ const StyledIframe = styled.iframe<{
   width: ${({ width }) => width};
   height: ${({ height }) => height};
 `;
-
-
 
 export default PreviewMap;

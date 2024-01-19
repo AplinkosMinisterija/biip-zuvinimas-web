@@ -1,22 +1,17 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import { Form, Formik } from "formik";
-import { useMutation } from "react-query";
-import Button, { ButtonColors } from "../components/buttons/Button";
-import TextField from "../components/fields/TextField";
-import DefaultLayout from "../components/Layouts/Default";
-import { useAppSelector } from "../state/hooks";
-import { device } from "../styles";
-import api from "../utils/api";
-import { handleAlert, handleSuccess } from "../utils/functions";
-import { useCheckAuthMutation } from "../utils/hooks";
-import {
-  buttonsTitles,
-  descriptions,
-  inputLabels,
-  toasts
-} from "../utils/texts";
-import { validateMyProfile } from "../utils/validations";
+import { Form, Formik } from 'formik';
+import { useMutation } from 'react-query';
+import Button, { ButtonColors } from '../components/buttons/Button';
+import TextField from '../components/fields/TextField';
+import DefaultLayout from '../components/Layouts/Default';
+import { useAppSelector } from '../state/hooks';
+import { device } from '../styles';
+import api from '../utils/api';
+import { handleAlert, handleSuccess } from '../utils/functions';
+import { useCheckAuthMutation } from '../utils/hooks';
+import { buttonsTitles, descriptions, inputLabels, toasts } from '../utils/texts';
+import { validateMyProfile } from '../utils/validations';
 
 interface ProfileProps {
   email?: string;
@@ -26,31 +21,25 @@ interface ProfileProps {
 const MyProfile = () => {
   const user = useAppSelector((state) => state.user?.userData);
 
-  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } =
-    useCheckAuthMutation();
+  const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } = useCheckAuthMutation();
 
-  const profileMutation = useMutation(
-    (data: ProfileProps) => api.updateMyProfile(data),
-    {
-      onError: () => {
-        handleAlert();
-      },
-      onSuccess: () => {
-        checkAuthMutation();
-        handleSuccess(toasts.profileUpdated);
-      }
-    }
-  );
+  const profileMutation = useMutation((data: ProfileProps) => api.updateMyProfile(data), {
+    onError: () => {
+      handleAlert();
+    },
+    onSuccess: () => {
+      checkAuthMutation();
+      handleSuccess(toasts.profileUpdated);
+    },
+  });
 
-  const isLoading = [checkAuthLoading, profileMutation.isLoading].some(
-    (loading) => loading
-  );
+  const isLoading = [checkAuthLoading, profileMutation.isLoading].some((loading) => loading);
 
   const initialValues = {
     firstName: user?.firstName,
     lastName: user?.lastName,
     email: user?.email,
-    phone: user?.phone
+    phone: user?.phone,
   };
 
   return (
@@ -62,7 +51,7 @@ const MyProfile = () => {
           onSubmit={(values) =>
             profileMutation.mutateAsync({
               email: values.email,
-              phone: values.phone
+              phone: values.phone,
             })
           }
           validateOnChange={false}
@@ -75,7 +64,7 @@ const MyProfile = () => {
               <StyledForm
                 noValidate={true}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === 'Enter') {
                     handleSubmit();
                   }
                 }}
@@ -89,7 +78,7 @@ const MyProfile = () => {
                   value={values.firstName}
                   label={inputLabels.firstName}
                   name="firstName"
-                  onChange={(value) => setFieldValue("firstName", value)}
+                  onChange={(value) => setFieldValue('firstName', value)}
                   disabled={true}
                   error={errors.firstName}
                 />
@@ -97,7 +86,7 @@ const MyProfile = () => {
                   value={values.lastName}
                   label={inputLabels.lastName}
                   name="lastName"
-                  onChange={(value) => setFieldValue("lastName", value)}
+                  onChange={(value) => setFieldValue('lastName', value)}
                   disabled={true}
                   error={errors.lastName}
                 />
@@ -106,7 +95,7 @@ const MyProfile = () => {
                   label={inputLabels.phone}
                   name="phone"
                   placeholder="864222222"
-                  onChange={(value) => setFieldValue("phone", value)}
+                  onChange={(value) => setFieldValue('phone', value)}
                   disabled={disabled}
                   error={errors.phone}
                 />
@@ -114,7 +103,7 @@ const MyProfile = () => {
                   value={values.email}
                   label={inputLabels.email}
                   name="email"
-                  onChange={(value) => setFieldValue("email", value)}
+                  onChange={(value) => setFieldValue('email', value)}
                   disabled={disabled}
                   error={errors.email}
                 />
@@ -122,11 +111,7 @@ const MyProfile = () => {
                   <Button variant={ButtonColors.TRANSPARENT} type="reset">
                     {buttonsTitles.clear}
                   </Button>
-                  <Button
-                    loading={isLoading}
-                    variant={ButtonColors.PRIMARY}
-                    type="submit"
-                  >
+                  <Button loading={isLoading} variant={ButtonColors.PRIMARY} type="submit">
                     {buttonsTitles.save}
                   </Button>
                 </DownBar>

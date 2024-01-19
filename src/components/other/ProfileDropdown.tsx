@@ -1,13 +1,13 @@
-import { map } from "lodash";
-import { useState } from "react";
-import styled from "styled-components";
-import { useAppSelector } from "../../state/hooks";
-import { handleSelectProfile } from "../../utils/functions";
-import { useGetCurrentProfile, useLogoutMutation } from "../../utils/hooks";
-import { buttonsTitles } from "../../utils/texts";
+import { map } from 'lodash';
+import { useState } from 'react';
+import styled from 'styled-components';
+import { useAppSelector } from '../../state/hooks';
+import { handleSelectProfile } from '../../utils/functions';
+import { useGetCurrentProfile, useLogoutMutation } from '../../utils/hooks';
+import { buttonsTitles } from '../../utils/texts';
 
-import Avatar from "./Avatar";
-import Icon from "./Icon";
+import Avatar from './Avatar';
+import Icon from './Icon';
 
 const UserSwitchMenu = () => {
   const user = useAppSelector((state) => state.user?.userData);
@@ -35,18 +35,15 @@ const UserSwitchMenu = () => {
         <InnerContainer>
           {map(user?.profiles, (profile: any, index: number) => {
             return (
-              <TopRow
-                onClick={() => handleSelectProfile(profile.id)}
-                key={`profile-${index}`}
-              >
+              <TopRow onClick={() => handleSelectProfile(profile.id)} key={`profile-${index}`}>
                 <StyledAvatar
                   active={currentProfile?.id === profile?.id}
                   name={user?.firstName!}
                   surname={user?.lastName!}
                 />
                 <Column>
-                  <FullNameDiv>{`${profile?.firstName || ""} ${
-                    profile?.lastName || ""
+                  <FullNameDiv>{`${profile?.firstName || ''} ${
+                    profile?.lastName || ''
                   }`}</FullNameDiv>
                   {profile?.name && <TenantName>{profile?.name}</TenantName>}
                   {profile?.code && (

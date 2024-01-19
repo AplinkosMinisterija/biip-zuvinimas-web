@@ -1,13 +1,13 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { LoginLayout } from "../components/Layouts/Login";
-import Icon from "../components/other/Icon";
-import Loader from "../components/other/Loader";
-import ProfileItem from "../components/other/ProfileItem";
-import { useAppSelector } from "../state/hooks";
-import { handleSelectProfile } from "../utils/functions";
-import { useLogoutMutation } from "../utils/hooks";
-import { buttonsTitles, formLabels } from "../utils/texts";
+import { useState } from 'react';
+import styled from 'styled-components';
+import { LoginLayout } from '../components/Layouts/Login';
+import Icon from '../components/other/Icon';
+import Loader from '../components/other/Loader';
+import ProfileItem from '../components/other/ProfileItem';
+import { useAppSelector } from '../state/hooks';
+import { handleSelectProfile } from '../utils/functions';
+import { useLogoutMutation } from '../utils/hooks';
+import { buttonsTitles, formLabels } from '../utils/texts';
 
 const Profiles = () => {
   const user = useAppSelector((state) => state?.user?.userData);
@@ -32,7 +32,7 @@ const Profiles = () => {
                 name: user?.firstName!,
                 lastName: user?.lastName!,
                 email: profile?.freelancer ? user?.email : profile?.name,
-                freelancer: profile?.freelancer
+                freelancer: profile?.freelancer,
               }}
               onClick={() => handleSelect(profile?.id)}
             />

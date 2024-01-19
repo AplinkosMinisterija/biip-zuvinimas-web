@@ -1,15 +1,15 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { FishStockingStatus } from "../../utils/constants";
-import { FishStocking } from "../../utils/types";
+import { useState } from 'react';
+import styled from 'styled-components';
+import { FishStockingStatus } from '../../utils/constants';
+import { FishStocking } from '../../utils/types';
 const tabs = [
-  { label: "Registracijos duomenys", route: FishStockingStatus.UPCOMING },
-  { label: "Faktiniai duomenys", route: FishStockingStatus.ONGOING }
+  { label: 'Registracijos duomenys', route: FishStockingStatus.UPCOMING },
+  { label: 'Faktiniai duomenys', route: FishStockingStatus.ONGOING },
 ];
 
 const UnfinishedTab = ({ fishStocking }: { fishStocking: FishStocking }) => {
   const [selectedTab, setSelectedTab] = useState(
-    fishStocking?.status || FishStockingStatus.UPCOMING
+    fishStocking?.status || FishStockingStatus.UPCOMING,
   );
 
   return (
@@ -30,15 +30,14 @@ const UnfinishedTab = ({ fishStocking }: { fishStocking: FishStocking }) => {
 };
 
 const MenuButton = styled.div<{ isSelected: boolean }>`
-  color: ${({ theme, isSelected }) =>
-    isSelected ? "white" : theme.colors.primary};
+  color: ${({ theme, isSelected }) => (isSelected ? 'white' : theme.colors.primary)};
   font-weight: 600;
   font-size: 1.4rem;
   cursor: pointer;
   position: relative;
   padding: 0 0 4px 0;
   background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.primary : "transparent"};
+    isSelected ? theme.colors.primary : 'transparent'};
   padding: 8px 16px;
   border-radius: 24px;
   text-align: center;

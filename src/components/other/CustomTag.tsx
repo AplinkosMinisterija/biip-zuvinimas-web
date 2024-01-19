@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export interface CustomTagProps {
   text: string;
@@ -12,19 +12,19 @@ export interface CustomTagProps {
 }
 
 const CustomTag = ({
-  color = "#7A7E9F",
+  color = '#7A7E9F',
   icon,
   text,
   isFilter = false,
-  margin = "0",
+  margin = '0',
   isPressed = false,
-  className
+  className,
 }: CustomTagProps) => {
   return (
     <Container margin={margin} className={className}>
       {icon}
       <LabelContainer isPressed={isPressed} isFilter={isFilter} color={color}>
-        <Label color={isPressed ? "white" : color}>{text}</Label>
+        <Label color={isPressed ? 'white' : color}>{text}</Label>
       </LabelContainer>
     </Container>
   );
@@ -45,8 +45,7 @@ const LabelContainer = styled.div<{
   height: ${({ isFilter }) => (isFilter ? `30px` : `20px`)};
   padding: 0 8px;
   border: 1px solid ${({ color }) => color};
-  background-color: ${({ color, isPressed }) =>
-    isPressed ? "#121A55" : `${color}14`};
+  background-color: ${({ color, isPressed }) => (isPressed ? '#121A55' : `${color}14`)};
   border-radius: 4px;
   margin: 2px;
   display: flex;

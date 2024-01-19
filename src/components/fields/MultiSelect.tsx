@@ -1,8 +1,8 @@
-import FieldWrapper from "./components/FieldWrapper";
-import MultiTextField from "./components/MultiTextFieldInput";
-import OptionsContainer from "./components/OptionsContainer";
-import { filterSelectedOptions, handleRemove } from "./utils/functions";
-import { useSelectData } from "./utils/hooks";
+import FieldWrapper from './components/FieldWrapper';
+import MultiTextField from './components/MultiTextFieldInput';
+import OptionsContainer from './components/OptionsContainer';
+import { filterSelectedOptions, handleRemove } from './utils/functions';
+import { useSelectData } from './utils/hooks';
 
 export interface SelectOption {
   id?: string;
@@ -68,7 +68,7 @@ const MultiSelect = ({
     handleBlur,
     handleClick,
     handleOnChange,
-    loading
+    loading,
   } = useSelectData({
     options,
     disabled,
@@ -76,15 +76,10 @@ const MultiSelect = ({
     refreshOptions,
     dependantId,
     value: values,
-    onChange: (option: any) => onChange([...values, option])
+    onChange: (option: any) => onChange([...values, option]),
   });
   return (
-    <FieldWrapper
-      onClick={handleToggleSelect}
-      label={label}
-      error={error}
-      handleBlur={handleBlur}
-    >
+    <FieldWrapper onClick={handleToggleSelect} label={label} error={error} handleBlur={handleBlur}>
       <MultiTextField
         values={values}
         input={input}

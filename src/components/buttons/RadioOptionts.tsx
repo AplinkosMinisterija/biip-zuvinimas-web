@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { device } from "../../styles";
+import styled from 'styled-components';
+import { device } from '../../styles';
 
 export interface RadioOptionsProps {
   options: { label: string; value: string }[];
@@ -47,10 +47,7 @@ const RadioOptions = ({
                 {...rest}
                 onChange={() => onChange(option.value)}
               />
-              <OptionLabel
-                disabled={!!disabled}
-                htmlFor={`${option.value}-${key}`}
-              >
+              <OptionLabel disabled={!!disabled} htmlFor={`${option.value}-${key}`}>
                 {option.label}
               </OptionLabel>
             </InputContainer>
@@ -64,12 +61,12 @@ const RadioOptions = ({
 
 const Container = styled.div<{ oneLine?: boolean }>`
   padding: 8px 0;
-  display: ${({ oneLine }) => (oneLine ? "flex" : "block")};
+  display: ${({ oneLine }) => (oneLine ? 'flex' : 'block')};
 `;
 
 const OptionsContainer = styled.div<{ column?: boolean }>`
   display: flex;
-  flex-direction: ${({ column }) => (column ? "column" : "row")};
+  flex-direction: ${({ column }) => (column ? 'column' : 'row')};
   @media ${device.mobileL} {
     flex-wrap: wrap;
     flex-direction: column;
@@ -99,7 +96,7 @@ const OptionLabel = styled.label<{ disabled: boolean }>`
   font-size: 1.4rem;
   color: #231f20;
   opacity: 1;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 
 const ErrorMessage = styled.label`
@@ -115,7 +112,7 @@ const StyledInput = styled.input<{ disabled?: boolean }>`
   }
 
   & + *::before {
-    content: "";
+    content: '';
     display: inline-block;
     width: 1.5rem;
     height: 1.5rem;
@@ -127,7 +124,7 @@ const StyledInput = styled.input<{ disabled?: boolean }>`
 
     border-color: ${({ theme }) => theme.colors.primary};
     opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
-    cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   }
 
   &:checked + *::before {

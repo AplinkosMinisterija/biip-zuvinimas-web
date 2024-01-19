@@ -1,25 +1,25 @@
-import { useMediaQuery } from "@material-ui/core";
-import { map } from "lodash";
-import { useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import styled from "styled-components";
-import { device } from "../../../styles";
-import api from "../../../utils/api";
+import { useMediaQuery } from '@material-ui/core';
+import { map } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
+import styled from 'styled-components';
+import { device } from '../../../styles';
+import api from '../../../utils/api';
 import {
   formatDate,
   handleAlert,
   handleGetExcel,
-  mapFishStockingsRequestParams
-} from "../../../utils/functions";
-import { buttonsTitles } from "../../../utils/texts";
-import Icon from "../Icon";
-import Loader from "../Loader";
-import Popup from "../Popup";
-import Filter, { FilterConfig, FilterInputTypes } from "./Filter";
+  mapFishStockingsRequestParams,
+} from '../../../utils/functions';
+import { buttonsTitles } from '../../../utils/texts';
+import Icon from '../Icon';
+import Loader from '../Loader';
+import Popup from '../Popup';
+import Filter, { FilterConfig, FilterInputTypes } from './Filter';
 
 const mapFilters = (
   filterConfig: { [key: string]: FilterConfig },
-  filters?: { [key: string]: any }
+  filters?: { [key: string]: any },
 ): string[] => {
   const applied: { key: string; label: string }[] | any = [];
   if (filters) {
@@ -29,21 +29,15 @@ const mapFilters = (
 
       const filter: any = filters?.[config.key];
       if (filter) {
-        const multiSelects = [
-          FilterInputTypes.multiselect,
-          FilterInputTypes.asyncMultiSelect
-        ];
-        const selects = [
-          FilterInputTypes.singleSelect,
-          FilterInputTypes.asyncSingleSelect
-        ];
+        const multiSelects = [FilterInputTypes.multiselect, FilterInputTypes.asyncMultiSelect];
+        const selects = [FilterInputTypes.singleSelect, FilterInputTypes.asyncSingleSelect];
 
         const label = `${config.label}:`;
 
         if (config.inputType === FilterInputTypes.date) {
           applied.push({
             key: config.key,
-            label: `${label} ${formatDate(filter)}`
+            label: `${label} ${formatDate(filter)}`,
           });
         } else if (multiSelects.includes(config.inputType)) {
           applied.push(
@@ -51,23 +45,19 @@ const mapFilters = (
               return {
                 key: config.key,
                 id: item.id,
-                label: `${label} ${
-                  hasOptionLabelFunction ? optionLabel(item) : item.label
-                }`
+                label: `${label} ${hasOptionLabelFunction ? optionLabel(item) : item.label}`,
               };
-            })
+            }),
           );
         } else if (selects.includes(config.inputType)) {
           applied.push({
             key: config.key,
-            label: `${label} ${
-              hasOptionLabelFunction ? optionLabel(filter) : filter.label
-            }`
+            label: `${label} ${hasOptionLabelFunction ? optionLabel(filter) : filter.label}`,
           });
         } else {
           applied.push({
             key: config.key,
-            label: `${label} ${filter}`
+            label: `${label} ${filter}`,
           });
         }
       }
@@ -83,7 +73,7 @@ const DynamicFilter = ({
   filterConfig,
   rowConfig,
   onSetFilters,
-  filters
+  filters,
 }: any) => {
   const isMobile = useMediaQuery(device.mobileL);
 
@@ -103,7 +93,7 @@ const DynamicFilter = ({
     },
     onSuccess: (data) => {
       handleGetExcel(data);
-    }
+    },
   });
 
   return (
@@ -120,8 +110,8 @@ const DynamicFilter = ({
                     onSetFilters({
                       ...rest,
                       [appliedFilter.key]: key.filter(
-                        (filter: any) => filter.id !== appliedFilter.id
-                      )
+                        (filter: any) => filter.id !== appliedFilter.id,
+                      ),
                     });
 
                     return;
@@ -130,24 +120,20 @@ const DynamicFilter = ({
                   onSetFilters(rest);
                 }}
               >
-                <CloseIcon name="close" />{" "}
+                <CloseIcon name="close" />{' '}
               </CloseIconContainer>
             </Tag>
           ))}
-        <Wrapper
-          className={className}
-          disabled={disabled}
-          onClick={() => setShowFilters(true)}
-        >
+        <Wrapper className={className} disabled={disabled} onClick={() => setShowFilters(true)}>
           <StyledButton disabled={disabled}>
             <StyledIcon name="filter" />
-            {loading ? <Loader color="white" /> : "Filtrai"}
+            {loading ? <Loader color="white" /> : 'Filtrai'}
             <Count>{appliedFilters.length}</Count>
           </StyledButton>
         </Wrapper>
 
         <StyledButton onClick={() => excelMutation.mutateAsync(params)}>
-          <StyledIcon name={"download"} />
+          <StyledIcon name={'download'} />
           {buttonsTitles.excel}
         </StyledButton>
       </Container>

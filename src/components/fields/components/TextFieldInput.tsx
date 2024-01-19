@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 export interface TextFieldProps {
   value?: string | number;
   name?: string;
@@ -32,21 +32,17 @@ const TextFieldInput = ({
   ...rest
 }: TextFieldProps) => {
   return (
-    <InputContainer
-      error={!!error}
-      height={height || 40}
-      disabled={disabled || false}
-    >
+    <InputContainer error={!!error} height={height || 40} disabled={disabled || false}>
       {leftIcon}
       <TextInput
         selectedValue={selectedValue}
         onClick={() => (onInputClick ? onInputClick() : null)}
         readOnly={readOnly}
-        type={type || "text"}
+        type={type || 'text'}
         name={name}
         autoComplete="off"
-        value={value || ""}
-        onChange={(e) => onChange && onChange(e?.target?.value || "")}
+        value={value || ''}
+        onChange={(e) => onChange && onChange(e?.target?.value || '')}
         placeholder={placeholder}
         disabled={disabled}
         {...rest}
@@ -68,11 +64,10 @@ const InputContainer = styled.div<{
   align-items: center;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid
-    ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
+  border: 1px solid ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
   opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
 
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "text")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'text')};
   :focus-within {
     border-color: ${({ theme }) => theme.colors.primary};
     box-shadow: 0 0 0 4px ${({ theme }) => `${theme.colors.primary}33`};
@@ -85,7 +80,7 @@ const TextInput = styled.input<{ readOnly: boolean; selectedValue: boolean }>`
   width: 100%;
   height: 100%;
 
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "text")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'text')};
 
   background-color: white;
   font-size: 1.6rem;
@@ -95,7 +90,7 @@ const TextInput = styled.input<{ readOnly: boolean; selectedValue: boolean }>`
     outline: none;
   }
 
-  [type="number"] {
+  [type='number'] {
     -moz-appearance: textfield;
   }
   ::-webkit-inner-spin-button,
@@ -104,20 +99,16 @@ const TextInput = styled.input<{ readOnly: boolean; selectedValue: boolean }>`
     margin: 0;
   }
   ::-webkit-input-placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
+    color: ${({ theme, selectedValue }) => theme.colors.label + `${!selectedValue ? '8F' : ''}`};
   }
   ::-moz-placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
+    color: ${({ theme, selectedValue }) => theme.colors.label + `${!selectedValue ? '8F' : ''}`};
   }
   ::-ms-placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
+    color: ${({ theme, selectedValue }) => theme.colors.label + `${!selectedValue ? '8F' : ''}`};
   }
   ::placeholder {
-    color: ${({ theme, selectedValue }) =>
-      theme.colors.label + `${!selectedValue ? "8F" : ""}`};
+    color: ${({ theme, selectedValue }) => theme.colors.label + `${!selectedValue ? '8F' : ''}`};
   }
 `;
 

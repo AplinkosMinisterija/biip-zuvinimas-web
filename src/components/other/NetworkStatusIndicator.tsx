@@ -1,4 +1,4 @@
-import { useNavigatorOnLine } from "../../utils/hooks";
+import { useNavigatorOnLine } from '../../utils/hooks';
 
 const NetworkStatusIndicator = () => {
   useNavigatorOnLine();

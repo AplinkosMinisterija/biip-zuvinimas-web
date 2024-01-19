@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 export interface NumericTextFieldProps {
   value?: string | number;
   name?: string;
@@ -36,11 +36,11 @@ const MonthDayField = ({
   onClick,
   disabled,
   height,
-  onInputClick
+  onInputClick,
 }: NumericTextFieldProps) => {
   const getMonthAndDay = (value: string | number) => {
     //@ts-ignore
-    const [, month, day] = value?.replace(/-/g, "").match(/(\d{0,2})(\d{0,2})/);
+    const [, month, day] = value?.replace(/-/g, '').match(/(\d{0,2})(\d{0,2})/);
 
     return { month, day };
   };
@@ -53,7 +53,7 @@ const MonthDayField = ({
       }
 
       if (!day) {
-        onChange("");
+        onChange('');
       }
     }
   };
@@ -65,7 +65,7 @@ const MonthDayField = ({
     const { month, day } = getMonthAndDay(input);
 
     if (regex.test(input)) {
-      if (input[1] === "-") {
+      if (input[1] === '-') {
         return onChange(`0${month[0]}-`);
       }
 
@@ -86,17 +86,13 @@ const MonthDayField = ({
   };
 
   return (
-    <Container className={className} padding={padding || "0"} onClick={onClick}>
+    <Container className={className} padding={padding || '0'} onClick={onClick}>
       {!!label && (
         <LabelContainer>
           <Label>{label}</Label>
         </LabelContainer>
       )}
-      <InputContainer
-        error={!!error}
-        height={height || 40}
-        disabled={disabled || false}
-      >
+      <InputContainer error={!!error} height={height || 40} disabled={disabled || false}>
         {left}
         <TextInput
           onBlur={handleBlur}
@@ -105,10 +101,10 @@ const MonthDayField = ({
           type="text"
           name={name}
           autoComplete="off"
-          value={value === 0 ? "0" : value || ""}
+          value={value === 0 ? '0' : value || ''}
           onChange={handleChange}
-          placeholder={"01-31"}
-          min={"0"}
+          placeholder={'01-31'}
+          min={'0'}
           disabled={disabled}
         />
         {right}
@@ -134,8 +130,7 @@ const InputContainer = styled.div<{
   justify-content: space-between;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid
-    ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
+  border: 1px solid ${({ theme, error }) => (error ? theme.colors.error : theme.colors.border)};
   opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
   :focus-within {
     border-color: ${({ theme }) => theme.colors.primary};
@@ -148,7 +143,7 @@ const TextInput = styled.input<{ readOnly: boolean }>`
   padding: 0 12px;
   width: 100%;
   display: inline-block;
-  cursor: ${({ readOnly }) => (readOnly ? "not-allowed" : "text")};
+  cursor: ${({ readOnly }) => (readOnly ? 'not-allowed' : 'text')};
 
   background-color: white;
   font-size: 1.6rem;
@@ -158,7 +153,7 @@ const TextInput = styled.input<{ readOnly: boolean }>`
     outline: none;
   }
 
-  [type="number"] {
+  [type='number'] {
     -moz-appearance: textfield;
   }
   ::-webkit-inner-spin-button,
@@ -167,16 +162,16 @@ const TextInput = styled.input<{ readOnly: boolean }>`
     margin: 0;
   }
   ::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
+    color: ${({ theme }) => theme.colors.label + '8F'};
   }
   ::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
+    color: ${({ theme }) => theme.colors.label + '8F'};
   }
   ::-ms-placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
+    color: ${({ theme }) => theme.colors.label + '8F'};
   }
   ::placeholder {
-    color: ${({ theme }) => theme.colors.label + "8F"};
+    color: ${({ theme }) => theme.colors.label + '8F'};
   }
 `;
 

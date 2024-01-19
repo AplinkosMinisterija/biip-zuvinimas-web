@@ -1,7 +1,7 @@
-import { isEmpty } from "lodash";
-import styled from "styled-components";
-import { inputLabels } from "../../../utils/texts";
-import LoaderComponent from "../../other/LoaderComponent";
+import { isEmpty } from 'lodash';
+import styled from 'styled-components';
+import { inputLabels } from '../../../utils/texts';
+import LoaderComponent from '../../other/LoaderComponent';
 
 export interface SelectOption {
   id?: string;
@@ -30,7 +30,7 @@ const OptionsContainer = ({
   handleScroll,
   showSelect,
   loading,
-  observerRef
+  observerRef,
 }: OptionsContainerProps) => {
   if (!showSelect || disabled) {
     return <></>;

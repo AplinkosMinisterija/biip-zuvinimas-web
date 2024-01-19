@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import Avatar from "../other/Avatar";
+import styled from 'styled-components';
+import Avatar from '../other/Avatar';
 
 export interface FishStockerItemProps {
   fisher: {
@@ -53,9 +53,7 @@ const Container = styled.a<{ status: boolean }>`
   vertical-align: middle;
   padding: 12px 0;
   margin: 8px 0;
-  border: 1px solid
-    ${({ theme, status }) =>
-      status ? theme.colors.error : theme.colors.border};
+  border: 1px solid ${({ theme, status }) => (status ? theme.colors.error : theme.colors.border)};
 
   &:hover,
   &:focus {
@@ -72,8 +70,7 @@ const StatusContainer = styled.div`
 const StatusMarker = styled.div<{ status: boolean }>`
   width: 4px;
   height: 40px;
-  background-color: ${({ theme, status }) =>
-    status ? theme.colors.pending : theme.colors.error};
+  background-color: ${({ theme, status }) => (status ? theme.colors.pending : theme.colors.error)};
   box-shadow: 0px 30px 60px #121a5514;
   border-radius: 0px 8px 8px 0px;
   opacity: 1;
@@ -83,8 +80,7 @@ const StatusMarker = styled.div<{ status: boolean }>`
 
 const StyledAvatar = styled(Avatar)<{ status: boolean }>`
   margin: auto 18px auto 15px;
-  ${({ status, theme }) =>
-    status ? `background-color: ${theme.colors.error}` : ""}
+  ${({ status, theme }) => (status ? `background-color: ${theme.colors.error}` : '')}
 `;
 
 const Content = styled.div`

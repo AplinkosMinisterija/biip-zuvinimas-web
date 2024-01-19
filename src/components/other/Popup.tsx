@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { device } from "../../styles";
-import Icon from "./Icon";
-import Modal from "./Modal";
+import styled from 'styled-components';
+import { device } from '../../styles';
+import Icon from './Icon';
+import Modal from './Modal';
 
 const Popup = ({ children, onClose, visible = true }: any) => {
   return (

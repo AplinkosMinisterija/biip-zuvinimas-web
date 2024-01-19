@@ -1,18 +1,14 @@
-import { map } from "lodash";
-import { useState } from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import {
-  compressImageSize,
-  handleAlert,
-  validateFileTypes
-} from "../../utils/functions";
-import { inputLabels } from "../../utils/texts";
-import { FileProps } from "../../utils/types";
-import Icon from "../other/Icon";
-import Loader from "../other/Loader";
-import Modal from "../other/Modal";
-import PhotoField from "./PhotoField";
+import { map } from 'lodash';
+import { useState } from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { compressImageSize, handleAlert, validateFileTypes } from '../../utils/functions';
+import { inputLabels } from '../../utils/texts';
+import { FileProps } from '../../utils/types';
+import Icon from '../other/Icon';
+import Loader from '../other/Loader';
+import Modal from '../other/Modal';
+import PhotoField from './PhotoField';
 
 export interface PhotoUploadFieldProps {
   name: string;
@@ -26,7 +22,7 @@ export interface PhotoUploadFieldProps {
   error?: string;
   showError?: boolean;
 }
-export const availablePhotoMimeTypes = ["image/png", "image/jpg", "image/jpeg"];
+export const availablePhotoMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
 const PhotoUploadField = ({
   photos,
@@ -36,7 +32,7 @@ const PhotoUploadField = ({
   onUpload,
   getSrc,
   error,
-  showError = true
+  showError = true,
 }: PhotoUploadFieldProps) => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
@@ -44,17 +40,14 @@ const PhotoUploadField = ({
   const selectedPhoto = photos?.[selectedPhotoIndex];
 
   const handleSetFiles = async (currentFiles: File[]) => {
-    const isValidFileTypes = validateFileTypes(
-      currentFiles,
-      availablePhotoMimeTypes
-    );
-    if (!isValidFileTypes) return handleAlert("badFileTypes");
+    const isValidFileTypes = validateFileTypes(currentFiles, availablePhotoMimeTypes);
+    if (!isValidFileTypes) return handleAlert('badFileTypes');
     if (onUpload) {
       const promises = map(currentFiles, async (file: any) => {
         const compressedObj = await compressImageSize(file);
 
         return new File([compressedObj] as BlobPart[], file.name, {
-          type: file.type
+          type: file.type,
         });
       });
       const compressedFiles = await Promise.all(promises);
@@ -66,8 +59,7 @@ const PhotoUploadField = ({
   };
 
   const handleOpenPreviousPhoto = () => {
-    const currentIndex =
-      (selectedPhotoIndex - 1 + photos.length) % photos.length;
+    const currentIndex = (selectedPhotoIndex - 1 + photos.length) % photos.length;
 
     handleOpenPhoto(currentIndex);
   };
@@ -106,10 +98,7 @@ const PhotoUploadField = ({
         </LoaderContainer>
       )}
 
-      <Modal
-        visible={!!selectedPhoto}
-        onClose={() => setSelectedPhotoIndex(-1)}
-      >
+      <Modal visible={!!selectedPhoto} onClose={() => setSelectedPhotoIndex(-1)}>
         <InnerContainer>
           {photos.length > 1 && (
             <div onClick={handleOpenPreviousPhoto}>
@@ -186,9 +175,9 @@ const StyledText = styled.div`
 const StyledButton = styled.button<{
   error: boolean;
 }>`
-  border-width: ${({ error }) => (error ? "1px" : "2px ")};
-  border-color: ${({ error }) => (error ? "red" : "#d3d2d2 ")};
-  border-style: ${({ error }) => (error ? "solid" : "dashed")};
+  border-width: ${({ error }) => (error ? '1px' : '2px ')};
+  border-color: ${({ error }) => (error ? 'red' : '#d3d2d2 ')};
+  border-style: ${({ error }) => (error ? 'solid' : 'dashed')};
   width: 133px;
   height: 100px;
   padding: 1rem;
