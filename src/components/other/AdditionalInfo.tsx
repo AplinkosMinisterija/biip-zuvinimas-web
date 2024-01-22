@@ -16,9 +16,7 @@ const AdditionalInfo = ({ fishStocking }: AdditionalInfoProps) => {
           <FishTotalAmount>
             {fishStocking.batches
               .map((e) =>
-                e?.reportedAmount || e?.reportedAmount === 0
-                  ? e?.reportedAmount
-                  : e?.reviewAmount || e?.reviewAmount === 0
+                e?.reviewAmount || e?.reviewAmount === 0
                   ? e?.reviewAmount
                   : e?.amount || e?.amount === 0
                   ? e?.amount

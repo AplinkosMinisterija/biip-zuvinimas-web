@@ -28,7 +28,6 @@ const FishStockingTable = ({ fishStocking }: FishStockingTableProps) => {
             <Th>ŽUVŲ RŪŠIS</Th>
             <Th>PLANUOTA</Th>
             <Th>ĮŽUVINTA</Th>
-            <Th>TIKRINTA</Th>
           </ThTr>
         )}
         {fishStocking?.batches.map((batch: any, index: any) => (
@@ -47,11 +46,6 @@ const FishStockingTable = ({ fishStocking }: FishStockingTableProps) => {
               <Td>
                 {batch.reviewAmount || batch.reviewAmount === 0
                   ? batch.reviewAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-                  : '-'}
-              </Td>
-              <Td>
-                {batch.reportedAmount || batch.reportedAmount === 0
-                  ? batch.reportedAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
                   : '-'}
               </Td>
             </TdTr>
