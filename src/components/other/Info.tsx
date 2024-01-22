@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import { device } from '../../styles';
-import { FishStocking, Tenant, User } from '../../utils/types';
+import { FishStocking, Info, Tenant, User } from '../../utils/types';
 import Icon from '../other/Icon';
 import AdditionalInfo from './AdditionalInfo';
 
 export interface FishStockingInfoProps {
   fishStocking?: FishStocking;
-  info?: Array<Array<{ type?: string; label?: string; value?: string }>>;
+  info?: Info;
   tenant?: Tenant;
   additionalInfo?: boolean;
   user?: User;
@@ -45,7 +45,7 @@ const FishStockingInfo = ({
                 return (
                   <InfoConainer key={index}>
                     <InfoPaceContainer user={!!user} tenant={!!tenant}>
-                      <StyledIcon name={item?.type!} />
+                      <StyledIcon name={item.type} />
                       <InfoPeaceColumn>
                         <Label>{item?.label}</Label>
                         <InfoPeaceLabel>{item?.value}</InfoPeaceLabel>

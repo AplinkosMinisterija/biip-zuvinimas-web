@@ -1,8 +1,6 @@
 import { useMediaQuery } from '@material-ui/core';
 import { useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
-
-//@ts-ignore
 import SignatureCanvas from 'react-signature-canvas';
 import styled from 'styled-components';
 import Button, { ButtonColors } from '../../components/buttons/Button';

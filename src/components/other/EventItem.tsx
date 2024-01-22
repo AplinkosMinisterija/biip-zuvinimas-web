@@ -54,7 +54,7 @@ const EventItem = ({ fishStocking, onClick }: FishStockingItemProps) => {
           </IconTextWraper>
           <IconTextWraper>
             <StyledIcon name="calendar" />
-            <StyledText>{format(new Date(fishStocking?.eventTime!), 'yyyy-MM-dd H:mm')}</StyledText>
+            <StyledText>{format(new Date(fishStocking?.eventTime), 'yyyy-MM-dd H:mm')}</StyledText>
           </IconTextWraper>
           {(fishStocking.batches || []).map((item: any, index) => (
             <StyledCustomTag

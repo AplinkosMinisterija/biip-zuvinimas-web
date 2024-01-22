@@ -83,3 +83,12 @@ export enum ServerErrorCodes {
   NOT_FOUND = '404',
   NO_PERMISSION = '401',
 }
+
+export enum FilterInputTypes {
+  text = 'text',
+  date = 'date',
+  multiselect = 'multiselect',
+  singleSelect = 'singleselect',
+  asyncSingleSelect = 'asyncSingleSelect',
+  asyncMultiSelect = 'asyncMultiSelect',
+}

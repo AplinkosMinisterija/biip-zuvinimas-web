@@ -8,7 +8,7 @@ import { device } from '../../styles';
 import { FishStockingStatus } from '../../utils/constants';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
-import { FishStocking } from '../../utils/types';
+import { FishStocking, Info } from '../../utils/types';
 import Button from '../buttons/Button';
 import PhotoUploadField from '../fields/PhotoUploadField';
 import FishStockingInfo from '../other/Info';
@@ -45,11 +45,11 @@ const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => 
 
   const fishStocker = fishStocking.reviewedBy || fishStocking.assignedTo || fishStocking.createdBy;
 
-  const info = [
+  const info: Info = [
     [
       {
         type: 'location',
-        value: fishStocking?.location?.municipality?.name,
+        value: fishStocking?.location?.municipality?.name || '',
         label: 'Įžuvinimo vieta',
       },
       {

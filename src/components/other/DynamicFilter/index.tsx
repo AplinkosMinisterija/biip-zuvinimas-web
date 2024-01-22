@@ -15,7 +15,8 @@ import { buttonsTitles } from '../../../utils/texts';
 import Icon from '../Icon';
 import Loader from '../Loader';
 import Popup from '../Popup';
-import Filter, { FilterConfig, FilterInputTypes } from './Filter';
+import Filter, { FilterConfig } from './Filter';
+import { FilterInputTypes } from '../../../utils/constants';
 
 const mapFilters = (
   filterConfig: { [key: string]: FilterConfig },
@@ -184,7 +185,7 @@ const Wrapper = styled.div<{
   min-width: 100px;
 `;
 
-export const StyledButton = styled.button<{}>`
+const StyledButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;

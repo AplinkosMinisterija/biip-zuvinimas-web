@@ -56,7 +56,7 @@ const Container = styled.div<{ display: boolean }>`
   display: ${({ display }) => (display ? 'flex' : 'none')};
 `;
 
-const InnerContainer = styled.div<{}>`
+const InnerContainer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;

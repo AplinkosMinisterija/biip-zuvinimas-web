@@ -203,3 +203,5 @@ export type RegistrationFormValues = Omit<Partial<FishStocking>, 'eventTime' | '
   eventTime?: Date;
   batches: Array<RegistrationFormFishRow | object>;
 };
+
+export type Info = Array<Array<{ type: string; label: string; value: string }>>;

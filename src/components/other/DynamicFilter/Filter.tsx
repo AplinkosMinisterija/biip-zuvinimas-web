@@ -11,6 +11,7 @@ import Datepicker from '../../fields/DatePicker';
 import MultiSelect from '../../fields/MultiSelect';
 import SelectField from '../../fields/SelectField';
 import TextField from '../../fields/TextField';
+import { FilterInputTypes } from '../../../utils/constants';
 
 export interface LabelsProps {
   [key: string]: string;
@@ -21,15 +22,6 @@ export interface LoginLayoutProps {
   rowConfig: string[][];
   onSubmit: (values: any) => void;
   values?: any;
-}
-
-export enum FilterInputTypes {
-  text = 'text',
-  date = 'date',
-  multiselect = 'multiselect',
-  singleSelect = 'singleselect',
-  asyncSingleSelect = 'asyncSingleSelect',
-  asyncMultiSelect = 'asyncMultiSelect',
 }
 
 export interface FilterConfig {
@@ -92,7 +84,7 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
                   isClearable={true}
                   options={filter.options || []}
                   onChange={(value) =>
-                    !!customSetValue
+                    customSetValue
                       ? customSetValue(setFieldValue, value)
                       : setFieldValue(filter.key, value)
                   }

@@ -11,6 +11,7 @@ import Icon from './Icon';
 
 const UserSwitchMenu = () => {
   const user = useAppSelector((state) => state.user?.userData);
+  //TODO: handle undefined user
   const currentProfile = useGetCurrentProfile();
   const [showSelect, setShowSelect] = useState(false);
 
@@ -29,7 +30,7 @@ const UserSwitchMenu = () => {
           setShowSelect(!showSelect);
         }}
       >
-        <Avatar name={user?.firstName!} surname={user?.lastName!} />
+        <Avatar name={user?.firstName} surname={user?.lastName} />
       </div>
       {showSelect && (
         <InnerContainer>
@@ -38,8 +39,8 @@ const UserSwitchMenu = () => {
               <TopRow onClick={() => handleSelectProfile(profile.id)} key={`profile-${index}`}>
                 <StyledAvatar
                   active={currentProfile?.id === profile?.id}
-                  name={user?.firstName!}
-                  surname={user?.lastName!}
+                  name={user?.firstName}
+                  surname={user?.lastName}
                 />
                 <Column>
                   <FullNameDiv>{`${profile?.firstName || ''} ${
