@@ -154,7 +154,7 @@ function App() {
 
 const PublicRoute = ({ loggedIn, profileId }: RouteProps) => {
   if (loggedIn) {
-    return <Navigate to={!!profileId ? slugs.fishStockings : slugs.profiles} replace />;
+    return <Navigate to={profileId ? slugs.fishStockings : slugs.profiles} replace />;
   }
 
   return <Outlet />;
