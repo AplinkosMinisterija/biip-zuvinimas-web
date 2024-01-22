@@ -22,7 +22,7 @@ export interface PhotoUploadFieldProps {
   error?: string;
   showError?: boolean;
 }
-export const availablePhotoMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+const availablePhotoMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
 const PhotoUploadField = ({
   photos,
@@ -151,17 +151,6 @@ const LoaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-export const StyledImg = styled.img<{ disabled: boolean }>`
-  width: fit-content;
-  height: 100px;
-  border-radius: 5px;
-  cursor: pointer;
-  opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
-  transition: 0.5s ease;
-  backface-visibility: hidden;
-  max-width: 100%;
 `;
 
 const StyledInput = styled.input``;

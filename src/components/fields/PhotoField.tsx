@@ -117,7 +117,7 @@ const MainPhotoText = styled.div`
   left: 7px;
 `;
 
-export const StyledImg = styled.img<{
+const StyledImg = styled.img<{
   height: number;
   disabled: boolean;
   display: boolean;

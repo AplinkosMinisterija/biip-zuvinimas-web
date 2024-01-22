@@ -1,14 +1,6 @@
 import styled from 'styled-components';
 
-export interface SimpleButtonProps {
-  height?: number;
-  color?: string;
-  textColor?: string;
-  value?: number;
-  onClick?: () => void;
-}
-
-const simpleButton = (props: any) => {
+const SimpleButton = (props: any) => {
   return (
     <Button type="button" {...props} onClick={props.onClick}>
       {props.children}
@@ -25,4 +17,4 @@ const Button = styled.button<{ height?: string; textColor?: string }>`
   opacity: ${({ disabled }) => (disabled ? 0.48 : 1)};
 `;
 
-export default simpleButton;
+export default SimpleButton;
