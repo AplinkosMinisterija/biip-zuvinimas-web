@@ -15,21 +15,23 @@ const FishStockingPage = () => {
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
   const { id } = useParams();
+
   const navigate = useNavigate();
 
-  const { data: fishStocking, isLoading } = useQuery(['fishStocking', id], () => getStocking(), {
-    onError: () => {
-      navigate(slugs.fishStockings);
-    },
-  });
   const getStocking = async () => {
     if (isNew(id) && repeat) {
       return await api.getFishStocking(repeat);
-    } else if (id) {
+    } else if (id && !isNew(id)) {
       return api.getFishStocking(id);
     }
     return;
   };
+
+  const { data: fishStocking, isLoading } = useQuery(['fishStocking', id], getStocking, {
+    onError: () => {
+      navigate(slugs.fishStockings);
+    },
+  });
 
   if (isLoading) return <LoaderComponent />;
 
