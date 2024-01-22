@@ -49,13 +49,13 @@ const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => 
     [
       {
         type: 'location',
-        value: fishStocking?.location?.municipality?.name || '',
+        value: fishStocking.location?.municipality?.name || '',
         label: 'Įžuvinimo vieta',
       },
       {
         type: 'date',
         value: format(
-          new Date(fishStocking?.reviewTime || fishStocking.eventTime!),
+          new Date(fishStocking.reviewTime || fishStocking.eventTime!),
           'yyyy-MM-dd HH:mm',
         ),
         label: 'Data',
