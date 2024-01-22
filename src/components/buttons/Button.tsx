@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Loader from '../other/Loader';
 
-export enum ButtonColors {
+enum ButtonColors {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
   TERTIARY = 'tertiary',

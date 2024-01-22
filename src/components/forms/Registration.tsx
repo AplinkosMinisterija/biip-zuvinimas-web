@@ -22,7 +22,7 @@ import {
 import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
 import { FishStocking, FishType, RegistrationFormValues } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
-import Button, { ButtonColors } from '../buttons/Button';
+import Button from '../buttons/Button';
 import RadioOptions from '../buttons/RadioOptionts';
 import SimpleButton from '../buttons/SimpleButton';
 import AsyncSelectField from '../fields/AsyncSelect';
@@ -398,7 +398,7 @@ const RegistrationForm = ({
                   {!!fishStocking && (
                     <StyledButtons
                       type="button"
-                      variant={ButtonColors.DANGER}
+                      variant={Button.colors.DANGER}
                       onClick={() => setShowModal(true)}
                       disabled={isCustomer}
                     >

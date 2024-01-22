@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import SignatureCanvas from 'react-signature-canvas';
 import styled from 'styled-components';
-import Button, { ButtonColors } from '../../components/buttons/Button';
+import Button from '../../components/buttons/Button';
 import { device } from '../../styles';
 import Icon from '../other/Icon';
 
@@ -70,7 +70,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
         <BottomRow>
           <SubRow>
             <StyledButtonLarge
-              variant={ButtonColors.TRANSPARENT}
+              variant={Button.colors.TRANSPARENT}
               onClick={onClear}
               height={44}
               type="button"
@@ -81,7 +81,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
             <StyledButton
               type="button"
               signature={true}
-              variant={ButtonColors.TRANSPARENT}
+              variant={Button.colors.TRANSPARENT}
               onClick={onClose}
               height={44}
             >

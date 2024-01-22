@@ -5,7 +5,7 @@ import { device } from '../../styles';
 import { useFilteredRoutes } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
-import Button, { ButtonColors } from '../buttons/Button';
+import Button from '../buttons/Button';
 import SimpleSelect from '../fields/SimpleSelect';
 import UserSwitchMenu from './ProfileDropdown';
 
@@ -22,7 +22,7 @@ const NavBar = () => {
         <Logo onClick={() => navigate('/')} src="/logo.svg" />
         <HeaderLeft>
           <StyledButton
-            variant={ButtonColors.SECONDARY}
+            variant={Button.colors.SECONDARY}
             onClick={() => navigate(slugs.newFishStockings)}
             height={40}
             padding="0"

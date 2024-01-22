@@ -4,7 +4,7 @@ import { Form, Formik } from 'formik';
 import styled from 'styled-components';
 
 import Cookies from 'universal-cookie';
-import Button, { ButtonColors } from '../components/buttons/Button';
+import Button from '../components/buttons/Button';
 import SelectField from '../components/fields/SelectField';
 import TextField from '../components/fields/TextField';
 import DefaultLayout from '../components/Layouts/Default';
@@ -148,7 +148,7 @@ const NariaiPage = () => {
                 setCurrentUser(initUser);
                 setOpen('form');
               }}
-              variant={ButtonColors.SECONDARY}
+              variant={Button.colors.SECONDARY}
             >
               {buttonsTitles.add}
             </Button>
@@ -287,7 +287,7 @@ const NariaiPage = () => {
                     />
                     <DownBar>
                       <Button
-                        variant={ButtonColors.TRANSPARENT}
+                        variant={Button.colors.TRANSPARENT}
                         type="reset"
                         onClick={() => {
                           setOpen('');
@@ -295,7 +295,7 @@ const NariaiPage = () => {
                       >
                         {buttonsTitles.cancel}
                       </Button>
-                      <Button loading={submitLoading} variant={ButtonColors.PRIMARY} type="submit">
+                      <Button loading={submitLoading} variant={Button.colors.PRIMARY} type="submit">
                         {buttonsTitles.save}
                       </Button>
                     </DownBar>
