@@ -86,7 +86,7 @@ const RegistrationForm = ({
     ...callBacks,
   });
 
-  const deleteFishStockingMutation = useMutation(() => api.deleteFishStocking(id!), {
+  const deleteFishStockingMutation = useMutation(() => api.cancelFishStocking(id!), {
     ...callBacks,
   });
 
@@ -134,22 +134,22 @@ const RegistrationForm = ({
     } = values;
     const params = {
       eventTime,
-      phone,
+      phone: phone || undefined,
       geom,
       assignedTo: assignedTo?.id,
       stockingCustomer: stockingCustomer?.id,
       location: location,
-      fishOrigin,
+      fishOrigin: fishOrigin.toUpperCase(),
       fishOriginCompanyName,
       ...(fishOriginReservoir && {
         fishOriginReservoir,
       }),
       batches: batches.map((batch) => {
         return {
-          amount: batch.amount,
+          amount: batch.amount || undefined,
           weight: batch.weight || undefined,
-          fishType: batch?.fishType?.id,
-          fishAge: batch?.fishAge?.id,
+          fishType: batch?.fishType?.id || undefined,
+          fishAge: batch?.fishAge?.id || undefined,
         };
       }),
     };
