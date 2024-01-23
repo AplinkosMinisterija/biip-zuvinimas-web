@@ -38,6 +38,9 @@ const TimePicker = ({
   const getTimeInterval = (time?: Date) => {
     if (time) {
       const minutes = time.getMinutes();
+      if (minutes === 30 || minutes == 0) {
+        return time;
+      }
       if (minutes < 30) {
         const d = new Date(time.setMinutes(30, 0, 0));
         return d;
@@ -105,7 +108,7 @@ const TimePicker = ({
           {...(minDate ? { minDate: new Date(minDate) } : {})}
           showTimeSelectOnly
           timeIntervals={30}
-          selected={null}
+          selected={time}
           onChange={(date: Date) => {
             if (maxDate && date > new Date(maxDate)) {
               return onChange(maxDate);
