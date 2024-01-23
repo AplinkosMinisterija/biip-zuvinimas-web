@@ -1,4 +1,4 @@
-import { FishOriginTypes, FishStockingStatus, RolesTypes } from "./constants";
+import { FishOriginTypes, FishStockingStatus, RolesTypes } from './constants';
 export interface User {
   id?: string;
   firstName?: string;
@@ -32,7 +32,7 @@ export interface TenantUser {
   user: User;
 }
 
-export type ProfileId = "freelancer" | string;
+export type ProfileId = 'freelancer' | string;
 
 export interface Profile {
   id: ProfileId;
@@ -101,6 +101,16 @@ export interface Municipality {
   name: string;
 }
 
+export interface FishBatch {
+  id: number;
+  fishType: number | FishType;
+  fishAge: number | FishAge;
+  amount: number;
+  weight?: number;
+  reviewWeight?: number;
+  reviewAmount?: number;
+}
+
 export interface FishStocking {
   id: number;
   geom: any;
@@ -121,7 +131,7 @@ export interface FishStocking {
     name: string;
     municipality: { id: string; name: string };
   };
-  batches: Array<any>;
+  batches: Array<FishBatch>;
   assignedTo?: User;
   phone: string;
   reviewedBy?: User;
@@ -160,6 +170,11 @@ export interface FishType {
   label: string;
 }
 
+export interface FishAge {
+  id: number;
+  label: number;
+}
+
 export interface FishStockingFilters {
   eventTimeFrom?: string;
   eventTimeTo?: string;
@@ -176,3 +191,15 @@ export interface FishStockingParams {
   fishTypes?: Array<string>;
   status?: string[];
 }
+
+export interface RegistrationFormFishRow {
+  fishType?: FishType;
+  fishAge?: FishAge;
+  amount?: number;
+  weight?: number;
+}
+
+export type RegistrationFormValues = Omit<FishStocking, 'eventType' | 'batches'> & {
+  eventTime?: Date;
+  batches: Array<{} | RegistrationFormFishRow>;
+};

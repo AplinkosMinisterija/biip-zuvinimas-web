@@ -1,15 +1,15 @@
-import { useMediaQuery } from "@material-ui/core";
-import { isEmpty } from "lodash";
-import { useCallback, useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import styled from "styled-components";
-import { device } from "../../styles";
-import api from "../../utils/api";
-import { handleAlert } from "../../utils/functions";
-import { buttonsTitles, Url } from "../../utils/texts";
-import Button from "../buttons/Button";
-import Icon from "./Icon";
-import LoaderComponent from "./LoaderComponent";
+import { useMediaQuery } from '@material-ui/core';
+import { isEmpty } from 'lodash';
+import { useCallback, useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import api from '../../utils/api';
+import { handleAlert } from '../../utils/functions';
+import { buttonsTitles, Url } from '../../utils/texts';
+import Button from '../buttons/Button';
+import Icon from './Icon';
+import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
   height?: string;
@@ -22,14 +22,7 @@ export interface MapProps {
   iframeRef: any;
 }
 
-const Map = ({
-  height,
-  onSave,
-  onClose,
-  value,
-  display,
-  iframeRef
-}: MapProps) => {
+const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) => {
   const [showModal, setShowModal] = useState(false);
   const [geom, setGeom] = useState<any[]>();
   const [loading, setLoading] = useState(true);
@@ -40,22 +33,19 @@ const Map = ({
   const handleLoadMap = () => {
     setLoading(false);
 
-    iframeRef?.current?.contentWindow?.postMessage(
-      JSON.stringify({ geom: value }),
-      "*"
-    );
+    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
   };
 
   const locationMutation = useMutation(
     (location: any) =>
       api.getLocations({
-        geom: JSON.stringify(location)
+        geom: JSON.stringify(location),
       }),
     {
       onError: () => {
         handleAlert();
-      }
-    }
+      },
+    },
   );
   const locationMutationMutateAsync = locationMutation.mutateAsync;
   const handleGetLocations = useCallback(
@@ -63,7 +53,7 @@ const Map = ({
       setGeom(location);
       locationMutationMutateAsync(location);
     },
-    [locationMutationMutateAsync]
+    [locationMutationMutateAsync],
   );
 
   const handleSaveGeom = useCallback(
@@ -77,18 +67,18 @@ const Map = ({
 
       handleGetLocations(userObjects);
     },
-    [handleGetLocations]
+    [handleGetLocations],
   );
 
   useEffect(() => {
-    window.addEventListener("message", handleSaveGeom);
-    return () => window.removeEventListener("message", handleSaveGeom);
+    window.addEventListener('message', handleSaveGeom);
+    return () => window.removeEventListener('message', handleSaveGeom);
   }, [handleSaveGeom]);
 
   return (
     <>
       {loading ? <LoaderComponent /> : null}
-      <Container display={display}>
+      <Container $display={display}>
         {isMobile && (
           <StyledButton
             popup
@@ -103,7 +93,7 @@ const Map = ({
             }}
           >
             <StyledIconContainer>
-              <StyledIcon name={"close"} />
+              <StyledIcon name={'close'} />
             </StyledIconContainer>
           </StyledButton>
         )}
@@ -125,8 +115,8 @@ const Map = ({
                     </IconContainer>
                     <ItemContainer>
                       {!isEmpty(locationMutation.data)
-                        ? locationMutation?.data?.map((location) => (
-                            <Item>
+                        ? locationMutation?.data?.map((location, index) => (
+                            <Item key={`${location.cadastral_id}_${index}`}>
                               <TitleContainer>
                                 <Title>{location?.name}</Title>
                                 <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
@@ -141,7 +131,7 @@ const Map = ({
                               </Button>
                             </Item>
                           ))
-                        : "Nerastas telkinys"}
+                        : 'Nerastas telkinys'}
                     </ItemContainer>
                   </>
                 )}
@@ -153,8 +143,8 @@ const Map = ({
             allow="geolocation *"
             ref={iframeRef}
             src={src}
-            width={"100%"}
-            height={showModal ? "100%" : `${height || "230px"}`}
+            width={'100%'}
+            height={showModal ? '100%' : `${height || '230px'}`}
             style={{ border: 0 }}
             allowFullScreen={true}
             onLoad={handleLoadMap}
@@ -167,10 +157,10 @@ const Map = ({
   );
 };
 
-const Container = styled.div<{ display: boolean }>`
+const Container = styled.div<{ $display: boolean }>`
   width: 100%;
   height: 100%;
-  display: ${({ display }) => (display ? "flex" : "none")};
+  display: ${({ $display }) => ($display ? 'flex' : 'none')};
 `;
 
 const IconContainer = styled.div`
@@ -241,15 +231,13 @@ const ModalContainer = styled.div<{ width?: string }>`
   background-color: white;
   flex-basis: auto;
   margin: auto;
-  display:flex
+  display: flex;
   flex-direction: column;
   gap: 12px;
 
   @media ${device.mobileL} {
     min-width: 100%;
   }
-
-
 `;
 
 const ItemContainer = styled.div`

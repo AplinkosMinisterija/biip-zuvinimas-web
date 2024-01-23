@@ -1,110 +1,105 @@
-import { useMediaQuery } from "@material-ui/core";
-import { format } from "date-fns";
-import { isEmpty } from "lodash";
-import { useNavigate } from "react-router";
-import { createSearchParams } from "react-router-dom";
-import styled from "styled-components";
-import { device } from "../../styles";
-import { FishStockingStatus } from "../../utils/constants";
-import { slugs } from "../../utils/routes";
-import { buttonsTitles } from "../../utils/texts";
-import { FishStocking } from "../../utils/types";
-import Button from "../buttons/Button";
-import PhotoUploadField from "../fields/PhotoUploadField";
-import FishStockingInfo from "../other/Info";
-import InfoColumn from "../other/InfoColumn";
-import FishStockingPageTitle from "../other/PageTitle";
-import PreviewMap from "../other/PreviewMap";
-import SignatureList from "../other/SignatureList";
-import FishStockingTable from "../other/Table";
-import { fishOrigins } from "./Registration";
+import { useMediaQuery } from '@material-ui/core';
+import { format } from 'date-fns';
+import { isEmpty } from 'lodash';
+import { useNavigate } from 'react-router';
+import { createSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { FishStockingStatus } from '../../utils/constants';
+import { slugs } from '../../utils/routes';
+import { buttonsTitles } from '../../utils/texts';
+import { FishStocking } from '../../utils/types';
+import Button from '../buttons/Button';
+import PhotoUploadField from '../fields/PhotoUploadField';
+import FishStockingInfo from '../other/Info';
+import InfoColumn from '../other/InfoColumn';
+import FishStockingPageTitle from '../other/PageTitle';
+import PreviewMap from '../other/PreviewMap';
+import SignatureList from '../other/SignatureList';
+import FishStockingTable from '../other/Table';
+import { fishOriginOptions } from '../../utils/options';
 
 export interface FishStockingCompletedProps {
   fishStocking: FishStocking;
   disabled?: boolean;
 }
 const locale = {
-  vet_no_0: "Vet. patvirtinimo nr.",
-  vet_no_1: "Vet. patvirtinimo įsakymo nr.",
-  waybill_no: "Važtaraščio nr.",
-  fish_origin_company: "Žuvivaisos įmonės pavadinimas",
-  fish_origin_reservoir: "Vandens telkinio pavadinimas"
+  vet_no_0: 'Vet. patvirtinimo nr.',
+  vet_no_1: 'Vet. patvirtinimo įsakymo nr.',
+  waybill_no: 'Važtaraščio nr.',
+  fish_origin_company: 'Žuvivaisos įmonės pavadinimas',
+  fish_origin_reservoir: 'Vandens telkinio pavadinimas',
 };
 
-const FishStockingCompleted = ({
-  fishStocking
-}: FishStockingCompletedProps) => {
-  const status = fishStocking?.status;
+const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => {
+  const status = fishStocking.status;
   const navigate = useNavigate();
   const isMobile = useMediaQuery(device.mobileL);
-
+  if (!fishStocking) {
+    return null;
+  }
   const showAdditionalInfo = ![
     FishStockingStatus.NOT_FINISHED,
-    FishStockingStatus.CANCELED
+    FishStockingStatus.CANCELED,
   ].includes(status!);
 
-  const fishStocker =
-    fishStocking.reviewedBy ||
-    fishStocking.assignedTo ||
-    fishStocking.createdBy;
+  const fishStocker = fishStocking.reviewedBy || fishStocking.assignedTo || fishStocking.createdBy;
 
   const info = [
     [
       {
-        type: "location",
+        type: 'location',
         value: fishStocking?.location?.municipality?.name,
-        label: "Įžuvinimo vieta"
+        label: 'Įžuvinimo vieta',
       },
       {
-        type: "date",
+        type: 'date',
         value: format(
           new Date(fishStocking?.reviewTime || fishStocking.eventTime!),
-          "yyyy-MM-dd HH:mm"
+          'yyyy-MM-dd HH:mm',
         ),
-        label: "Data"
+        label: 'Data',
       },
       {
-        type: "phone",
+        type: 'phone',
         value: fishStocking.phone,
-        label: "Telefonas"
-      }
+        label: 'Telefonas',
+      },
     ],
     [
       {
-        type: "info",
+        type: 'info',
         value: `${fishStocking.location?.name}, ${fishStocking.location?.cadastral_id}`,
-        label: "Telkinys"
+        label: 'Telkinys',
       },
       {
-        type: "user",
+        type: 'user',
         value: `${fishStocker?.firstName} ${fishStocker?.lastName}`,
-        label: "Atsakingas asmuo"
-      }
-    ]
+        label: 'Atsakingas asmuo',
+      },
+    ],
   ];
   if (showAdditionalInfo) {
     info.push([
       {
-        type: "temp",
+        type: 'temp',
         value: fishStocking.containerWaterTemp
-          ? fishStocking.containerWaterTemp + "\u00b0C"
-          : "Nežinoma temperatūra",
-        label: "Vandens temperatūra taroje"
+          ? fishStocking.containerWaterTemp + '\u00b0C'
+          : 'Nežinoma temperatūra',
+        label: 'Vandens temperatūra taroje',
       },
       {
-        type: "water",
-        value: fishStocking.waterTemp
-          ? fishStocking.waterTemp + "\u00b0C"
-          : "Nežinoma temperatūra",
-        label: "Vandens temperatūra telkinyje"
-      }
+        type: 'water',
+        value: fishStocking.waterTemp ? fishStocking.waterTemp + '\u00b0C' : 'Nežinoma temperatūra',
+        label: 'Vandens temperatūra telkinyje',
+      },
     ]);
   }
 
   return (
     <InnerContainer>
       <Container>
-        <FishStockingPageTitle status={fishStocking?.status!} />
+        <FishStockingPageTitle status={fishStocking.status!} />
         <FishStockingInfo
           fishStocking={fishStocking}
           additionalInfo={showAdditionalInfo}
@@ -116,60 +111,48 @@ const FishStockingCompleted = ({
             {showAdditionalInfo && (
               <>
                 <Row>
-                  {fishStocking?.fishOrigin === fishOrigins[0].value ? (
+                  {fishStocking.fishOrigin === fishOriginOptions[0].value ? (
                     <InfoColumn
                       label={locale.fish_origin_company}
-                      value={fishStocking?.fishOriginCompanyName}
+                      value={fishStocking.fishOriginCompanyName}
                     />
                   ) : (
                     <InfoColumn
                       label={locale.fish_origin_reservoir}
-                      value={fishStocking?.fishOriginReservoir?.name}
+                      value={fishStocking.fishOriginReservoir?.name}
                     />
                   )}
                 </Row>
                 <Row>
-                  <InfoColumn
-                    label={locale.vet_no_0}
-                    value={fishStocking?.veterinaryApprovalNo}
-                  />
+                  <InfoColumn label={locale.vet_no_0} value={fishStocking.veterinaryApprovalNo} />
                   <InfoColumn
                     label={locale.vet_no_1}
-                    value={fishStocking?.veterinaryApprovalOrderNo}
+                    value={fishStocking.veterinaryApprovalOrderNo}
                   />
-                  <InfoColumn
-                    label={locale.waybill_no}
-                    value={fishStocking?.waybillNo}
-                  />
+                  <InfoColumn label={locale.waybill_no} value={fishStocking.waybillNo} />
                 </Row>
               </>
             )}
 
-            {fishStocking?.batches && (
-              <FishStockingTable fishStocking={fishStocking} />
-            )}
+            {fishStocking?.batches && <FishStockingTable fishStocking={fishStocking} />}
             {fishStocking?.comment && (
-              <InfoColumn
-                label="Pastaba"
-                value={fishStocking?.comment}
-                reverse={true}
-              />
+              <InfoColumn label="Pastaba" value={fishStocking?.comment} reverse={true} />
             )}
 
             {!isEmpty(fishStocking.images) && (
               <PhotoUploadField
-                name={"images"}
-                photos={fishStocking?.images!}
+                name={'images'}
+                photos={fishStocking.images!}
                 getSrc={(photo) => `${photo?.url}`}
                 disabled={true}
               />
             )}
-            {!isEmpty(fishStocking?.signatures) && (
+            {!isEmpty(fishStocking.signatures) && (
               <SignedContainer>
-                <Label>{"Įžuvinime dalyvavo"}</Label>
+                <Label>{'Įžuvinime dalyvavo'}</Label>
                 <SignatureList
-                  data={fishStocking?.signatures}
-                  municipalityId={fishStocking?.location?.municipality?.id}
+                  data={fishStocking.signatures}
+                  municipalityId={fishStocking.location?.municipality?.id}
                 />
               </SignedContainer>
             )}
@@ -180,8 +163,8 @@ const FishStockingCompleted = ({
                 navigate({
                   pathname: slugs.newFishStockings,
                   search: createSearchParams({
-                    repeat: fishStocking?.id!.toString()
-                  }).toString()
+                    repeat: fishStocking?.id!.toString(),
+                  }).toString(),
                 });
               }}
             >

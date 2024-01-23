@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@material-ui/core';
 import { FieldArray, Form, Formik } from 'formik';
 import { useRef, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -10,7 +10,7 @@ import { useAppSelector } from '../../state/hooks';
 import { device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
-import { getLocationList, getTenantsList, isNew } from '../../utils/functions';
+import { getLocationList, getTenantsList, handleAlert, isNew } from '../../utils/functions';
 import {
   useAssignedToUsers,
   useFishAges,
@@ -20,7 +20,7 @@ import {
   useSettings,
 } from '../../utils/hooks';
 import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
-import { FishStocking } from '../../utils/types';
+import { FishStocking, FishType, RegistrationFormValues } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import Button, { ButtonColors } from '../buttons/Button';
 import RadioOptions from '../buttons/RadioOptionts';
@@ -32,31 +32,13 @@ import SelectField from '../fields/SelectField';
 import TextField from '../fields/TextField';
 import TimePicker from '../fields/TimePicker';
 import DeleteCard from '../other/DeleteCard';
-import FishStickingRegistrationFishRow from '../other/FishRow';
+import FishRow from '../other/FishRow';
 import LoaderComponent from '../other/LoaderComponent';
 import Modal from '../other/Modal';
 import FishStockingPageTitle from '../other/PageTitle';
 import Map from '../other/RegistrationMap';
-
+import { fishOriginOptions } from '../../utils/options';
 const cookies = new Cookies();
-
-export interface FishRow {
-  type: { label: string; id: string };
-  age: { label: string; id: string };
-  amount: string | number;
-  weight: string | number;
-}
-
-export const fishOrigins = [
-  {
-    value: FishOriginTypes.GROWN,
-    label: 'Užaugintos žuvivaisos įmonėje',
-  },
-  {
-    label: 'Sugautos vandens telkinyje',
-    value: FishOriginTypes.CAUGHT,
-  },
-];
 
 const RegistrationForm = ({
   fishStocking,
@@ -71,7 +53,6 @@ const RegistrationForm = ({
   const [queryString, setQueryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
   const fishAges = useFishAges();
-  const fishTypes = useFishTypes();
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
   const iframeRef = useRef<any>(null);
@@ -80,6 +61,14 @@ const RegistrationForm = ({
   const users = useAssignedToUsers();
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
+
+  const { data, isLoading: fihTypesLoading } = useQuery('fishTypes', () => api.getFishTypes(), {
+    onError: () => {
+      handleAlert();
+    },
+  });
+
+  const fishTypesFullList = data?.rows || [];
 
   const callBacks = useFishStockingCallbacks();
 
@@ -112,12 +101,12 @@ const RegistrationForm = ({
 
   const { id } = useParams();
 
-  if (loading) return <LoaderComponent />;
+  if (loading || fihTypesLoading) return <LoaderComponent />;
 
   const assignedTo = fishStocking?.assignedTo || fishStocking?.createdBy || null;
 
-  const initialValues: any = {
-    eventTime: fishStocking?.eventTime && !repeat ? new Date(fishStocking.eventTime) : null,
+  const initialValues: RegistrationFormValues = {
+    eventTime: fishStocking?.eventTime && !repeat ? new Date(fishStocking.eventTime) : undefined,
     fishOriginCompanyName: fishStocking?.fishOriginCompanyName || '',
     assignedTo: fishStocking?.assignedTo || user || undefined,
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,
@@ -130,7 +119,7 @@ const RegistrationForm = ({
     geom: fishStocking?.geom || undefined,
   };
 
-  const handleSubmit = async (values: FishStocking) => {
+  const handleSubmit = async (values: any) => {
     const {
       eventTime,
       phone,
@@ -208,6 +197,14 @@ const RegistrationForm = ({
 
   const validationSchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
 
+  const filterFishTypes = (batches: any[]) => {
+    const batchesFishTypesIds = batches.filter((b) => !!b.fishType?.id).map((b) => b.fishType?.id);
+    return fishTypesFullList.filter((fishType) => {
+      const inBatches = batchesFishTypesIds.includes(fishType.id);
+      return !inBatches;
+    });
+  };
+
   return (
     <>
       <Formik
@@ -216,11 +213,12 @@ const RegistrationForm = ({
         validationSchema={validationSchema}
         validateOnChange={false}
       >
-        {({ values, errors, handleSubmit, handleChange, setFieldValue }) => {
+        {({ values, errors, handleSubmit, handleChange, setFieldValue }: any) => {
+          const filteredFistTypes: FishType[] = filterFishTypes(values.batches || []);
           return (
             <InnerContainer>
               <StyledForm
-                display={!isMobile || !showMap}
+                $display={!isMobile || !showMap}
                 noValidate={true}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -243,7 +241,6 @@ const RegistrationForm = ({
                   onChange={(location: any) => {
                     const { geom, ...rest } = location;
                     iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom }), '*');
-
                     setFieldValue('geom', geom);
                     setFieldValue('location', rest);
                   }}
@@ -268,7 +265,7 @@ const RegistrationForm = ({
                   />
                 </TimeRow>
                 <RadioOptions
-                  options={fishOrigins}
+                  options={fishOriginOptions}
                   label="Žuvų kilmė"
                   name="fishOrigin"
                   value={values.fishOrigin}
@@ -282,7 +279,7 @@ const RegistrationForm = ({
                 />
                 <Row>
                   {values.fishOrigin === FishOriginTypes.GROWN ? (
-                    <StyledTextInput
+                    <TextField
                       label="Žuvivaisos įmonė"
                       name="fishOriginCompanyName"
                       value={values.fishOriginCompanyName}
@@ -326,7 +323,7 @@ const RegistrationForm = ({
                         disabled={isCustomer}
                       />
 
-                      <StyledTextInput
+                      <TextField
                         label="Telefonas"
                         name="phone"
                         value={values.phone}
@@ -367,38 +364,28 @@ const RegistrationForm = ({
                       {values.batches?.map((item, index) => {
                         const fishErrors = errors.batches?.[index];
                         return (
-                          <FishStickingRegistrationFishRow
+                          <FishRow
                             key={`fish_row_${index}`}
-                            fishTypes={fishTypes}
-                            item={item}
-                            setFieldValue={setFieldValue}
-                            handleChange={handleChange}
-                            arrayHelpers={arrayHelpers}
-                            showDelete={values.batches.length > 1}
                             index={index}
-                            errors={fishErrors}
-                            allFishSelections={values.batches}
-                            disabled={disabled}
+                            fishTypes={filteredFistTypes}
                             fishAges={fishAges}
+                            item={item}
+                            setFieldValue={(key, value) => {
+                              setFieldValue(key, value);
+                            }}
+                            handleDelete={(e) => {
+                              arrayHelpers.remove(e);
+                            }}
+                            showDelete={values.batches.length > 1}
+                            errors={fishErrors}
+                            disabled={disabled}
                           />
                         );
                       })}
                       {!disabled && (
                         <SimpleButton
                           onClick={() => {
-                            arrayHelpers.push({
-                              type: {
-                                label: '',
-                                id: '',
-                              },
-                              age: {
-                                label: '',
-                                id: '',
-                              },
-                              amount: '',
-                              weight: '',
-                              error: false,
-                            });
+                            arrayHelpers.push({});
                           }}
                         >
                           {buttonsTitles.addFish}
@@ -457,11 +444,11 @@ const RegistrationForm = ({
   );
 };
 
-const StyledForm = styled(Form)<{ display: boolean }>`
+const StyledForm = styled(Form)<{ $display: boolean }>`
   padding: 32px;
   flex-direction: column;
   gap: 12px;
-  display: ${({ display }) => (display ? 'flex' : 'none')};
+  display: ${({ $display }) => ($display ? 'flex' : 'none')};
   overflow-y: auto;
 
   @media ${device.mobileL} {
