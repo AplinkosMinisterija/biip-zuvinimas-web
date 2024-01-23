@@ -1,58 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import { Form, Formik } from "formik";
-import styled from "styled-components";
+import { Form, Formik } from 'formik';
+import styled from 'styled-components';
 
-import Cookies from "universal-cookie";
-import Button, { ButtonColors } from "../components/buttons/Button";
-import SelectField from "../components/fields/SelectField";
-import TextField from "../components/fields/TextField";
-import DefaultLayout from "../components/Layouts/Default";
-import Avatar from "../components/other/Avatar";
-import DeleteCard from "../components/other/DeleteCard";
-import Icon from "../components/other/Icon";
-import LoaderComponent from "../components/other/LoaderComponent";
-import Modal from "../components/other/Modal";
-import { device } from "../styles";
-import api from "../utils/api";
-import { RolesTypes } from "../utils/constants";
-import { handleAlert } from "../utils/functions";
-import { useGetCurrentProfile } from "../utils/hooks";
+import Cookies from 'universal-cookie';
+import Button from '../components/buttons/Button';
+import SelectField from '../components/fields/SelectField';
+import TextField from '../components/fields/TextField';
+import DefaultLayout from '../components/Layouts/Default';
+import Avatar from '../components/other/Avatar';
+import DeleteCard from '../components/other/DeleteCard';
+import Icon from '../components/other/Icon';
+import LoaderComponent from '../components/other/LoaderComponent';
+import Modal from '../components/other/Modal';
+import { device } from '../styles';
+import api from '../utils/api';
+import { RolesTypes } from '../utils/constants';
+import { handleAlert } from '../utils/functions';
+import { useGetCurrentProfile } from '../utils/hooks';
 
-import React from "react";
-import { useInfiniteQuery, useMutation } from "react-query";
-import { intersectionObserverConfig } from "../utils/configs";
-import {
-  buttonsTitles,
-  descriptions,
-  formLabels,
-  inputLabels
-} from "../utils/texts";
-import { User } from "../utils/types";
-import {
-  validateNewTenantUser,
-  validateUpdateTenantUser
-} from "../utils/validations";
+import React from 'react';
+import { useInfiniteQuery, useMutation } from 'react-query';
+import { intersectionObserverConfig } from '../utils/configs';
+import { buttonsTitles, descriptions, formLabels, inputLabels } from '../utils/texts';
+import { User } from '../utils/types';
+import { validateNewTenantUser, validateUpdateTenantUser } from '../utils/validations';
 const options = [
-  { label: "Administratorius", value: RolesTypes.USER_ADMIN },
-  { label: "Naudotojas", value: RolesTypes.USER }
+  { label: 'Administratorius', value: RolesTypes.USER_ADMIN },
+  { label: 'Naudotojas', value: RolesTypes.USER },
 ];
 
 const initUser = {
-  id: "",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  email: "",
-  personalCode: "",
-  role: options[1]?.value
+  id: '',
+  firstName: '',
+  lastName: '',
+  phone: '',
+  email: '',
+  personalCode: '',
+  role: options[1]?.value,
 };
 
 const cookies = new Cookies();
 const NariaiPage = () => {
-  const [open, setOpen] = useState("");
+  const [open, setOpen] = useState('');
   const currentProfile = useGetCurrentProfile();
-  const [currentUser, setCurrentUser] = useState<User>(initUser);
+  const [currentUser, setCurrentUser] = useState<any>(initUser); //TODO: should be defined another type for form instead of used type that will be returned from api
 
   const fetchTenantUsers = async (page: number) => {
     const tenantUsers = await api.tenantUsers({ page });
@@ -61,34 +53,21 @@ const NariaiPage = () => {
       return {
         ...tenantUser.user,
         id: tenantUser.id,
-        role: tenantUser.role
+        role: tenantUser.role,
       };
     });
 
     return {
       data: newUsers,
-      page:
-        tenantUsers.page < tenantUsers.totalPages
-          ? tenantUsers.page + 1
-          : undefined
+      page: tenantUsers.page < tenantUsers.totalPages ? tenantUsers.page + 1 : undefined,
     };
   };
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    refetch,
-    isFetching
-  } = useInfiniteQuery(
-    "tenantUsers",
-    ({ pageParam }) => fetchTenantUsers(pageParam),
-    {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isFetching } =
+    useInfiniteQuery('tenantUsers', ({ pageParam }) => fetchTenantUsers(pageParam), {
       getNextPageParam: (lastPage) => lastPage.page,
-      cacheTime: 60000
-    }
-  );
+      cacheTime: 60000,
+    });
 
   const observerRef = useRef(null);
 
@@ -111,51 +90,44 @@ const NariaiPage = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);
 
-  const deleteUserMutation = useMutation(
-    (id: string) => api.deleteTenantUser(id),
+  const deleteUserMutation = useMutation((id: string) => api.deleteTenantUser(id), {
+    onError: () => {
+      handleAlert();
+    },
+    onSuccess: () => {
+      setOpen('');
+      refetch();
+    },
+  });
+
+  const createUserMutation = useMutation((params: User) => api.createTenantUser(params), {
+    onError: () => {
+      handleAlert();
+    },
+  });
+
+  const updateUserMutation = useMutation(
+    (user: User) => api.updateTenantUser({ role: user.role }, user?.id),
     {
       onError: () => {
         handleAlert();
       },
-      onSuccess: () => {
-        setOpen("");
-        refetch();
-      }
-    }
+    },
   );
 
-  const createUserMutation = useMutation(
-    (params: User) => api.createTenantUser(params),
-    {
-      onError: () => {
-        handleAlert();
-      }
-    }
+  const submitLoading = [updateUserMutation.isLoading, createUserMutation.isLoading].some(
+    (loading) => loading,
   );
-
-  const updateUserMutation = useMutation(
-    (user: User) => api.updateTenantUser({ role: user.role }, user?.id!),
-    {
-      onError: () => {
-        handleAlert();
-      }
-    }
-  );
-
-  const submitLoading = [
-    updateUserMutation.isLoading,
-    createUserMutation.isLoading
-  ].some((loading) => loading);
 
   const handleSubmit = async (user: User) => {
     await createOrUpdateUser(user);
-    setOpen("");
+    setOpen('');
     refetch();
   };
 
   const createOrUpdateUser = async (user: User) => {
-    const params = { ...user, tenant: parseInt(cookies.get("profileId")) };
-    if (!!user.id) {
+    const params = { ...user, tenant: parseInt(cookies.get('profileId')) };
+    if (user.id) {
       await updateUserMutation.mutateAsync(user);
     } else {
       await createUserMutation.mutateAsync(params);
@@ -174,9 +146,9 @@ const NariaiPage = () => {
               height={40}
               onClick={() => {
                 setCurrentUser(initUser);
-                setOpen("form");
+                setOpen('form');
               }}
-              variant={ButtonColors.SECONDARY}
+              variant={Button.colors.SECONDARY}
             >
               {buttonsTitles.add}
             </Button>
@@ -193,13 +165,10 @@ const NariaiPage = () => {
                         <InnerCardContainer
                           onClick={() => {
                             setCurrentUser(user);
-                            setOpen("form");
+                            setOpen('form');
                           }}
                         >
-                          <Avatar
-                            name={user.firstName!}
-                            surname={user.lastName!}
-                          />
+                          <Avatar name={user.firstName!} surname={user.lastName!} />
                           <NameContainer>
                             <Title>
                               {user.firstName} {user.lastName}
@@ -213,7 +182,7 @@ const NariaiPage = () => {
                         <IconContainer
                           onClick={() => {
                             setCurrentUser(user);
-                            setOpen("remove");
+                            setOpen('remove');
                           }}
                         >
                           <Dots name="trashcan" />
@@ -231,13 +200,13 @@ const NariaiPage = () => {
       </Container>
       <Modal
         onClose={() => {
-          setOpen("");
+          setOpen('');
         }}
         visible={!!open}
       >
-        {open === "form" ? (
+        {open === 'form' ? (
           <PopContainer>
-            <Close onClick={() => setOpen("")}>
+            <Close onClick={() => setOpen('')}>
               <Icon name="close" />
             </Close>
             <Formik
@@ -245,11 +214,7 @@ const NariaiPage = () => {
               initialValues={currentUser}
               onSubmit={handleSubmit}
               validateOnChange={false}
-              validationSchema={
-                currentUser.id
-                  ? validateUpdateTenantUser
-                  : validateNewTenantUser
-              }
+              validationSchema={currentUser.id ? validateUpdateTenantUser : validateNewTenantUser}
             >
               {({ values, errors, handleSubmit, setFieldValue }) => {
                 const disabled = !!currentUser?.id;
@@ -258,7 +223,7 @@ const NariaiPage = () => {
                   <StyledForm
                     noValidate={true}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === 'Enter') {
                         handleSubmit();
                       }
                     }}
@@ -266,18 +231,14 @@ const NariaiPage = () => {
                     onSubmit={handleSubmit}
                   >
                     <SubH1Container>
-                      <H1>
-                        {!values.id
-                          ? descriptions.inviteUser
-                          : descriptions.updateUserInfo}
-                      </H1>
+                      <H1>{!values.id ? descriptions.inviteUser : descriptions.updateUserInfo}</H1>
                       {!disabled && <SubH1>{descriptions.email}</SubH1>}
                     </SubH1Container>
                     <TextField
                       value={values.firstName}
                       label={inputLabels.firstName}
                       name="firstName"
-                      onChange={(value) => setFieldValue("firstName", value)}
+                      onChange={(value) => setFieldValue('firstName', value)}
                       disabled={disabled}
                       error={errors.firstName}
                     />
@@ -285,7 +246,7 @@ const NariaiPage = () => {
                       value={values.lastName}
                       label={inputLabels.lastName}
                       name="lastName"
-                      onChange={(value) => setFieldValue("lastName", value)}
+                      onChange={(value) => setFieldValue('lastName', value)}
                       disabled={disabled}
                       error={errors.lastName}
                     />
@@ -294,7 +255,7 @@ const NariaiPage = () => {
                       label={inputLabels.phone}
                       name="phone"
                       placeholder="864222222"
-                      onChange={(value) => setFieldValue("phone", value)}
+                      onChange={(value) => setFieldValue('phone', value)}
                       disabled={disabled}
                       error={errors.phone}
                     />
@@ -302,7 +263,7 @@ const NariaiPage = () => {
                       value={values.email}
                       label={inputLabels.email}
                       name="email"
-                      onChange={(value) => setFieldValue("email", value)}
+                      onChange={(value) => setFieldValue('email', value)}
                       disabled={disabled}
                       error={errors.email}
                     />
@@ -311,9 +272,7 @@ const NariaiPage = () => {
                         value={values.personalCode}
                         label={inputLabels.personalCode}
                         name="personalCode"
-                        onChange={(value) =>
-                          setFieldValue("personalCode", value)
-                        }
+                        onChange={(value) => setFieldValue('personalCode', value)}
                         error={errors.personalCode}
                       />
                     )}
@@ -323,24 +282,20 @@ const NariaiPage = () => {
                       value={options.find((opt) => opt.value === values.role)}
                       label={inputLabels.role}
                       name="role"
-                      onChange={(val) => setFieldValue("role", val.value)}
+                      onChange={(val) => setFieldValue('role', val.value)}
                       error={errors.role}
                     />
                     <DownBar>
                       <Button
-                        variant={ButtonColors.TRANSPARENT}
+                        variant={Button.colors.TRANSPARENT}
                         type="reset"
                         onClick={() => {
-                          setOpen("");
+                          setOpen('');
                         }}
                       >
                         {buttonsTitles.cancel}
                       </Button>
-                      <Button
-                        loading={submitLoading}
-                        variant={ButtonColors.PRIMARY}
-                        type="submit"
-                      >
+                      <Button loading={submitLoading} variant={Button.colors.PRIMARY} type="submit">
                         {buttonsTitles.save}
                       </Button>
                     </DownBar>
@@ -353,12 +308,12 @@ const NariaiPage = () => {
           <DeleteCardContainer>
             <DeleteCard
               action="Pašalinti"
-              title={""}
-              description={"Ar norite pašalinti įmonės darbuotoją"}
+              title={''}
+              description={'Ar norite pašalinti įmonės darbuotoją'}
               name={`${currentUser?.firstName} ${currentUser?.lastName}`}
-              onSetClose={() => setOpen("")}
+              onSetClose={() => setOpen('')}
               handleDelete={() =>
-                deleteUserMutation.mutateAsync(currentUser?.id!)
+                currentUser?.id ? deleteUserMutation.mutateAsync(currentUser.id) : {}
               }
               deleteInProgress={deleteUserMutation.isLoading}
             />
@@ -493,7 +448,7 @@ const PopContainer = styled.div`
   @media ${device.mobileL} {
     border-radius: 0px;
     margin: 0px;
-    width:100%
+    width: 100%;
     max-width: 100%;
     padding: 32px;
   }

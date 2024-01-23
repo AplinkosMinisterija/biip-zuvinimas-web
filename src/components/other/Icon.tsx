@@ -5,7 +5,7 @@ import {
   AiOutlineLeft,
   AiOutlineMail,
   AiOutlineRight,
-} from "react-icons/ai";
+} from 'react-icons/ai';
 import {
   BiBriefcase,
   BiBuildings,
@@ -15,19 +15,15 @@ import {
   BiMinusCircle,
   BiSearchAlt2,
   BiWater,
-} from "react-icons/bi";
-import { BsLayersHalf } from "react-icons/bs";
-import { CgMathMinus, CgMathPlus } from "react-icons/cg";
-import { FaSignature } from "react-icons/fa";
-import { FiClock, FiDownload, FiPhone, FiUser, FiUsers } from "react-icons/fi";
-import { GoLocation } from "react-icons/go";
-import { HiOutlineDotsVertical, HiOutlineLocationMarker } from "react-icons/hi";
-import { IoMdCalendar } from "react-icons/io";
-import {
-  IoCloseOutline,
-  IoLocationSharp,
-  IoTrashOutline,
-} from "react-icons/io5";
+} from 'react-icons/bi';
+import { BsLayersHalf } from 'react-icons/bs';
+import { CgMathMinus, CgMathPlus } from 'react-icons/cg';
+import { FaSignature } from 'react-icons/fa';
+import { FiClock, FiDownload, FiPhone, FiUser, FiUsers } from 'react-icons/fi';
+import { GoLocation } from 'react-icons/go';
+import { HiOutlineDotsVertical, HiOutlineLocationMarker } from 'react-icons/hi';
+import { IoMdCalendar } from 'react-icons/io';
+import { IoCloseOutline, IoLocationSharp, IoTrashOutline } from 'react-icons/io5';
 import {
   MdArrowBack,
   MdEmail,
@@ -42,12 +38,12 @@ import {
   MdOutlineVisibilityOff,
   MdTune,
   MdViewModule,
-} from "react-icons/md";
-import { RiMap2Fill, RiTempColdLine } from "react-icons/ri";
-import { TiThMenu } from "react-icons/ti";
-import { VscVerified } from "react-icons/vsc";
+} from 'react-icons/md';
+import { RiMap2Fill, RiTempColdLine } from 'react-icons/ri';
+import { TiThMenu } from 'react-icons/ti';
+import { VscVerified } from 'react-icons/vsc';
 
-import { FaExclamation } from "react-icons/fa";
+import { FaExclamation } from 'react-icons/fa';
 export interface IconProps {
   name: string;
   className?: string;
@@ -56,101 +52,101 @@ export interface IconProps {
 
 const Icon = ({ name, className }: IconProps) => {
   switch (name) {
-    case "temp":
+    case 'temp':
       return <RiTempColdLine className={className} />;
-    case "layer":
+    case 'layer':
       return <BsLayersHalf className={className} />;
-    case "location":
+    case 'location':
       return <HiOutlineLocationMarker className={className} />;
-    case "date":
+    case 'date':
       return <BiCalendarEvent className={className} />;
-    case "info":
+    case 'info':
       return <BiInfoCircle className={className} />;
-    case "water":
+    case 'water':
       return <BiWater className={className} />;
-    case "verified":
+    case 'verified':
       return <VscVerified className={className} />;
-    case "plus":
+    case 'plus':
       return <CgMathPlus className={className} />;
-    case "minus":
+    case 'minus':
       return <CgMathMinus className={className} />;
-    case "search":
+    case 'search':
       return <BiSearchAlt2 className={className} />;
-    case "Searchlocation":
+    case 'Searchlocation':
       return <GoLocation className={className} />;
-    case "MapLocation":
+    case 'MapLocation':
       return <IoLocationSharp className={className} />;
-    case "filter":
+    case 'filter':
       return <MdTune className={className} />;
-    case "delete":
+    case 'delete':
       return <BiMinusCircle className={className} />;
-    case "calendar":
+    case 'calendar':
       return <IoMdCalendar className={className} />;
-    case "arrowDown":
+    case 'arrowDown':
       return <AiFillCaretDown className={className} />;
-    case "arrowUp":
+    case 'arrowUp':
       return <AiFillCaretUp className={className} />;
-    case "close":
+    case 'close':
       return <IoCloseOutline className={className} />;
-    case "map":
+    case 'map':
       return <RiMap2Fill className={className} />;
-    case "visibleOn":
+    case 'visibleOn':
       return <MdOutlineVisibility className={className} />;
-    case "visibleOff":
+    case 'visibleOff':
       return <MdOutlineVisibilityOff className={className} />;
-    case "fullscreen":
+    case 'fullscreen':
       return <MdOutlineFullscreen className={className} />;
-    case "exitFullScreen":
+    case 'exitFullScreen':
       return <MdOutlineFullscreenExit className={className} />;
-    case "current":
+    case 'current':
       return <BiCurrentLocation className={className} />;
-    case "leftArrow":
+    case 'leftArrow':
       return <AiOutlineLeft className={className} />;
-    case "rightArrow":
+    case 'rightArrow':
       return <AiOutlineRight className={className} />;
-    case "photo":
+    case 'photo':
       return <MdOutlineInsertPhoto className={className} />;
-    case "back":
+    case 'back':
       return <MdKeyboardBackspace className={className} />;
-    case "backMobile":
+    case 'backMobile':
       return <MdArrowBack className={className} />;
-    case "phone":
+    case 'phone':
       return <FiPhone className={className} />;
-    case "email":
+    case 'email':
       return <MdEmail className={className} />;
-    case "user":
+    case 'user':
       return <FiUser className={className} />;
-    case "users":
+    case 'users':
       return <FiUsers className={className} />;
-    case "modules":
+    case 'modules':
       return <MdViewModule className={className} />;
-    case "time":
+    case 'time':
       return <FiClock className={className} />;
-    case "exit":
+    case 'exit':
       return <MdExitToApp className={className} />;
-    case "company":
+    case 'company':
       return <BiBriefcase className={className} />;
-    case "userEmail":
+    case 'userEmail':
       return <AiOutlineMail className={className} />;
-    case "list":
+    case 'list':
       return <MdList className={className} />;
-    case "export":
+    case 'export':
       return <AiOutlineDownload className={className} />;
-    case "menu":
+    case 'menu':
       return <TiThMenu className={className} />;
-    case "exclamation":
+    case 'exclamation':
       return <FaExclamation className={className} />;
-    case "building":
+    case 'building':
       return <BiBuildings className={className} />;
-    case "dots":
+    case 'dots':
       return <HiOutlineDotsVertical className={className} />;
-    case "trashcan":
+    case 'trashcan':
       return <IoTrashOutline className={className} />;
-    case "sign":
+    case 'sign':
       return <FaSignature className={className} />;
-    case "dropdownArrow":
+    case 'dropdownArrow':
       return <MdKeyboardArrowDown className={className} />;
-    case "download":
+    case 'download':
       return <FiDownload className={className} />;
     default:
       return null;

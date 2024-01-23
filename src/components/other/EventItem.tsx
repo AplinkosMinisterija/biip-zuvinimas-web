@@ -1,12 +1,12 @@
-import { format } from "date-fns";
-import styled from "styled-components";
-import { FishStockingStatus } from "../../utils/constants";
-import { useGetCurrentProfile } from "../../utils/hooks";
-import { FishStocking } from "../../utils/types";
-import CustomTag from "../other/CustomTag";
-import Icon from "../other/Icon";
-import FishStockingTag from "./FishStockingTag";
-import FishStockingStatusIcon from "./StatusIcon";
+import { format } from 'date-fns';
+import styled from 'styled-components';
+import { FishStockingStatus } from '../../utils/constants';
+import { useGetCurrentProfile } from '../../utils/hooks';
+import { FishStocking } from '../../utils/types';
+import CustomTag from '../other/CustomTag';
+import Icon from '../other/Icon';
+import FishStockingTag from './FishStockingTag';
+import FishStockingStatusIcon from './StatusIcon';
 
 export interface FishStockingItemProps {
   fishStocking: FishStocking;
@@ -23,10 +23,7 @@ const EventItem = ({ fishStocking, onClick }: FishStockingItemProps) => {
     fishStocking.stockingCustomer.id !== fishStocking.tenant?.id &&
     currentProfile?.id === fishStocking.stockingCustomer.id;
 
-  const fishStocker =
-    fishStocking.reviewedBy ||
-    fishStocking.assignedTo ||
-    fishStocking.createdBy;
+  const fishStocker = fishStocking.reviewedBy || fishStocking.assignedTo || fishStocking.createdBy;
 
   return (
     <Container onClick={onClick}>
@@ -38,14 +35,12 @@ const EventItem = ({ fishStocking, onClick }: FishStockingItemProps) => {
           <Titles>
             {showTenant && (
               <StyledText>
-                {fishStocking.tenant
-                  ? fishStocking.tenant.name
-                  : "Fizinis asmuo"}
+                {fishStocking.tenant ? fishStocking.tenant.name : 'Fizinis asmuo'}
               </StyledText>
             )}
             <Location>
-              {`${fishStocking?.location?.name || "Telkinys"}, ${
-                fishStocking?.location?.municipality?.name || "Savivaldybė"
+              {`${fishStocking?.location?.name || 'Telkinys'}, ${
+                fishStocking?.location?.municipality?.name || 'Savivaldybė'
               }`}
             </Location>
           </Titles>
@@ -59,14 +54,12 @@ const EventItem = ({ fishStocking, onClick }: FishStockingItemProps) => {
           </IconTextWraper>
           <IconTextWraper>
             <StyledIcon name="calendar" />
-            <StyledText>
-              {format(new Date(fishStocking?.eventTime!), "yyyy-MM-dd H:mm")}
-            </StyledText>
+            <StyledText>{format(new Date(fishStocking?.eventTime), 'yyyy-MM-dd H:mm')}</StyledText>
           </IconTextWraper>
           {(fishStocking.batches || []).map((item: any, index) => (
             <StyledCustomTag
               key={`stockings_list_fish_type_${index}`}
-              text={item.fishType?.label || ""}
+              text={item.fishType?.label || ''}
             />
           ))}
         </SecondRow>

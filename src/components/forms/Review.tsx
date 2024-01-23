@@ -12,7 +12,7 @@ import { useCurrentLocation, useFishStockingCallbacks } from '../../utils/hooks'
 import { buttonsTitles } from '../../utils/texts';
 import { FishStocking } from '../../utils/types';
 import { validateFishStockingReview } from '../../utils/validations';
-import Button, { ButtonColors } from '../buttons/Button';
+import Button from '../buttons/Button';
 import NumericTextField from '../fields/NumericTextField';
 import PhotoUploadField from '../fields/PhotoUploadField';
 import TextAreaField from '../fields/TextAreaField';
@@ -287,7 +287,7 @@ const Review = ({ fishStocking, disabled, renderTabs }: FishStockingFactFormProp
                   {!!fishStocking && (
                     <StyledButtons
                       type="button"
-                      variant={ButtonColors.DANGER}
+                      variant={Button.colors.DANGER}
                       disabled={disabled}
                       onClick={() => setShowModal(true)}
                     >

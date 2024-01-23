@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import styled from "styled-components";
-import { device } from "../../styles";
-import Button, { ButtonColors } from "../buttons/Button";
-import Icon from "../other/Icon";
+import React, { useCallback, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import { device } from '../../styles';
+import Button from '../buttons/Button';
+import Icon from '../other/Icon';
 export interface DeleteCardProps {
   title: string;
   description: string;
@@ -22,8 +22,8 @@ const DeleteCard = ({
   onSetClose,
   handleDelete,
   deleteInProgress,
-  declineLabel = "Atšaukti",
-  agreeLabel = "Ištrinti"
+  declineLabel = 'Atšaukti',
+  agreeLabel = 'Ištrinti',
 }: DeleteCardProps) => {
   const cardRef = useRef<any>(null);
 
@@ -33,13 +33,13 @@ const DeleteCard = ({
         onSetClose(false);
       }
     },
-    [onSetClose]
+    [onSetClose],
   );
 
   useEffect(() => {
-    document.addEventListener("click", handleClickOutside, true);
+    document.addEventListener('click', handleClickOutside, true);
     return () => {
-      document.removeEventListener("click", handleClickOutside, true);
+      document.removeEventListener('click', handleClickOutside, true);
     };
   }, [handleClickOutside]);
 
@@ -55,14 +55,14 @@ const DeleteCard = ({
         <StyledButton
           type="button"
           onClick={() => onSetClose(false)}
-          variant={ButtonColors.TRANSPARENT}
+          variant={Button.colors.TRANSPARENT}
         >
           {declineLabel}
         </StyledButton>
         <StyledButton
           type="button"
           onClick={() => handleDelete()}
-          variant={ButtonColors.DANGER}
+          variant={Button.colors.DANGER}
           loading={deleteInProgress}
         >
           {agreeLabel}

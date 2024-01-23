@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 export interface AvatarProps {
   name: string;
@@ -11,16 +11,14 @@ export interface AvatarProps {
 }
 
 const Avatar = ({
-  name = " ",
-  surname = " ",
+  name = ' ',
+  surname = ' ',
   className,
   style = {},
   active,
-  icon
+  icon,
 }: AvatarProps) => {
-  const initials = `${name[0]?.toUpperCase() || ""} ${
-    surname[0]?.toUpperCase() || ""
-  }`;
+  const initials = `${name[0]?.toUpperCase() || ''} ${surname[0]?.toUpperCase() || ''}`;
   return (
     <Container active={active} className={className}>
       <InnerContainer style={style}>{icon ? icon : initials}</InnerContainer>
@@ -29,8 +27,7 @@ const Avatar = ({
 };
 
 const Container = styled.div<{ active?: boolean }>`
-  border: ${({ active, theme }) =>
-    active ? ` 2px solid ${theme.colors.secondary}` : "none"};
+  border: ${({ active, theme }) => (active ? ` 2px solid ${theme.colors.secondary}` : 'none')};
   border-radius: 50%;
   height: 49px;
   width: 49px;

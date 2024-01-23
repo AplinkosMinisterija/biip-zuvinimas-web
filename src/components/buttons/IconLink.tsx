@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import Icon from "../other/Icon";
+import styled from 'styled-components';
+import Icon from '../other/Icon';
 
 export interface IconLinkProps {
   text: string;
@@ -16,7 +16,7 @@ const IconLink = ({ text, onClick }: IconLinkProps) => {
           onClick();
         }}
       >
-        <StyledIcons name={"eye"} />
+        <StyledIcons name={'eye'} />
       </IconContainer>
     </Container>
   );

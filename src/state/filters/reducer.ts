@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 interface FiltersState {
   users: any;
@@ -7,11 +7,11 @@ interface FiltersState {
 
 const initialState: FiltersState = {
   users: {},
-  fishStocking: {}
+  fishStocking: {},
 };
 
 export const Filters = createSlice({
-  name: "filters",
+  name: 'filters',
   initialState,
   reducers: {
     setUser: (state, action) => {
@@ -19,8 +19,8 @@ export const Filters = createSlice({
     },
     setFishStocking: (state, action) => {
       return { ...state, fishStocking: action.payload };
-    }
-  }
+    },
+  },
 });
 
 export default Filters.reducer;

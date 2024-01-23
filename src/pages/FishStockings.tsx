@@ -9,7 +9,6 @@ import Button from '../components/buttons/Button';
 import DefaultLayout from '../components/Layouts/Default';
 import DisplayMap from '../components/other/DisplayMap';
 import DynamicFilter from '../components/other/DynamicFilter';
-import { FilterInputTypes } from '../components/other/DynamicFilter/Filter';
 import EventItem from '../components/other/EventItem';
 import LoaderComponent from '../components/other/LoaderComponent';
 import { actions } from '../state/filters/reducer';
@@ -23,6 +22,7 @@ import { useFishTypes, useMunicipalities } from '../utils/hooks';
 import { slugs } from '../utils/routes';
 import { buttonsTitles, descriptions, fishStockingsFiltersLabels } from '../utils/texts';
 import { FishStockingFilters, FishType, Municipality } from '../utils/types';
+import { FilterInputTypes } from '../utils/constants';
 
 const rowConfig = [
   ['locationName'],

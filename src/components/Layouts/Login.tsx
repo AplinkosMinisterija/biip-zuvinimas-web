@@ -1,6 +1,6 @@
-import React from "react";
-import Div100vh from "react-div-100vh";
-import styled from "styled-components";
+import React from 'react';
+import Div100vh from 'react-div-100vh';
+import styled from 'styled-components';
 
 export const LoginLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -15,7 +15,7 @@ export const LoginLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const Container = styled.div`
+const Container = styled.div`
   background-color: white;
   display: flex;
   width: 100%;
@@ -49,7 +49,7 @@ const Image = styled.div`
   width: 100%;
   background-repeat: no-repeat;
   background-size: cover;
-  background-image: url(${"/background.png"});
+  background-image: url(${'/background.png'});
   position: sticky;
   object-fit: cover;
   top: 0;
@@ -65,5 +65,5 @@ const BiipLogo = styled.a`
   position: absolute;
   right: 20px;
   top: 20px;
-  background-image: url(${"/biip-logo.svg"});
+  background-image: url(${'/biip-logo.svg'});
 `;

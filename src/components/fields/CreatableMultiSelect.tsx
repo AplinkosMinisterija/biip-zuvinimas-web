@@ -1,8 +1,8 @@
-import { useState } from "react";
-import FieldWrapper from "./components/FieldWrapper";
-import MultiTextField from "./components/MultiTextFieldInput";
-import OptionsContainer from "./components/OptionsContainer";
-import { handleRemove } from "./utils/functions";
+import { useState } from 'react';
+import FieldWrapper from './components/FieldWrapper';
+import MultiTextField from './components/MultiTextFieldInput';
+import OptionsContainer from './components/OptionsContainer';
+import { handleRemove } from './utils/functions';
 
 export interface SelectOption {
   id?: string;
@@ -34,12 +34,12 @@ const CreatableMultiSelect = ({
   error,
   showError = true,
   className,
-  placeholder = "Įveskite sinonimus",
+  placeholder = 'Įveskite sinonimus',
   padding,
   onChange,
-  disabled = false
+  disabled = false,
 }: SelectFieldProps) => {
-  const [input, setInputValue] = useState<any>("");
+  const [input, setInputValue] = useState<any>('');
   const [showSelect, setShowSelect] = useState(false);
   const isExist = values.some((value: any) => value === input);
 
@@ -51,7 +51,7 @@ const CreatableMultiSelect = ({
 
   const clear = () => {
     setShowSelect(false);
-    setInputValue("");
+    setInputValue('');
   };
 
   const handleAdd = () => {
@@ -62,7 +62,7 @@ const CreatableMultiSelect = ({
   };
 
   const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       handleAdd();
     }
   };
@@ -93,9 +93,7 @@ const CreatableMultiSelect = ({
         getOptionLabel={(option) => `${option}`}
       />
       <OptionsContainer
-        values={[
-          isExist ? "Toks sinonimas jau egzistuoja" : `Sukurti: ${input}`
-        ]}
+        values={[isExist ? 'Toks sinonimas jau egzistuoja' : `Sukurti: ${input}`]}
         getOptionLabel={(option) => `${option}`}
         showSelect={showSelect}
         handleClick={handleAdd}

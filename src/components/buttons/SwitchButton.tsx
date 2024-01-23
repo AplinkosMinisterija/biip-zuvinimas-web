@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export interface SwitchProps {
   isOn: boolean;
@@ -41,7 +41,7 @@ const IsNotOnText = styled.div`
 const StyledLabel = styled.label<{ checked: boolean }>`
   display: flex;
   align-items: center;
-  justify-content: ${({ checked }) => (checked ? "flex-start" : "flex-end")};
+  justify-content: ${({ checked }) => (checked ? 'flex-start' : 'flex-end')};
   cursor: pointer;
   width: 76px;
   height: 24px;
@@ -52,7 +52,7 @@ const StyledLabel = styled.label<{ checked: boolean }>`
   background: #027a48 0% 0% no-repeat padding-box;
 
   span {
-    content: "";
+    content: '';
     position: absolute;
     top: 2px;
     left: 2px;

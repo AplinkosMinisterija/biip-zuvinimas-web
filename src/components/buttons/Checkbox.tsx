@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export interface CheckFieldProps {
   value: string[];
@@ -8,21 +8,13 @@ export interface CheckFieldProps {
   options: any[];
 }
 
-const Checkbox = ({
-  value,
-  onChange,
-  disabled = false,
-  options
-}: CheckFieldProps) => {
+const Checkbox = ({ value, onChange, disabled = false, options }: CheckFieldProps) => {
   const handleMultipleSelect = (option: any) => {
     const index = value.indexOf(option);
     if (index === -1) {
       return [...value, option];
     } else {
-      return [
-        ...value.slice(0, index),
-        ...value.slice(index + 1, value.length)
-      ];
+      return [...value.slice(0, index), ...value.slice(index + 1, value.length)];
     }
   };
 
@@ -77,10 +69,10 @@ const Label = styled.label`
   background-color: white;
 
   &::after {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
     filter: alpha(opacity=0);
     opacity: 0;
-    content: "";
+    content: '';
     position: absolute;
     width: 11px;
     height: 7px;
@@ -106,12 +98,12 @@ const CheckBox = styled.input<{ disabled: boolean }>`
   z-index: 7;
   opacity: 0;
 
-  cursor: ${({ disabled }) => (disabled ? "text" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'text' : 'pointer')};
   &:checked + label {
     background-color: transparent;
   }
   &:checked + label::after {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
     filter: alpha(opacity=100);
     opacity: 1;
   }

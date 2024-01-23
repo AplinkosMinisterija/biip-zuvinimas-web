@@ -1,13 +1,11 @@
-import { useMediaQuery } from "@material-ui/core";
-import { useRef } from "react";
-import { useResizeDetector } from "react-resize-detector";
-
-//@ts-ignore
-import SignatureCanvas from "react-signature-canvas";
-import styled from "styled-components";
-import Button, { ButtonColors } from "../../components/buttons/Button";
-import { device } from "../../styles";
-import Icon from "../other/Icon";
+import { useMediaQuery } from '@material-ui/core';
+import { useRef } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
+import SignatureCanvas from 'react-signature-canvas';
+import styled from 'styled-components';
+import Button from '../../components/buttons/Button';
+import { device } from '../../styles';
+import Icon from '../other/Icon';
 
 interface handleSignatureInterface {
   isSignatureEmpty: boolean;
@@ -32,11 +30,11 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
   const canvasStyle = {
     width: isMObile ? width : 605,
     height: isMObile ? height! * 0.85 : 356,
-    border: "1px solid #121A553D",
-    backgroundColor: "#F3F3F7",
+    border: '1px solid #121A553D',
+    backgroundColor: '#F3F3F7',
     borderRadius: 4,
-    marginLeft: "auto",
-    marginRight: "auto"
+    marginLeft: 'auto',
+    marginRight: 'auto',
   };
 
   return (
@@ -44,10 +42,10 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
       <Container
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === 'Enter') {
             onSubmit({
               isSignatureEmpty: signature.current.isEmpty(),
-              sign: signature.current.toDataURL("image/png")
+              sign: signature.current.toDataURL('image/png'),
             });
           }
         }}
@@ -56,7 +54,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
       >
         {!isMObile && (
           <Row onClick={() => onClose()}>
-            <StyledCloseButton name={"close"} />
+            <StyledCloseButton name={'close'} />
           </Row>
         )}
         <SignatureCanvas
@@ -66,13 +64,13 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
           canvasProps={{
             width: isMObile ? width : 605,
             height: isMObile ? height! * 0.85 : 356,
-            style: canvasStyle
+            style: canvasStyle,
           }}
         />
         <BottomRow>
           <SubRow>
             <StyledButtonLarge
-              variant={ButtonColors.TRANSPARENT}
+              variant={Button.colors.TRANSPARENT}
               onClick={onClear}
               height={44}
               type="button"
@@ -83,7 +81,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
             <StyledButton
               type="button"
               signature={true}
-              variant={ButtonColors.TRANSPARENT}
+              variant={Button.colors.TRANSPARENT}
               onClick={onClose}
               height={44}
             >
@@ -96,7 +94,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
             onClick={() =>
               onSubmit({
                 isSignatureEmpty: signature.current.isEmpty(),
-                sign: signature.current.toDataURL("image/png")
+                sign: signature.current.toDataURL('image/png'),
               })
             }
             height={44}
@@ -113,7 +111,7 @@ const Container = styled.div<{ visible: boolean }>`
   background: #ffffff 0% 0% no-repeat padding-box;
   box-shadow: 0px 18px 41px #121a5529;
   border-radius: 10px;
-  display: ${({ visible }) => (visible ? "flex" : "none")};
+  display: ${({ visible }) => (visible ? 'flex' : 'none')};
   flex-direction: column;
   width: 767px;
   margin: auto;

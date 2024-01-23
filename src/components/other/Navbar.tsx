@@ -1,28 +1,28 @@
-import { useMediaQuery } from "@material-ui/core";
-import { useLocation, useNavigate } from "react-router";
-import styled, { css } from "styled-components";
-import { device } from "../../styles";
-import { useFilteredRoutes } from "../../utils/hooks";
-import { slugs } from "../../utils/routes";
-import { buttonsTitles } from "../../utils/texts";
-import Button, { ButtonColors } from "../buttons/Button";
-import SimpleSelect from "../fields/SimpleSelect";
-import UserSwitchMenu from "./ProfileDropdown";
+import { useMediaQuery } from '@material-ui/core';
+import { useLocation, useNavigate } from 'react-router';
+import styled, { css } from 'styled-components';
+import { device } from '../../styles';
+import { useFilteredRoutes } from '../../utils/hooks';
+import { slugs } from '../../utils/routes';
+import { buttonsTitles } from '../../utils/texts';
+import Button from '../buttons/Button';
+import SimpleSelect from '../fields/SimpleSelect';
+import UserSwitchMenu from './ProfileDropdown';
 
 const NavBar = () => {
   const isMobile = useMediaQuery(device.mobileL);
   const navigate = useNavigate();
   const location = useLocation();
   const routes = useFilteredRoutes();
-  const locationSlug = location?.pathname?.split("/")[1];
+  const locationSlug = location?.pathname?.split('/')[1];
 
   return (
     <>
       <Header>
-        <Logo onClick={() => navigate("/")} src="/logo.svg" />
+        <Logo onClick={() => navigate('/')} src="/logo.svg" />
         <HeaderLeft>
           <StyledButton
-            variant={ButtonColors.SECONDARY}
+            variant={Button.colors.SECONDARY}
             onClick={() => navigate(slugs.newFishStockings)}
             height={40}
             padding="0"
@@ -33,7 +33,7 @@ const NavBar = () => {
 
           {!isMobile ? (
             routes.map((tab, index) => {
-              const slugRoot = tab.slug?.split("/")[1];
+              const slugRoot = tab.slug?.split('/')[1];
 
               return (
                 <MenuButton
@@ -72,7 +72,7 @@ const MenuButton = styled.div<{ isSelected: boolean }>`
     current &&
     css`
       &::after {
-        content: " ";
+        content: ' ';
         position: absolute;
         background-color: ${({ theme }) => theme.colors.secondary};
         bottom: -10px;

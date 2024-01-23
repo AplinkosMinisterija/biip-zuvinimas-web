@@ -1,12 +1,12 @@
-import styled from "styled-components";
-import { device } from "../../styles";
-import { FishStocking, Tenant, User } from "../../utils/types";
-import Icon from "../other/Icon";
-import AdditionalInfo from "./AdditionalInfo";
+import styled from 'styled-components';
+import { device } from '../../styles';
+import { FishStocking, Info, Tenant, User } from '../../utils/types';
+import Icon from '../other/Icon';
+import AdditionalInfo from './AdditionalInfo';
 
 export interface FishStockingInfoProps {
   fishStocking?: FishStocking;
-  info?: Array<Array<{ type?: string; label?: string; value?: string }>>;
+  info?: Info;
   tenant?: Tenant;
   additionalInfo?: boolean;
   user?: User;
@@ -24,15 +24,13 @@ const FishStockingInfo = ({
   info,
   additionalInfo,
   tenant,
-  user
+  user,
 }: FishStockingInfoProps) => {
   return (
     <Container>
       <HeaderRow>
         <Location>
-          {fishStocking?.location?.name ||
-            tenant?.name ||
-            `${user?.firstName} ${user?.lastName}`}
+          {fishStocking?.location?.name || tenant?.name || `${user?.firstName} ${user?.lastName}`}
         </Location>
       </HeaderRow>
       <InfoPeaceRow>
@@ -40,18 +38,14 @@ const FishStockingInfo = ({
           if (index >= 3) return <></>;
 
           return (
-            <InfoPeacePair
-              user={!!user}
-              tenant={!!tenant}
-              key={`fish_stocking_info_${index}`}
-            >
+            <InfoPeacePair user={!!user} tenant={!!tenant} key={`fish_stocking_info_${index}`}>
               {items?.map((item, index) => {
                 if (!item) return <></>;
 
                 return (
                   <InfoConainer key={index}>
                     <InfoPaceContainer user={!!user} tenant={!!tenant}>
-                      <StyledIcon name={item?.type!} />
+                      <StyledIcon name={item.type} />
                       <InfoPeaceColumn>
                         <Label>{item?.label}</Label>
                         <InfoPeaceLabel>{item?.value}</InfoPeaceLabel>
@@ -87,7 +81,7 @@ const Container = styled.div`
     border-radius: 0 0 40px 40px;
     padding: 16px 16px 27px 16px;
   }
-  background-image: url("/backgroundImageRightTop.png");
+  background-image: url('/backgroundImageRightTop.png');
   background-position: top right;
   background-repeat: no-repeat;
 `;
@@ -125,23 +119,22 @@ const InfoPaceContainer = styled.div<{ tenant: boolean; user: boolean }>`
   flex-direction: row;
   align-items: center;
   margin: auto 0;
-  padding: ${({ user }) => (user ? "8px 43px 8px 0px" : "8px 0")};
+  padding: ${({ user }) => (user ? '8px 43px 8px 0px' : '8px 0')};
   @media ${device.mobileL} {
     width: 100%;
-    width: ${({ tenant, user }) => (tenant || user ? "100%" : "200px")};
+    width: ${({ tenant, user }) => (tenant || user ? '100%' : '200px')};
   }
 `;
 
 const InfoPeacePair = styled.div<{ tenant: boolean; user: boolean }>`
   display: flex;
-  flex-direction: ${({ user }) => (user ? "row" : "column")};
+  flex-direction: ${({ user }) => (user ? 'row' : 'column')};
   color: #fff;
   flex: 1;
-  max-width: ${({ tenant }) => (tenant ? "100%" : "350px")};
-  min-width: ${({ tenant }) => (tenant ? "225px" : "250px")};
+  max-width: ${({ tenant }) => (tenant ? '100%' : '350px')};
+  min-width: ${({ tenant }) => (tenant ? '225px' : '250px')};
   @media ${device.mobileL} {
-    flex-direction: ${({ tenant, user }) =>
-      tenant || user ? "column" : "row"};
+    flex-direction: ${({ tenant, user }) => (tenant || user ? 'column' : 'row')};
     flex-wrap: wrap;
     width: 100%;
   }

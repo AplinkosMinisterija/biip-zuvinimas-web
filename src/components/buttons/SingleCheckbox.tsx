@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export interface SingleCheckBoxProps {
   value?: boolean;
@@ -19,7 +19,7 @@ const SingleCheckbox = ({
   label,
   error,
   className,
-  intermediate
+  intermediate,
 }: SingleCheckBoxProps) => {
   return (
     <>
@@ -43,11 +43,7 @@ const SingleCheckbox = ({
             disabled={disabled}
             onChange={() => {}}
           />
-          <Label
-            checked={value || false}
-            intermediate={intermediate}
-            disabled={disabled}
-          />
+          <Label checked={value || false} intermediate={intermediate} disabled={disabled} />
         </InnerContainer>
         <TextLabel>{label}</TextLabel>
       </Container>
@@ -58,7 +54,7 @@ const SingleCheckbox = ({
 const Container = styled.div<{ disabled: boolean }>`
   display: grid;
   grid-template-columns: 28px 1fr;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 
 const TextLabel = styled.div`
@@ -91,7 +87,7 @@ const Label = styled.label<{
   checked: boolean;
   intermediate?: boolean;
 }>`
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   cursor: pointer;
   position: absolute;
   z-index: 0;
@@ -101,13 +97,13 @@ const Label = styled.label<{
   top: 2px;
 
   background-color: ${({ intermediate, checked }) =>
-    intermediate || checked ? "transparent" : "white"};
+    intermediate || checked ? 'transparent' : 'white'};
 
   &::after {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
     filter: alpha(opacity=0);
     opacity: 0;
-    content: "";
+    content: '';
     position: absolute;
     width: 13px;
     height: 6px;
@@ -131,20 +127,14 @@ const Label = styled.label<{
       filter: alpha(opacity=100);
       opacity: 1;
   `
-        : ""}
+        : ''}
 
     -webkit-transform: rotate(
       ${({ intermediate }) => `${intermediate ? 0 : -45}deg`}
     );
-    -moz-transform: rotate(
-      ${({ intermediate }) => `${intermediate ? 0 : -45}deg`}
-    );
-    -o-transform: rotate(
-      ${({ intermediate }) => `${intermediate ? 0 : -45}deg`}
-    );
-    -ms-transform: rotate(
-      ${({ intermediate }) => `${intermediate ? 0 : -45}deg`}
-    );
+    -moz-transform: rotate(${({ intermediate }) => `${intermediate ? 0 : -45}deg`});
+    -o-transform: rotate(${({ intermediate }) => `${intermediate ? 0 : -45}deg`});
+    -ms-transform: rotate(${({ intermediate }) => `${intermediate ? 0 : -45}deg`});
     transform: rotate(${({ intermediate }) => `${intermediate ? 0 : -45}deg`});
   }
 `;
@@ -156,7 +146,7 @@ const CheckBox = styled.input<{ disabled: boolean }>`
   left: -4px;
   z-index: 1;
   opacity: 0;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 
 export default SingleCheckbox;

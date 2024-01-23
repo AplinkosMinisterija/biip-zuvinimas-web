@@ -1,8 +1,8 @@
-import FieldWrapper from "./components/FieldWrapper";
-import MultiTextField from "./components/MultiTextFieldInput";
-import OptionsContainer from "./components/OptionsContainer";
-import { filterSelectedOptions, handleRemove } from "./utils/functions";
-import { useAsyncSelectData } from "./utils/hooks";
+import FieldWrapper from './components/FieldWrapper';
+import MultiTextField from './components/MultiTextFieldInput';
+import OptionsContainer from './components/OptionsContainer';
+import { filterSelectedOptions, handleRemove } from './utils/functions';
+import { useAsyncSelectData } from './utils/hooks';
 
 export interface SelectOption {
   id?: string;
@@ -49,7 +49,7 @@ const AsyncMultiSelect = ({
   left,
   right,
   padding,
-  optionsKey = "rows",
+  optionsKey = 'rows',
   onChange,
   handleLogs,
   disabled = false,
@@ -70,22 +70,17 @@ const AsyncMultiSelect = ({
     input,
     showSelect,
     handleBlur,
-    handleClick
+    handleClick,
   } = useAsyncSelectData({
     setSuggestionsFromApi,
     disabled,
     onChange: (option: any) => onChange([...values, option]),
     dependantId,
-    optionsKey
+    optionsKey,
   });
 
   return (
-    <FieldWrapper
-      onClick={handleToggleSelect}
-      label={label}
-      error={error}
-      handleBlur={handleBlur}
-    >
+    <FieldWrapper onClick={handleToggleSelect} label={label} error={error} handleBlur={handleBlur}>
       <MultiTextField
         values={values}
         onRemove={({ index }) => {

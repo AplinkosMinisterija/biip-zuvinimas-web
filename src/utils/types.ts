@@ -1,9 +1,9 @@
 import { FishOriginTypes, FishStockingStatus, RolesTypes } from './constants';
 export interface User {
-  id?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   role?: RolesTypes;
   active?: boolean;
   phone?: string;
@@ -114,8 +114,8 @@ export interface FishBatch {
 export interface FishStocking {
   id: number;
   geom: any;
-  status?: FishStockingStatus;
-  eventTime?: Date;
+  status: FishStockingStatus;
+  eventTime: Date;
   comment?: string;
   tenant?: Tenant;
   stockingCustomer?: Tenant;
@@ -132,7 +132,7 @@ export interface FishStocking {
     municipality: { id: string; name: string };
   };
   batches: Array<FishBatch>;
-  assignedTo?: User;
+  assignedTo: User;
   phone: string;
   reviewedBy?: User;
   reviewLocation?: { lat: number; lng: number };
@@ -199,7 +199,9 @@ export interface RegistrationFormFishRow {
   weight?: number;
 }
 
-export type RegistrationFormValues = Omit<FishStocking, 'eventType' | 'batches'> & {
+export type RegistrationFormValues = Omit<Partial<FishStocking>, 'eventTime' | 'batches'> & {
   eventTime?: Date;
-  batches: Array<{} | RegistrationFormFishRow>;
+  batches: Array<RegistrationFormFishRow | object>;
 };
+
+export type Info = Array<Array<{ type: string; label: string; value: string }>>;

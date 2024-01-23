@@ -85,7 +85,7 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) =
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              if (!!onClose) {
+              if (onClose) {
                 return onClose();
               }
 
@@ -198,7 +198,7 @@ top: 0;
   overflow-y: auto;
 `;
 
-const InnerContainer = styled.div<{}>`
+const InnerContainer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
