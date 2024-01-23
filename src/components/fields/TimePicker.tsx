@@ -38,7 +38,7 @@ const TimePicker = ({
   const getTimeInterval = (time?: Date) => {
     if (time) {
       const minutes = time.getMinutes();
-      if (minutes === 30 || minutes == 0) {
+      if (minutes === 30 || minutes === 0) {
         return time;
       }
       if (minutes < 30) {
