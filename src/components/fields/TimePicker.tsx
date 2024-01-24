@@ -36,20 +36,15 @@ const TimePicker = ({
   const [time, setTime] = useState<Date | null>(null);
 
   const getTimeInterval = (time?: Date) => {
-    if (time) {
-      const minutes = time.getMinutes();
-      if (minutes < 30) {
-        const d = new Date(time.setMinutes(30, 0, 0));
-        return d;
-      } else {
-        const hours = time.getHours();
-        if (hours < 23) {
-          const d = new Date(time.setHours(hours + 1, 0, 0, 0));
-          return d;
-        }
-      }
+    if (!time) {
+      return null;
     }
-    return null;
+    const minutes = Math.ceil(time.getMinutes() / 30) * 30; //result = 30 | 60 min
+    const hours = time.getHours();
+    if (minutes === 60 && hours === 23) {
+      return null; //if almost midnight, return null as there is no available time option today.
+    }
+    return new Date(time.setMinutes(minutes, 0, 0)); //adds 1 hour if minutes = 60;
   };
 
   useEffect(() => {
@@ -105,7 +100,7 @@ const TimePicker = ({
           {...(minDate ? { minDate: new Date(minDate) } : {})}
           showTimeSelectOnly
           timeIntervals={30}
-          selected={null}
+          selected={time}
           onChange={(date: Date) => {
             if (maxDate && date > new Date(maxDate)) {
               return onChange(maxDate);
