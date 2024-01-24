@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import lt from 'date-fns/locale/lt';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
@@ -33,6 +33,27 @@ const TimePicker = ({
   maxDate,
 }: TimepickerProps) => {
   const [open, setOpen] = useState(false);
+  const [time, setTime] = useState<Date | null>(null);
+
+  const getTimeInterval = (time?: Date) => {
+    if (!time) {
+      return null;
+    }
+    const minutes = Math.ceil(time.getMinutes() / 30) * 30; //result = 30 | 60 min
+    const hours = time.getHours();
+    if (minutes === 60 && hours === 23) {
+      return null; //if almost midnight, return null as there is no available time option today.
+    }
+    return new Date(time.setMinutes(minutes, 0, 0)); //adds 1 hour if minutes = 60;
+  };
+
+  useEffect(() => {
+    if (!value) {
+      setTime(null);
+    } else {
+      setTime(getTimeInterval(value));
+    }
+  }, [value]);
 
   const handleBlur = (event: any) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -64,7 +85,7 @@ const TimePicker = ({
         showError={true}
         label={label}
         padding={padding}
-        value={value ? format(new Date(value), 'HH:mm') : ''}
+        value={time ? format(new Date(time), 'HH:mm') : ''}
         error={error}
         rightIcon={<TimeIcon name={'time'} />}
         disabled={disabled}
@@ -79,21 +100,19 @@ const TimePicker = ({
           {...(minDate ? { minDate: new Date(minDate) } : {})}
           showTimeSelectOnly
           timeIntervals={30}
-          selected={value ? new Date(value as any) : null}
+          selected={time}
           onChange={(date: Date) => {
             if (maxDate && date > new Date(maxDate)) {
               return onChange(maxDate);
             }
-
             if (minDate && date < new Date(minDate)) {
               return onChange(minDate);
             }
-
             onChange(date);
             setOpen(false);
           }}
           inline
-        ></DatePicker>
+        />
       ) : null}
     </TimeContainer>
   );

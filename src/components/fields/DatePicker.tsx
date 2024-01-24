@@ -104,6 +104,7 @@ const Datepicker = ({
           placeholder="2000-01-01"
           className={className}
           onChange={handleChange}
+          onInputClick={() => setOpen(!open)}
           label={label}
           padding={padding}
           value={textValue}
