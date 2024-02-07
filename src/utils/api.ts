@@ -74,29 +74,21 @@ interface Create {
   id?: string;
 }
 
-const token = cookies.get('token');
-const profileId = cookies.get('profileId');
-
 class Api {
   private AuthApiAxios: AxiosInstance;
   private readonly proxy: string = '/api';
 
   constructor() {
     this.AuthApiAxios = Axios.create();
-
     this.AuthApiAxios.interceptors.request.use(
       (config) => {
-        if (!config.url) {
-          return config;
-        }
-
-        config.url = this.proxy + config.url;
+        const token = cookies.get('token');
+        const profileId = cookies.get('profileId');
         if (token) {
           config.headers!.Authorization = 'Bearer ' + token;
-
           if (isFinite(parseInt(profileId))) config.headers!['X-Profile'] = profileId;
         }
-
+        config.url = this.proxy + config.url;
         return config;
       },
       (error) => {
@@ -417,6 +409,9 @@ class Api {
   };
 
   getExcel = async ({ filter }: TableList): Promise<any> => {
+    const token = cookies.get('token');
+    const profileId = cookies.get('profileId');
+
     const response = await fetch(
       `${this.proxy}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
       {
