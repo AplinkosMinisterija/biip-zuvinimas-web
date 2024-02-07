@@ -277,7 +277,7 @@ class Api {
       pageSize: '999',
     });
 
-  getLocations = async ({ search = '', page, geom }: TableList): Promise<{ rows: any[] }> =>
+  getLocations = async ({ search = '', page, geom }: TableList): Promise<any[]> =>
     await this.get({
       resource: Resources.LOCATION,
       search,
