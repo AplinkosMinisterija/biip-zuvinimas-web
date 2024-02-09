@@ -83,9 +83,7 @@ class Api {
   constructor() {
     this.apiBaseUrl = process.env.VITE_ZUVINIMAS_API_BASE_URL ?? '/api';
 
-    this.AuthApiAxios = Axios.create({
-      baseURL: this.apiBaseUrl,
-    });
+    this.AuthApiAxios = Axios.create();
     this.AuthApiAxios.interceptors.request.use(
       (config) => {
         const token = cookies.get('token');
@@ -94,6 +92,7 @@ class Api {
           config.headers!.Authorization = 'Bearer ' + token;
           if (isFinite(parseInt(profileId))) config.headers!['X-Profile'] = profileId;
         }
+        config.url = this.apiBaseUrl + config.url;
         return config;
       },
       (error) => {
