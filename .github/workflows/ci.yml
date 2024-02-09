@@ -57,9 +57,7 @@ jobs:
     needs: build-test
     permissions:
       contents: read
-      pages: write
       deployments: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
