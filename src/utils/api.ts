@@ -7,6 +7,7 @@ import Cookies from 'universal-cookie';
 import { Resources } from './constants';
 
 const cookies = new Cookies();
+const env = import.meta.env;
 
 interface GetAll {
   resource?: string;
@@ -81,7 +82,7 @@ class Api {
   private readonly apiBaseUrl: string;
 
   constructor() {
-    this.apiBaseUrl = process.env.VITE_ZUVINIMAS_API_BASE_URL ?? '/api';
+    this.apiBaseUrl = env.VITE_ZUVINIMAS_API_BASE_URL ?? '/api';
 
     this.AuthApiAxios = Axios.create();
     this.AuthApiAxios.interceptors.request.use(
