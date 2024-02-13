@@ -5,7 +5,9 @@ import { FishStocking, FishType, Tenant, TenantUser, User } from './types';
 import { isEmpty } from 'lodash';
 import Cookies from 'universal-cookie';
 import { Resources } from './constants';
+
 const cookies = new Cookies();
+const env = import.meta.env;
 
 interface GetAll {
   resource?: string;
@@ -57,6 +59,7 @@ interface GetOne {
   populate?: string[];
   scope?: string;
 }
+
 interface UpdateOne {
   resource?: string;
   id?: string;
@@ -76,9 +79,11 @@ interface Create {
 
 class Api {
   private AuthApiAxios: AxiosInstance;
-  private readonly proxy: string = '/api';
+  private readonly apiBaseUrl: string;
 
   constructor() {
+    this.apiBaseUrl = env.VITE_ZUVINIMAS_API_BASE_URL ?? '/api';
+
     this.AuthApiAxios = Axios.create();
     this.AuthApiAxios.interceptors.request.use(
       (config) => {
@@ -88,7 +93,7 @@ class Api {
           config.headers!.Authorization = 'Bearer ' + token;
           if (isFinite(parseInt(profileId))) config.headers!['X-Profile'] = profileId;
         }
-        config.url = this.proxy + config.url;
+        config.url = this.apiBaseUrl + config.url;
         return config;
       },
       (error) => {
@@ -413,7 +418,7 @@ class Api {
     const profileId = cookies.get('profileId');
 
     const response = await fetch(
-      `${this.proxy}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
+      `${this.apiBaseUrl}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
       {
         headers: {
           'Content-Type': 'application/json',
