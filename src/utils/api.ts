@@ -79,9 +79,11 @@ interface Create {
 
 class Api {
   private AuthApiAxios: AxiosInstance;
-  private readonly proxy: string = '/proxy';
+  private readonly apiBaseUrl: string;
 
   constructor() {
+    this.apiBaseUrl = env.VITE_ZUVINIMAS_API_BASE_URL ?? '/api';
+
     this.AuthApiAxios = Axios.create();
     this.AuthApiAxios.interceptors.request.use(
       (config) => {
@@ -91,7 +93,7 @@ class Api {
           config.headers!.Authorization = 'Bearer ' + token;
           if (isFinite(parseInt(profileId))) config.headers!['X-Profile'] = profileId;
         }
-        config.url = this.proxy + config.url;
+        config.url = this.apiBaseUrl + config.url;
         return config;
       },
       (error) => {
@@ -416,7 +418,7 @@ class Api {
     const profileId = cookies.get('profileId');
 
     const response = await fetch(
-      `${this.proxy}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
+      `${this.apiBaseUrl}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
       {
         headers: {
           'Content-Type': 'application/json',
