@@ -228,15 +228,6 @@ class Api {
       pageSize: '12',
     });
 
-  // getFishStockings = async ({ filter, page }: TableList): Promise<GetAllResponse<FishStocking>> =>
-  //     await this.get({
-  //       resource: Resources.FISH_STOCKING,
-  //       populate: ['batches', 'createdBy', 'reviewedBy', 'assignedTo', 'status', 'location'],
-  //       filter,
-  //       page,
-  //       pageSize: '12',
-  //     });
-
   createTenantUser = async (params: any): Promise<User> => {
     return await this.create({
       resource: Resources.INVITE_USER,
