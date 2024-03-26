@@ -30,7 +30,6 @@ jobs:
         env:
           NODE_ENV: development
           VITE_MAPS_HOST: https://dev-maps.biip.lt
-          VITE_ZUVINIMAS_API_BASE_URL: https://dev-zuvinimas.biip.lt/api
 
       - uses: actions/upload-artifact@v4
         with:
