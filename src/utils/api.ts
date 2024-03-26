@@ -7,7 +7,6 @@ import Cookies from 'universal-cookie';
 import { Resources } from './constants';
 
 const cookies = new Cookies();
-const env = import.meta.env;
 
 interface GetAll {
   resource?: string;
@@ -79,11 +78,9 @@ interface Create {
 
 class Api {
   private AuthApiAxios: AxiosInstance;
-  private readonly apiBaseUrl: string;
+  private readonly proxy: string = '/api';
 
   constructor() {
-    this.apiBaseUrl = env.VITE_ZUVINIMAS_API_BASE_URL ?? '/api';
-
     this.AuthApiAxios = Axios.create();
     this.AuthApiAxios.interceptors.request.use(
       (config) => {
@@ -93,7 +90,7 @@ class Api {
           config.headers!.Authorization = 'Bearer ' + token;
           if (isFinite(parseInt(profileId))) config.headers!['X-Profile'] = profileId;
         }
-        config.url = this.apiBaseUrl + config.url;
+        config.url = this.proxy + config.url;
         return config;
       },
       (error) => {
@@ -230,6 +227,15 @@ class Api {
       page,
       pageSize: '12',
     });
+
+  // getFishStockings = async ({ filter, page }: TableList): Promise<GetAllResponse<FishStocking>> =>
+  //     await this.get({
+  //       resource: Resources.FISH_STOCKING,
+  //       populate: ['batches', 'createdBy', 'reviewedBy', 'assignedTo', 'status', 'location'],
+  //       filter,
+  //       page,
+  //       pageSize: '12',
+  //     });
 
   createTenantUser = async (params: any): Promise<User> => {
     return await this.create({
@@ -418,7 +424,7 @@ class Api {
     const profileId = cookies.get('profileId');
 
     const response = await fetch(
-      `${this.apiBaseUrl}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
+      `${this.proxy}/${Resources.EXCEL}?filter=${JSON.stringify(filter)}`,
       {
         headers: {
           'Content-Type': 'application/json',
