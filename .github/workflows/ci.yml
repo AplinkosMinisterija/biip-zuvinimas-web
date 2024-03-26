@@ -29,7 +29,6 @@ jobs:
         run: yarn run build --mode development
         env:
           NODE_ENV: development
-          VITE_MAPS_HOST: https://dev-maps.biip.lt
 
       - uses: actions/upload-artifact@v4
         with:
