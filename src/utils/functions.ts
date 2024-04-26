@@ -242,3 +242,9 @@ export const compressImageSize = (file: File) =>
       'blob',
     );
   });
+
+export const checkIfDateIsAfter = (value: Date | undefined, minTime: number) => {
+  const selectedDate = value && new Date(value);
+  const minDate = new Date(new Date().setDate(new Date().getDate() + minTime));
+  return selectedDate && selectedDate > minDate;
+};
