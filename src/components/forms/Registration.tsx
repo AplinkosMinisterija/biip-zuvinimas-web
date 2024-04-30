@@ -195,7 +195,10 @@ const RegistrationForm = ({
 
   const deleteInfo = getDeleteInfo();
 
-  const validationSchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
+  const validationSchema = () => {
+    const applySchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
+    return applySchema(minTime);
+  };
 
   const filterFishTypes = (batches: any[]) => {
     const batchesFishTypesIds = batches.filter((b) => !!b.fishType?.id).map((b) => b.fishType?.id);
