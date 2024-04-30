@@ -1,13 +1,30 @@
 import { isEmpty } from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useRecentLocations } from '../../utils/hooks';
 import { inputLabels } from '../../utils/texts';
 import Icon from '../other/Icon';
 import FieldWrapper from './components/FieldWrapper';
 import TextFieldInput from './components/TextFieldInput';
+import { Location } from '../../utils/types';
 
-const LocationInput = ({ onChange, error, disabled, value, handleSelectMap }: any) => {
+export interface LocationInputProps {
+  onOpen: () => void;
+  handleSelectMap: () => void;
+  onChange: (recentLocation: Location) => void;
+  error?: string;
+  value?: string;
+  disabled: boolean;
+}
+
+const LocationInput = ({
+  onChange,
+  error,
+  disabled,
+  value,
+  handleSelectMap,
+  onOpen,
+}: LocationInputProps) => {
   const [showSelect, setShowSelect] = useState(false);
 
   const recentLocations = useRecentLocations();
@@ -20,6 +37,10 @@ const LocationInput = ({ onChange, error, disabled, value, handleSelectMap }: an
   const handleToggleSelect = () => {
     !disabled && setShowSelect(!showSelect);
   };
+
+  useEffect(() => {
+    showSelect && onOpen && onOpen();
+  }, [showSelect, onOpen]);
 
   return (
     <FieldWrapper
@@ -50,7 +71,7 @@ const LocationInput = ({ onChange, error, disabled, value, handleSelectMap }: an
           {!isEmpty(recentLocations) && (
             <>
               <HistoryTitle>Paskutinės paieškos</HistoryTitle>
-              {recentLocations.map((recentLocation: any) => {
+              {recentLocations.map((recentLocation: Location) => {
                 return (
                   <OptionRowContainer
                     onClick={() => onChange(recentLocation)}

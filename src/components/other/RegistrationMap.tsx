@@ -20,15 +20,31 @@ export interface MapProps {
   value?: string;
   display: boolean;
   iframeRef: any;
+  isMapPreviewMode?: boolean;
 }
 
-const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) => {
+const Map = ({
+  isMapPreviewMode,
+  height,
+  onSave,
+  onClose,
+  value,
+  display,
+  iframeRef,
+}: MapProps) => {
   const [showModal, setShowModal] = useState(false);
   const [geom, setGeom] = useState<any[]>();
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery(device.mobileL);
 
-  const src = `${Url.DRAW}`;
+  const getMapUrl = () => {
+    const url = new URL(Url.DRAW);
+    const params = new URLSearchParams(url.search);
+    params.append('preview', isMapPreviewMode ? 'true' : 'false');
+    url.search = params.toString();
+    return url.href;
+  };
+  const src = getMapUrl();
 
   const handleLoadMap = () => {
     setLoading(false);

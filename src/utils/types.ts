@@ -111,6 +111,13 @@ export interface FishBatch {
   reviewAmount?: number;
 }
 
+export interface Location {
+  cadastral_id: string;
+  geom: any;
+  municipality: { id: string; name: string };
+  name: string;
+}
+
 export interface FishStocking {
   id: number;
   geom: any;

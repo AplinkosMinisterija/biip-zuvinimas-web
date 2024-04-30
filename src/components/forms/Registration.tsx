@@ -50,6 +50,7 @@ const RegistrationForm = ({
   disabled?: boolean;
 }) => {
   const [showMap, setShowMap] = useState(false);
+  const [isMapPreviewMode, toggleMapPreviewMode] = useState(false);
   const [queryString, setQueryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
   const fishAges = useFishAges();
@@ -237,11 +238,16 @@ const RegistrationForm = ({
                   error={errors.location}
                   disabled={disabled}
                   value={values?.location?.name}
+                  onOpen={() => toggleMapPreviewMode(true)}
                   handleSelectMap={() => {
+                    toggleMapPreviewMode(false);
                     setQueryString(queryStrings.draw);
                     setShowMap(true);
+                    setFieldValue('geom', undefined);
+                    setFieldValue('location', undefined);
                   }}
                   onChange={(location: any) => {
+                    toggleMapPreviewMode(true);
                     const { geom, ...rest } = location;
                     iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom }), '*');
                     setFieldValue('geom', geom);
@@ -428,6 +434,7 @@ const RegistrationForm = ({
               </StyledForm>
               <Map
                 iframeRef={iframeRef}
+                isMapPreviewMode={isMapPreviewMode}
                 display={!isMobile || showMap}
                 onClose={() => setShowMap(false)}
                 value={values.geom}
