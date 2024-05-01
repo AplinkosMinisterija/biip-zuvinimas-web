@@ -20,7 +20,7 @@ export interface MapProps {
   value?: string;
   display: boolean;
   iframeRef: any;
-  isMapPreviewMode?: boolean;
+  isMapPreviewMode: boolean;
 }
 
 const Map = ({

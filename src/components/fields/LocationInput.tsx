@@ -14,7 +14,7 @@ export interface LocationInputProps {
   onChange: (recentLocation: Location) => void;
   error?: string;
   value?: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const LocationInput = ({
