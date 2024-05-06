@@ -30,7 +30,6 @@ export const validateNewTenantUser = Yup.object().shape({
     }),
   phone: Yup.string()
     .required(validationTexts.requireText)
-    .trim()
     .matches(lithuanianPhoneNumberFormat, validationTexts.badPhoneFormat),
   personalCode: Yup.string()
     .required(validationTexts.requireText)
@@ -46,7 +45,6 @@ export const validateMyProfile = Yup.object().shape({
   email: Yup.string().required(validationTexts.requireText).email(validationTexts.badEmailFormat),
   phone: Yup.string()
     .required(validationTexts.requireText)
-    .trim()
     .matches(lithuanianPhoneNumberFormat, validationTexts.badPhoneFormat),
 });
 
@@ -61,7 +59,6 @@ export const validateFishStocking = (minTime: number) =>
     assignedTo: Yup.object().required(validationTexts.requireText).nullable(),
     phone: Yup.string()
       .required(validationTexts.requireText)
-      .trim()
       .matches(lithuanianPhoneNumberFormat, validationTexts.badPhoneFormat),
     batches: Yup.array().of(
       Yup.object().shape({
