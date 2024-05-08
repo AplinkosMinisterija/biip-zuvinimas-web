@@ -5,6 +5,8 @@ import { validationTexts } from './texts';
 import { FishBatch, FishType } from './types';
 import { checkIfDateIsAfter } from './functions';
 
+const lithuanianPhoneNumberFormat = /^(06|86|\+3706)\d{7}$/;
+
 export const loginSchema = Yup.object().shape({
   email: Yup.string().required(validationTexts.requireText).email(validationTexts.badEmailFormat),
   password: Yup.string().required(validationTexts.requireText),
@@ -28,8 +30,7 @@ export const validateNewTenantUser = Yup.object().shape({
     }),
   phone: Yup.string()
     .required(validationTexts.requireText)
-    .trim()
-    .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+    .matches(lithuanianPhoneNumberFormat, validationTexts.badPhoneFormat),
   personalCode: Yup.string()
     .required(validationTexts.requireText)
     .trim()
@@ -44,8 +45,7 @@ export const validateMyProfile = Yup.object().shape({
   email: Yup.string().required(validationTexts.requireText).email(validationTexts.badEmailFormat),
   phone: Yup.string()
     .required(validationTexts.requireText)
-    .trim()
-    .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+    .matches(lithuanianPhoneNumberFormat, validationTexts.badPhoneFormat),
 });
 
 export const validateFishStocking = (minTime: number) =>
@@ -59,8 +59,7 @@ export const validateFishStocking = (minTime: number) =>
     assignedTo: Yup.object().required(validationTexts.requireText).nullable(),
     phone: Yup.string()
       .required(validationTexts.requireText)
-      .trim()
-      .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+      .matches(lithuanianPhoneNumberFormat, validationTexts.badPhoneFormat),
     batches: Yup.array().of(
       Yup.object().shape({
         fishType: Yup.object()
