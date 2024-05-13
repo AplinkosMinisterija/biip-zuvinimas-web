@@ -24,6 +24,7 @@ export const validationTexts: any = {
   positiveNumber: 'Reikšmė turi būti didesnė už nulį',
   requireFiles: 'Privalote įkelti dokumentus',
   atLeastOneColumn: 'Turi būti pasirinktas bent vienas stulpelis',
+  invalidEventTime: 'Pasirinkite teisingą datą',
 };
 
 export const inputLabels = {

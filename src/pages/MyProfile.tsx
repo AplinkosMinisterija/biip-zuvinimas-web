@@ -95,7 +95,7 @@ const MyProfile = () => {
                   label={inputLabels.phone}
                   name="phone"
                   placeholder="864222222"
-                  onChange={(value) => setFieldValue('phone', value)}
+                  onChange={(value) => setFieldValue('phone', value?.trim())}
                   disabled={disabled}
                   error={errors.phone}
                 />

@@ -195,7 +195,10 @@ const RegistrationForm = ({
 
   const deleteInfo = getDeleteInfo();
 
-  const validationSchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
+  const validationSchema = () => {
+    const applySchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
+    return applySchema(minTime);
+  };
 
   const filterFishTypes = (batches: any[]) => {
     const batchesFishTypesIds = batches.filter((b) => !!b.fishType?.id).map((b) => b.fishType?.id);
@@ -317,7 +320,7 @@ const RegistrationForm = ({
                         error={errors.assignedTo}
                         onChange={(value: any) => {
                           setFieldValue('assignedTo', value);
-                          setFieldValue('phone', value?.phone || '');
+                          setFieldValue('phone', value?.phone?.trim() || '');
                         }}
                         options={users}
                         disabled={isCustomer}
@@ -331,7 +334,7 @@ const RegistrationForm = ({
                         error={errors.phone}
                         onChange={(e: any) => {
                           if (/^\+?[0-9\s]{0,11}$/.test(e)) {
-                            setFieldValue('phone', e);
+                            setFieldValue('phone', e.trim());
                           }
                         }}
                         disabled={isCustomer}
