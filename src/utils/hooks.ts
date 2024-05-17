@@ -10,6 +10,7 @@ import { RolesTypes, ServerErrorCodes } from './constants';
 import {
   clearCookies,
   emptyUser,
+  getLocationList,
   getOnLineStatus,
   handleAlert,
   handleGetCurrentUser,
@@ -60,7 +61,6 @@ export const useSignatureUsers = (id = '') => {
       handleAlert();
     },
   });
-
   return data || [];
 };
 
@@ -100,13 +100,37 @@ export const useSettings = () => {
 };
 
 export const useRecentLocations = () => {
-  const { data } = useQuery('location', () => api.getRecentLocations(), {
+  const { data } = useQuery('recentLocations', () => api.getRecentLocations(), {
     onError: () => {
       handleAlert();
     },
   });
 
-  return data || [];
+  console.log(
+    'DATA',
+    data,
+    data?.map((item) => item.cadastral_id),
+  );
+
+  const { data: locations } = useQuery(
+    ['locations', JSON.stringify(data)],
+    () =>
+      data
+        ? api.searchLocations({
+            search: '',
+            page: 1,
+            cadastralIds: data?.map((item) => item.cadastral_id),
+          })
+        : Promise.resolve(),
+    {
+      onError: () => {
+        handleAlert();
+      },
+      enabled: !!data,
+    },
+  );
+  // api.searchLocations({ search: input, page });
+  return locations?.rows || [];
 };
 
 export const useFishAges = () => {
@@ -115,7 +139,6 @@ export const useFishAges = () => {
       handleAlert();
     },
   });
-
   return data?.rows || [];
 };
 

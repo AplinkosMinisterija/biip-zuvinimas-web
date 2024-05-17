@@ -78,7 +78,9 @@ interface Create {
 
 class Api {
   private AuthApiAxios: AxiosInstance;
+  private uetkAxios: AxiosInstance;
   private readonly proxy: string = '/api';
+  private readonly riversLakesSearchUrl: string = `${import.meta.env.VITE_UETK_URL}/objects/search`;
 
   constructor() {
     this.AuthApiAxios = Axios.create();
@@ -97,6 +99,7 @@ class Api {
         Promise.reject(error);
       },
     );
+    this.uetkAxios = Axios.create();
   }
 
   errorWrapper = async (endpoint: () => Promise<AxiosResponse<any, any>>) => {
@@ -164,6 +167,11 @@ class Api {
     return this.errorWrapper(() =>
       this.AuthApiAxios.get(`/${resource}${id ? `/${id}` : ''}`, config),
     );
+  };
+
+  getPublic = async ({ resource, id, ...rest }: GetAll) => {
+    const config = this.getCommonConfigs(rest);
+    return this.errorWrapper(() => this.uetkAxios.get(`${resource}${id ? `/${id}` : ''}`, config));
   };
 
   update = async ({ resource, id, params }: UpdateOne) => {
@@ -429,6 +437,31 @@ class Api {
     const data = await response.blob();
 
     return data;
+  };
+
+  searchLocations = async ({ search, page, cadastralIds }: any): Promise<any> => {
+    const query = JSON.stringify({
+      category: {
+        $in: [
+          'RIVER',
+          'CANAL',
+          'INTERMEDIATE_WATER_BODY',
+          'TERRITORIAL_WATER_BODY',
+          'NATURAL_LAKE',
+          'PONDED_LAKE',
+          'POND',
+          'ISOLATED_WATER_BODY',
+        ],
+      },
+      ...(cadastralIds ? { cadastralId: { $in: cadastralIds } } : {}),
+    });
+
+    const config = this.getCommonConfigs({
+      query,
+      search,
+      page,
+    });
+    return this.errorWrapper(() => this.uetkAxios.get(`${this.riversLakesSearchUrl}`, config));
   };
 }
 

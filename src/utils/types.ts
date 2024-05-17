@@ -121,16 +121,8 @@ export interface FishStocking {
   stockingCustomer?: Tenant;
   fishOrigin: FishOriginTypes;
   fishOriginCompanyName?: string;
-  fishOriginReservoir?: {
-    cadastral_id: string;
-    name: string;
-    municipality: { id: string; name: string };
-  };
-  location?: {
-    cadastral_id: string;
-    name: string;
-    municipality: { id: string; name: string };
-  };
+  fishOriginReservoir?: FishStockingLocation;
+  location?: FishStockingLocation;
   batches: Array<FishBatch>;
   assignedTo: User;
   phone: string;
@@ -205,3 +197,23 @@ export type RegistrationFormValues = Omit<Partial<FishStocking>, 'eventTime' | '
 };
 
 export type Info = Array<Array<{ type: string; label: string; value: string }>>;
+
+export type UETKLocation = {
+  area: number;
+  cadastralId: string;
+  category: string;
+  categoryTranslate: string;
+  geom: string;
+  id: string;
+  lat: number;
+  lng: number;
+  length: number;
+  municipality: string;
+  name: string;
+};
+
+export type FishStockingLocation = {
+  cadastral_id: string;
+  name: string;
+  municipality: { id: string; name: string } | string;
+};

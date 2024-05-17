@@ -15,12 +15,13 @@ import {
   useAssignedToUsers,
   useFishAges,
   useFishStockingCallbacks,
-  useFishTypes,
   useIsFreelancer,
+  useMunicipalities,
+  useRecentLocations,
   useSettings,
 } from '../../utils/hooks';
-import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
-import { FishStocking, FishType, RegistrationFormValues } from '../../utils/types';
+import { buttonsTitles, formLabels, inputLabels, queryStrings } from '../../utils/texts';
+import { FishStocking, FishType, RegistrationFormValues, UETKLocation } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import Button from '../buttons/Button';
 import RadioOptions from '../buttons/RadioOptionts';
@@ -61,6 +62,11 @@ const RegistrationForm = ({
   const users = useAssignedToUsers();
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
+  const municipalities = useMunicipalities();
+  const recentLocations = useRecentLocations();
+
+  console.log('RECENT locations', recentLocations);
+  // const recent = recentLocations?.map((location) => ({cadastralId: location.id, municipality: }))
 
   const { data, isLoading: fihTypesLoading } = useQuery('fishTypes', () => api.getFishTypes(), {
     onError: () => {
@@ -132,6 +138,7 @@ const RegistrationForm = ({
       stockingCustomer,
       batches,
     } = values;
+
     const params = {
       eventTime,
       phone: phone || undefined,
@@ -208,6 +215,17 @@ const RegistrationForm = ({
     });
   };
 
+  const handleSelectLocation = (
+    data: UETKLocation,
+    setFieldValue: (name: string, value: any) => void,
+  ) => {
+    iframeRef?.current?.contentWindow?.postMessage(
+      JSON.stringify({ cadastralId: data.cadastralId }),
+      '*',
+    );
+    setFieldValue('location', data);
+  };
+
   return (
     <>
       <Formik
@@ -234,18 +252,21 @@ const RegistrationForm = ({
                 <FishStockingPageTitle status={fishStocking?.status} />
                 {renderTabs}
                 <LocationInput
+                  value={values.location}
                   error={errors.location}
-                  disabled={disabled}
-                  value={values?.location?.name}
-                  handleSelectMap={() => {
-                    setQueryString(queryStrings.draw);
-                    setShowMap(true);
+                  municipalities={municipalities}
+                  onChange={(value: UETKLocation) => {
+                    handleSelectLocation(value, setFieldValue);
                   }}
-                  onChange={(location: any) => {
-                    const { geom, ...rest } = location;
-                    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom }), '*');
-                    setFieldValue('geom', geom);
-                    setFieldValue('location', rest);
+                  getOptionValue={(option) => option?.cadastral_id}
+                  getOptionLabel={(option: UETKLocation) => {
+                    return `${option?.name} ${option.categoryTranslate} (${option.cadastralId}) - ${option.municipality}`;
+                  }}
+                  setSuggestionsFromApi={(input: string, page: number) => {
+                    if (!input) {
+                      return recentLocations;
+                    }
+                    return getLocationList(input, page);
                   }}
                 />
                 <TimeRow>
@@ -438,6 +459,7 @@ const RegistrationForm = ({
                 }}
                 queryString={queryString}
                 height="100%"
+                showLocationPopup={!fishStocking}
               />
             </InnerContainer>
           );

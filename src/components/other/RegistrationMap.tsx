@@ -1,15 +1,12 @@
 import { useMediaQuery } from '@material-ui/core';
-import { isEmpty } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import api from '../../utils/api';
-import { handleAlert } from '../../utils/functions';
 import { buttonsTitles, Url } from '../../utils/texts';
 import Button from '../buttons/Button';
 import Icon from './Icon';
 import LoaderComponent from './LoaderComponent';
+import { UETKLocation } from '../../utils/types';
 
 export interface MapProps {
   height?: string;
@@ -20,11 +17,21 @@ export interface MapProps {
   value?: string;
   display: boolean;
   iframeRef: any;
+  showLocationPopup?: boolean;
 }
 
-const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) => {
+const Map = ({
+  height,
+  onSave,
+  onClose,
+  value,
+  display,
+  iframeRef,
+  showLocationPopup,
+}: MapProps) => {
   const [showModal, setShowModal] = useState(false);
   const [geom, setGeom] = useState<any[]>();
+  const [locations, setLocations] = useState<UETKLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery(device.mobileL);
 
@@ -32,43 +39,27 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) =
 
   const handleLoadMap = () => {
     setLoading(false);
-
-    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
+    if (value) {
+      iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
+    }
   };
 
-  const locationMutation = useMutation(
-    (location: any) =>
-      api.getLocations({
-        geom: JSON.stringify(location),
-      }),
-    {
-      onError: () => {
-        handleAlert();
-      },
-    },
-  );
-  const locationMutationMutateAsync = locationMutation.mutateAsync;
-  const handleGetLocations = useCallback(
-    async (location: any) => {
-      setGeom(location);
-      locationMutationMutateAsync(location);
-    },
-    [locationMutationMutateAsync],
-  );
+  const showPopup = showLocationPopup && (locations.length === 0 || locations.length > 1);
 
-  const handleSaveGeom = useCallback(
-    (event: any) => {
-      if (!event?.data?.mapIframeMsg) return;
+  const handleSaveGeom = (event: any) => {
+    if (event.origin === import.meta.env.VITE_MAPS_HOST) {
+      const geom = event?.data?.mapIframeMsg?.selected?.geom;
+      const items = event?.data?.mapIframeMsg?.selected?.items;
+      console.log('showLocationPopup', showLocationPopup, items);
 
-      const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
-      if (!userObjects) return;
-
-      if (isEmpty(userObjects.features)) return;
-
-      handleGetLocations(userObjects);
-    },
-    [handleGetLocations],
-  );
+      if (!geom) return;
+      setGeom(geom);
+      setLocations(items);
+      if (showLocationPopup && items.length === 1) {
+        onSave && onSave(geom, items[0]);
+      }
+    }
+  };
 
   useEffect(() => {
     window.addEventListener('message', handleSaveGeom);
@@ -88,7 +79,6 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) =
               if (onClose) {
                 return onClose();
               }
-
               setShowModal(!showModal);
             }}
           >
@@ -99,42 +89,38 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) =
         )}
 
         <InnerContainer>
-          {geom && (
+          {showPopup && (
             <MapModal>
               <ModalContainer>
-                {locationMutation.isLoading ? (
-                  <LoaderComponent />
-                ) : (
-                  <>
-                    <IconContainer
-                      onClick={() => {
-                        setGeom(undefined);
-                      }}
-                    >
-                      <StyledIcon name="close" />
-                    </IconContainer>
-                    <ItemContainer>
-                      {!isEmpty(locationMutation.data)
-                        ? locationMutation?.data?.map((location, index) => (
-                            <Item key={`${location.cadastral_id}_${index}`}>
-                              <TitleContainer>
-                                <Title>{location?.name}</Title>
-                                <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
-                              </TitleContainer>
-                              <Button
-                                onClick={() => {
-                                  setGeom(undefined);
-                                  onSave && onSave(geom, location);
-                                }}
-                              >
-                                {buttonsTitles.select}
-                              </Button>
-                            </Item>
-                          ))
-                        : 'Nerastas telkinys'}
-                    </ItemContainer>
-                  </>
-                )}
+                <>
+                  <IconContainer
+                    onClick={() => {
+                      setGeom(undefined);
+                    }}
+                  >
+                    <StyledIcon name="close" />
+                  </IconContainer>
+                  <ItemContainer>
+                    {locations.length === 0
+                      ? 'Nerastas telkinys'
+                      : locations?.map((location, index) => (
+                          <Item key={`${location.cadastralId}_${index}`}>
+                            <TitleContainer>
+                              <Title>{location?.name}</Title>
+                              <Description>{`${location?.cadastralId}, ${location?.municipality}`}</Description>
+                            </TitleContainer>
+                            <Button
+                              onClick={() => {
+                                setGeom(undefined);
+                                onSave && onSave(geom, location);
+                              }}
+                            >
+                              {buttonsTitles.select}
+                            </Button>
+                          </Item>
+                        ))}
+                  </ItemContainer>
+                </>
               </ModalContainer>
             </MapModal>
           )}
@@ -175,13 +161,13 @@ const StyledIcon = styled(Icon)`
 `;
 
 const MapModal = styled.div`
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%
-z-index:999;
-top: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;

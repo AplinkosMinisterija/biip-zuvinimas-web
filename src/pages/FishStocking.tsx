@@ -15,7 +15,6 @@ const FishStockingPage = () => {
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const getStocking = async () => {

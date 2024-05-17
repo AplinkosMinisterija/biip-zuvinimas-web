@@ -39,7 +39,7 @@ export interface Theme {
   };
 }
 
-export const theme: Theme = {
+export const theme: any = {
   colors: {
     primary: '#121A55',
     secondary: '#13C9E7',
@@ -72,6 +72,9 @@ export const theme: Theme = {
     darkerWhite: '#A4A7BD',
     pending: '#fea700',
     grey: '#B3B5C4',
+  },
+  height: {
+    fields: 4,
   },
 };
 

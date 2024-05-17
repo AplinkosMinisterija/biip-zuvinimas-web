@@ -150,7 +150,7 @@ export const handleSetProfile = (profiles?: Profile[]) => {
 };
 
 export const getLocationList = async (input: string, page: number) => {
-  return await api.getLocations({ search: input, page });
+  return await api.searchLocations({ search: input, page });
 };
 
 export const getTenantsList = async (input: string, page: number) => {
