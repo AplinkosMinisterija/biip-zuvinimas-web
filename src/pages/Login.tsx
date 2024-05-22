@@ -86,7 +86,7 @@ export const Login = () => {
             onChange={(e) => handleType('password', e)}
           />
           <ButtonContainer>
-            <StyledButton loading={loading} type="submit">
+            <StyledButton loading={loading} type="submit" disabled={loading}>
               {buttonLabels.login}
             </StyledButton>
           </ButtonContainer>

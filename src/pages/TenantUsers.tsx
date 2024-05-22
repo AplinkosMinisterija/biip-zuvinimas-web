@@ -295,7 +295,12 @@ const NariaiPage = () => {
                       >
                         {buttonsTitles.cancel}
                       </Button>
-                      <Button loading={submitLoading} variant={Button.colors.PRIMARY} type="submit">
+                      <Button
+                        loading={submitLoading}
+                        variant={Button.colors.PRIMARY}
+                        type="submit"
+                        disabled={submitLoading}
+                      >
                         {buttonsTitles.save}
                       </Button>
                     </DownBar>

@@ -111,7 +111,12 @@ const MyProfile = () => {
                   <Button variant={Button.colors.TRANSPARENT} type="reset">
                     {buttonsTitles.clear}
                   </Button>
-                  <Button loading={isLoading} variant={Button.colors.PRIMARY} type="submit">
+                  <Button
+                    loading={isLoading}
+                    variant={Button.colors.PRIMARY}
+                    type="submit"
+                    disabled={isLoading}
+                  >
                     {buttonsTitles.save}
                   </Button>
                 </DownBar>
