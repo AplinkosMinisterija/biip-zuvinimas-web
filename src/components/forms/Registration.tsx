@@ -15,7 +15,6 @@ import {
   useAssignedToUsers,
   useFishAges,
   useFishStockingCallbacks,
-  useFishTypes,
   useIsFreelancer,
   useSettings,
 } from '../../utils/hooks';
@@ -98,6 +97,7 @@ const RegistrationForm = ({
   ].some((loading) => loading);
 
   const isCustomer = fishStocking?.stockingCustomer?.id === cookies.get('profileId');
+  const isDisabledSubmit = isCustomer || submitLoading;
 
   const { id } = useParams();
 
@@ -403,12 +403,12 @@ const RegistrationForm = ({
                       type="button"
                       variant={Button.colors.DANGER}
                       onClick={() => setShowModal(true)}
-                      disabled={isCustomer}
+                      disabled={isDisabledSubmit}
                     >
                       {deleteInfo.name}
                     </StyledButtons>
                   )}
-                  <StyledButtons type="submit" loading={submitLoading} disabled={isCustomer}>
+                  <StyledButtons type="submit" loading={submitLoading} disabled={isDisabledSubmit}>
                     {buttonsTitles.save}
                   </StyledButtons>
                 </ButtonRow>
