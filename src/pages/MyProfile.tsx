@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useMutation } from 'react-query';
 import Button from '../components/buttons/Button';
-import TextField from '../components/fields/TextField';
+import { TextField } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import { useAppSelector } from '../state/hooks';
 import { device } from '../styles';

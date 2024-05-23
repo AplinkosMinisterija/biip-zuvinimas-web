@@ -1,8 +1,6 @@
 import Div100vh from 'react-div-100vh';
 import styled from 'styled-components';
-import InstallButton from '../other/InstallButton';
 import NavBar from '../other/Navbar';
-import PWAInstallerPrompt from '../other/PWAInstallerPrompt';
 
 export interface DefaultLayoutProps {
   children?: React.ReactNode;
@@ -14,10 +12,6 @@ const DefaultLayout = ({ children, maxWidth = '100%', onScroll }: DefaultLayoutP
   return (
     <Div100vh>
       <Container>
-        <PWAInstallerPrompt
-          render={({ onClick }) => <InstallButton onClick={onClick} />}
-          callback={(data) => {}}
-        />
         <NavBar />
         <Content onScroll={onScroll} $maxWidth={maxWidth}>
           {children}

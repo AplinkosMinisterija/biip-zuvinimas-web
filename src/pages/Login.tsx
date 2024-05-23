@@ -3,7 +3,7 @@ import { useMutation } from 'react-query';
 import styled from 'styled-components';
 import Button from '../components/buttons/Button';
 import PasswordField from '../components/fields/PasswordField';
-import TextField from '../components/fields/TextField';
+import { TextField } from '@aplinkosministerija/design-system';
 import { LoginLayout } from '../components/Layouts/Login';
 import api from '../utils/api';
 import { handleAlert, handleUpdateTokens } from '../utils/functions';

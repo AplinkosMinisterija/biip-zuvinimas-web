@@ -56,7 +56,7 @@ const FishRow = ({
         showError={false}
         disabled={disabled}
       />
-      <StyledNumericTextInput
+      <NumericTextField
         name={`batches.${index}.amount`}
         value={amount}
         onChange={(e) => setFieldValue(`batches.${index}.amount`, e)}
@@ -67,7 +67,7 @@ const FishRow = ({
         disabled={disabled}
         wholeNumber={true}
       />
-      <StyledNumericTextInput
+      <NumericTextField
         name={`batches.${index}.weight`}
         value={weight}
         onChange={(e) => setFieldValue(`batches.${index}.weight`, e)}
@@ -98,8 +98,6 @@ const Row = styled.div<{ $showDelete: boolean }>`
   }
 `;
 
-const StyledNumericTextInput = styled(NumericTextField)``;
-
 const DeleteButton = styled.div`
   margin-top: auto;
   height: 40px;
@@ -119,6 +117,7 @@ const DeleteIcon = styled(Icon)`
     margin: 8px 0 16px 0;
   }
 `;
+
 const InputInnerLabel = styled.div`
   margin: auto 8px;
   font-size: 1.4rem;

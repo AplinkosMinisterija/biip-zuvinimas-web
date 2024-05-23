@@ -176,7 +176,7 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
   );
 };
 
-const Container = styled.div<{ $display: boolean }>`
+const Container = styled.div<{ $display?: boolean }>`
   width: 100%;
   height: 100%;
   display: ${({ $display }) => ($display ? 'flex' : 'none')};
@@ -238,7 +238,7 @@ const StyledIframe = styled.iframe<{
   height: ${({ height }) => height};
 `;
 
-const ModalContainer = styled.div<{ width?: string }>`
+const ModalContainer = styled.div`
   background-color: white;
   padding: 16px;
   border: 1px solid #dfdfdf;
@@ -246,7 +246,6 @@ const ModalContainer = styled.div<{ width?: string }>`
   position: relative;
   height: fit-content;
   min-width: 440px;
-  width: ${({ width }) => width};
   background-color: white;
   flex-basis: auto;
   margin: auto;

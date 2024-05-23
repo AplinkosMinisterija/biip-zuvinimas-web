@@ -38,7 +38,7 @@ const NavBar = () => {
               return (
                 <MenuButton
                   key={`${tab.title}-${index}`}
-                  isSelected={locationSlug?.includes(slugRoot)}
+                  $isSelected={locationSlug?.includes(slugRoot)}
                   onClick={() => navigate(tab.slug)}
                 >
                   {tab.title}
@@ -61,14 +61,14 @@ const NavBar = () => {
   );
 };
 
-const MenuButton = styled.div<{ isSelected: boolean }>`
+const MenuButton = styled.div<{ $isSelected: boolean }>`
   font-size: 1.6rem;
   color: #121926;
   width: 100%;
   white-space: nowrap;
   cursor: pointer;
   position: relative;
-  ${({ isSelected: current }) =>
+  ${({ $isSelected: current }) =>
     current &&
     css`
       &::after {

@@ -12,11 +12,13 @@ import { useCurrentLocation, useFishStockingCallbacks } from '../../utils/hooks'
 import { buttonsTitles } from '../../utils/texts';
 import { FishStocking } from '../../utils/types';
 import { validateFishStockingReview } from '../../utils/validations';
-import Button from '../buttons/Button';
-import NumericTextField from '../fields/NumericTextField';
 import PhotoUploadField from '../fields/PhotoUploadField';
-import TextAreaField from '../fields/TextAreaField';
-import TextField from '../fields/TextField';
+import {
+  TextField,
+  TextAreaField,
+  NumericTextField,
+  Button,
+} from '@aplinkosministerija/design-system';
 import ApproveFishRow from '../other/ApproveFishRow';
 import DeleteCard from '../other/DeleteCard';
 import Modal from '../other/Modal';
@@ -183,7 +185,7 @@ const Review = ({ fishStocking, disabled, renderTabs }: FishStockingFactFormProp
                     value={values.containerWaterTemp}
                     error={errors.containerWaterTemp}
                     onChange={(e) => setFieldValue(`containerWaterTemp`, e)}
-                    right={<InputInnerLabel>°C</InputInnerLabel>}
+                    rightIcon={<InputInnerLabel>°C</InputInnerLabel>}
                     disabled={disabled}
                   />
                   <TempStyledTextInput
@@ -192,7 +194,7 @@ const Review = ({ fishStocking, disabled, renderTabs }: FishStockingFactFormProp
                     value={values.waterTemp}
                     error={errors.waterTemp}
                     onChange={(e) => setFieldValue(`waterTemp`, e)}
-                    right={<InputInnerLabel>°C</InputInnerLabel>}
+                    rightIcon={<InputInnerLabel>°C</InputInnerLabel>}
                     disabled={disabled}
                   />
                 </Row>
@@ -287,7 +289,7 @@ const Review = ({ fishStocking, disabled, renderTabs }: FishStockingFactFormProp
                   {!!fishStocking && (
                     <StyledButtons
                       type="button"
-                      variant={Button.colors.DANGER}
+                      variant="danger"
                       disabled={disabled}
                       onClick={() => setShowModal(true)}
                     >

@@ -21,7 +21,7 @@ const Unfinished = ({ fishStocking }: { fishStocking: FishStocking }) => {
       {tabs.map((tab) => (
         <MenuButton
           key={tab.route}
-          isSelected={tab.route === selectedTab}
+          $isSelected={tab.route === selectedTab}
           onClick={() => setSelectedTab(tab.route)}
         >
           {tab.label}
@@ -39,6 +39,8 @@ const Unfinished = ({ fishStocking }: { fishStocking: FishStocking }) => {
       />
     );
 
+  console.log;
+
   return (
     <Registration
       disabled={
@@ -51,14 +53,14 @@ const Unfinished = ({ fishStocking }: { fishStocking: FishStocking }) => {
   );
 };
 
-const MenuButton = styled.div<{ isSelected: boolean }>`
-  color: ${({ theme, isSelected }) => (isSelected ? 'white' : theme.colors.primary)};
+const MenuButton = styled.div<{ $isSelected: boolean }>`
+  color: ${({ theme, $isSelected }) => ($isSelected ? 'white' : theme.colors.primary)};
   font-size: 1.4rem;
   cursor: pointer;
   position: relative;
   padding: 0 0 4px 0;
-  background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.primary : 'transparent'};
+  background-color: ${({ theme, $isSelected }) =>
+    $isSelected ? theme.colors.primary : 'transparent'};
   padding: 8px 16px;
   border-radius: 24px;
   text-align: center;

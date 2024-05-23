@@ -463,7 +463,7 @@ const RegistrationForm = ({
   );
 };
 
-const StyledForm = styled(Form)<{ $display: boolean }>`
+const StyledForm = styled(Form)<{ $display?: boolean }>`
   padding: 32px;
   flex-direction: column;
   gap: 12px;
@@ -524,8 +524,6 @@ const StyledButtons = styled(Button)`
     width: 100%;
   }
 `;
-
-const StyledTextInput = styled(TextField)``;
 
 const Subheader = styled.div`
   font-size: 1.4rem;

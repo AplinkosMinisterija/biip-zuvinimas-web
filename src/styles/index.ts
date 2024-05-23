@@ -63,6 +63,18 @@ export const theme: Theme = {
         border: 'transparent',
         hover: '#13C9E7',
       },
+      secondary: {
+        background: '#13C9E7',
+        text: 'white',
+        border: 'transparent',
+        hover: '#13C9E78F',
+      },
+      transparent: {
+        background: 'transparent',
+        text: '#0b1f51',
+        border: 'transparent',
+        hover: 'transparent',
+      },
       danger: {
         background: '#FE5B78',
         text: 'white',

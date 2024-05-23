@@ -49,7 +49,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
             });
           }
         }}
-        visible={visible}
+        $visible={visible}
         ref={ref}
       >
         {!isMObile && (
@@ -107,11 +107,11 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
   );
 };
 
-const Container = styled.div<{ visible: boolean }>`
+const Container = styled.div<{ $visible: boolean }>`
   background: #ffffff 0% 0% no-repeat padding-box;
   box-shadow: 0px 18px 41px #121a5529;
   border-radius: 10px;
-  display: ${({ visible }) => (visible ? 'flex' : 'none')};
+  display: ${({ $visible }) => ($visible ? 'flex' : 'none')};
   flex-direction: column;
   width: 767px;
   margin: auto;
