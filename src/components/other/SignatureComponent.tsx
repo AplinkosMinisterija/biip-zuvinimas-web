@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import SignatureCanvas from 'react-signature-canvas';
 import styled from 'styled-components';
-import Button from '../../components/buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import { device } from '../../styles';
 import Icon from '../other/Icon';
 
@@ -69,22 +69,11 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
         />
         <BottomRow>
           <SubRow>
-            <StyledButtonLarge
-              variant={Button.colors.TRANSPARENT}
-              onClick={onClear}
-              height={44}
-              type="button"
-            >
+            <StyledButtonLarge variant="transparent" onClick={onClear} type="button">
               Išvalyti
             </StyledButtonLarge>
 
-            <StyledButton
-              type="button"
-              signature={true}
-              variant={Button.colors.TRANSPARENT}
-              onClick={onClose}
-              height={44}
-            >
+            <StyledButton type="button" signature={true} variant="transparent" onClick={onClose}>
               Atšaukti
             </StyledButton>
           </SubRow>
@@ -97,7 +86,6 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
                 sign: signature.current.toDataURL('image/png'),
               })
             }
-            height={44}
           >
             Atlikta
           </StyledButton>

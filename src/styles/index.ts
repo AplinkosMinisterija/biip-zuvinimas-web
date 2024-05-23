@@ -1,51 +1,9 @@
 import { createGlobalStyle } from 'styled-components';
 import { Theme } from '@aplinkosministerija/design-system';
-
-declare module 'styled-components' {
-  // export interface DefaultTheme extends Theme {}
-}
-// export interface Theme {
-//   colors: {
-//     primary: string;
-//     secondary: string;
-//     tertiary: string;
-//     transparent: string;
-//     danger: string;
-//     success: string;
-//     hover: {
-//       primary: string;
-//       secondary: string;
-//       tertiary: string;
-//       danger: string;
-//       success: string;
-//       transparent: string;
-//     };
-//     tertiaryMedium: string;
-//     tertiaryLight: string;
-//     UPCOMING: string;
-//     NOT_FINISHED: string;
-//     FINISHED: string;
-//     INSPECTED: string;
-//     ONGOING: string;
-//     input: string;
-//     border: string;
-//     label: string;
-//     error: string;
-//     light: string;
-//     white: string;
-//     darkerWhite: string;
-//     pending: string;
-//     grey: string;
-//     CANCELED: string;
-//   };
-// }
-
 export enum ButtonColors {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
-  TERTIARY = 'tertiary',
   DANGER = 'danger',
-  SUCCESS = 'success',
   TRANSPARENT = 'transparent',
 }
 export const theme: Theme = {
@@ -57,25 +15,25 @@ export const theme: Theme = {
     danger: '#FE5B78',
     success: '#4FB922',
     buttons: {
-      primary: {
+      [ButtonColors.PRIMARY]: {
         background: '#121A55',
         text: 'white',
         border: 'transparent',
         hover: '#13C9E7',
       },
-      secondary: {
+      [ButtonColors.SECONDARY]: {
         background: '#13C9E7',
         text: 'white',
         border: 'transparent',
         hover: '#13C9E78F',
       },
-      transparent: {
+      [ButtonColors.TRANSPARENT]: {
         background: 'transparent',
         text: '#0b1f51',
-        border: 'transparent',
+        border: '#0b1f51',
         hover: 'transparent',
       },
-      danger: {
+      [ButtonColors.DANGER]: {
         background: '#FE5B78',
         text: 'white',
         border: 'transparent',
@@ -95,7 +53,6 @@ export const theme: Theme = {
     },
     border: '#121A553D',
     link: '#13C9E7',
-
     hover: {
       primary: '#13C9E7',
       secondary: '#13C9E78F',

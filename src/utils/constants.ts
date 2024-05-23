@@ -93,12 +93,3 @@ export enum FilterInputTypes {
   asyncSingleSelect = 'asyncSingleSelect',
   asyncMultiSelect = 'asyncMultiSelect',
 }
-
-export enum ButtonColors {
-  PRIMARY = 'primary',
-  SECONDARY = 'secondary',
-  TERTIARY = 'tertiary',
-  DANGER = 'danger',
-  SUCCESS = 'success',
-  TRANSPARENT = 'transparent',
-}

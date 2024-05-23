@@ -5,7 +5,7 @@ import { useInfiniteQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import Button from '../components/buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import DisplayMap from '../components/other/DisplayMap';
 import DynamicFilter from '../components/other/DynamicFilter';
@@ -142,12 +142,7 @@ const FishStockings = () => {
               : descriptions.stockingsNotFoundbyFilter}
           </Description>
           {isNoFishStockings && (
-            <StyledButton
-              onClick={() => navigate(slugs.newFishStockings)}
-              height={40}
-              padding="0"
-              disabled={false}
-            >
+            <StyledButton onClick={() => navigate(slugs.newFishStockings)} disabled={false}>
               {buttonsTitles.newFishStocking}
             </StyledButton>
           )}

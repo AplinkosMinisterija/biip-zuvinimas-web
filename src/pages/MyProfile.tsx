@@ -2,8 +2,7 @@ import styled from 'styled-components';
 
 import { Form, Formik } from 'formik';
 import { useMutation } from 'react-query';
-import Button from '../components/buttons/Button';
-import { TextField } from '@aplinkosministerija/design-system';
+import { TextField, Button } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import { useAppSelector } from '../state/hooks';
 import { device } from '../styles';
@@ -108,15 +107,10 @@ const MyProfile = () => {
                   error={errors.email}
                 />
                 <DownBar>
-                  <Button variant={Button.colors.TRANSPARENT} type="reset">
+                  <Button variant="transparent" type="reset">
                     {buttonsTitles.clear}
                   </Button>
-                  <Button
-                    loading={isLoading}
-                    variant={Button.colors.PRIMARY}
-                    type="submit"
-                    disabled={isLoading}
-                  >
+                  <Button loading={isLoading} type="submit" disabled={isLoading}>
                     {buttonsTitles.save}
                   </Button>
                 </DownBar>

@@ -5,7 +5,7 @@ import { device } from '../../styles';
 import { useFilteredRoutes } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
-import Button from '../buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import SimpleSelect from '../fields/SimpleSelect';
 import UserSwitchMenu from './ProfileDropdown';
 
@@ -22,10 +22,8 @@ const NavBar = () => {
         <Logo onClick={() => navigate('/')} src="/logo.svg" />
         <HeaderLeft>
           <StyledButton
-            variant={Button.colors.SECONDARY}
+            variant="secondary"
             onClick={() => navigate(slugs.newFishStockings)}
-            height={40}
-            padding="0"
             disabled={false}
           >
             {buttonsTitles.new}
@@ -53,7 +51,6 @@ const NavBar = () => {
               iconRight="menu"
             />
           )}
-
           <UserSwitchMenu />
         </HeaderLeft>
       </Header>

@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { device } from '../../../styles';
 import { handleDateRestriction } from '../../../utils/functions';
 import { buttonsTitles } from '../../../utils/texts';
-import Button from '../../buttons/Button';
 import {
   AsyncMultiSelectField,
   AsyncSelectField,
@@ -12,6 +11,7 @@ import {
   SelectField,
   TextField,
   DatePicker,
+  Button,
 } from '@aplinkosministerija/design-system';
 import { FilterInputTypes } from '../../../utils/constants';
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { buttonsTitles, Url } from '../../utils/texts';
-import Button from '../buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import Icon from './Icon';
 import LoaderComponent from './LoaderComponent';
 import { FishStockingLocation } from '../../utils/types';
@@ -138,7 +138,7 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
                                 <Title>{location?.name}</Title>
                                 <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
                               </TitleContainer>
-                              <Button
+                              <PopupButton
                                 onClick={() => {
                                   if (onSave && geom) {
                                     onSave({ geom, data: location });
@@ -148,7 +148,7 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
                                 }}
                               >
                                 {buttonsTitles.select}
-                              </Button>
+                              </PopupButton>
                             </Item>
                           ))}
                     </ItemContainer>
@@ -291,7 +291,6 @@ const StyledButton = styled(Button)<{ popup: boolean }>`
   top: 100px;
   right: ${({ popup }) => (popup ? 28 : 11)}px;
   min-width: 28px;
-
   height: 28px;
   @media ${device.mobileL} {
     top: 180px;
@@ -311,6 +310,10 @@ const StyledIconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const PopupButton = styled(Button)`
+  width: fit-content;
 `;
 
 export default Map;

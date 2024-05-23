@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import Button from '../buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import Icon from '../other/Icon';
 export interface DeleteCardProps {
   title: string;
@@ -52,17 +52,13 @@ const DeleteCard = ({
       <Description>{description}</Description>
       <Name>{name}</Name>
       <ButtonRow>
-        <StyledButton
-          type="button"
-          onClick={() => onSetClose(false)}
-          variant={Button.colors.TRANSPARENT}
-        >
+        <StyledButton type="button" onClick={() => onSetClose(false)} variant="transparent">
           {declineLabel}
         </StyledButton>
         <StyledButton
           type="button"
           onClick={() => handleDelete()}
-          variant={Button.colors.DANGER}
+          variant="danger"
           loading={deleteInProgress}
         >
           {agreeLabel}
@@ -78,7 +74,6 @@ const Container = styled.div`
   border-radius: 10px;
   max-width: 410px;
   padding: 40px;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -106,12 +101,14 @@ const Name = styled.div`
   font: normal normal bold 16px/26px;
   color: #121a55;
 `;
+
 const StyledButton = styled(Button)`
   margin-top: 32px;
   @media ${device.mobileL} {
     margin-top: 16px;
   }
 `;
+
 const ButtonRow = styled.div`
   display: flex;
   gap: 12px;
