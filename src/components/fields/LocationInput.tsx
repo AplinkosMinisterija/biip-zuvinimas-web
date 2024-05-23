@@ -1,67 +1,34 @@
-import styled from 'styled-components';
 import { inputLabels } from '../../utils/texts';
-import Icon from '../other/Icon';
 import { AsyncSelectField } from '@aplinkosministerija/design-system';
-import { FishStockingLocation, Municipality, UETKLocation } from '../../utils/types';
+import { FishStockingLocation } from '../../utils/types';
+import api from '../../utils/api';
 
 export interface LocationFieldProps {
-  id?: string;
-  name?: string;
-  label?: string;
   value?: any;
   error?: string;
-  showError?: boolean;
-  editable?: boolean;
-  left?: JSX.Element;
-  handleLogs?: (data: any) => void;
-  right?: JSX.Element;
-  padding?: string;
-  onChange: (option: UETKLocation) => void;
+  onChange: (option: FishStockingLocation) => void;
   disabled?: boolean;
-  getOptionLabel: (option: any) => string;
-  getInputLabel?: (option: any) => string;
-  className?: string;
-  placeholder?: string;
-  backgroundColor?: string;
-  hasBorder?: boolean;
-  setSuggestionsFromApi: (input: any, page: number, id?: any) => any;
-  getOptionValue?: (option: any) => any;
-  dependantId?: string;
-  optionsKey?: string;
-  hasOptionKey?: boolean;
-  primaryKey?: string;
-  haveIncludeOptions?: boolean;
-  municipalities: Municipality[];
 }
 
-const LocationField = ({
-  value,
-  error,
-  onChange,
-  setSuggestionsFromApi,
-  municipalities,
-}: LocationFieldProps) => {
+const LocationField = ({ value, error, onChange, disabled }: LocationFieldProps) => {
   return (
     <AsyncSelectField
       label={inputLabels.location}
       hasOptionKey={false}
       value={value}
       error={error}
-      onChange={(e: UETKLocation) => {
+      onChange={(e: FishStockingLocation) => {
         onChange(e);
       }}
-      getOptionLabel={(option: UETKLocation) =>
-        `${option.name} (${option.cadastralId}) - ${option.municipality}`
+      getOptionLabel={(option: FishStockingLocation) =>
+        `${option.name} (${option.cadastral_id}) - ${option.municipality.name}`
       }
-      loadOptions={setSuggestionsFromApi}
+      loadOptions={(input: string, page: number) =>
+        api.getRecentLocations({ filter: { name: input }, page })
+      }
+      disabled={disabled}
     />
   );
 };
-
-const StyledIcon = styled(Icon)`
-  color: #cdd5df;
-  font-size: 2.4rem;
-  margin-right: 12px;
-`;
 
 export default LocationField;

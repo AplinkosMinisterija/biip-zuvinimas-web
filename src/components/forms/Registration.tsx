@@ -16,21 +16,26 @@ import {
   useFishAges,
   useFishStockingCallbacks,
   useIsFreelancer,
-  useMunicipalities,
-  useRecentLocations,
   useSettings,
 } from '../../utils/hooks';
 import { buttonsTitles, formLabels, inputLabels, queryStrings } from '../../utils/texts';
-import { FishStocking, FishType, RegistrationFormValues, UETKLocation } from '../../utils/types';
+import {
+  FishStocking,
+  FishStockingLocation,
+  FishType,
+  RegistrationFormValues,
+} from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
-import Button from '../buttons/Button';
 import RadioOptions from '../buttons/RadioOptionts';
 import SimpleButton from '../buttons/SimpleButton';
-import AsyncSelectField from '../fields/AsyncSelect';
-import Datepicker from '../fields/DatePicker';
+import {
+  DatePicker,
+  TextField,
+  SelectField,
+  Button,
+  AsyncSelectField,
+} from '@aplinkosministerija/design-system';
 import LocationInput from '../fields/LocationInput';
-import SelectField from '../fields/SelectField';
-import TextField from '../fields/TextField';
 import TimePicker from '../fields/TimePicker';
 import DeleteCard from '../other/DeleteCard';
 import FishRow from '../other/FishRow';
@@ -62,11 +67,7 @@ const RegistrationForm = ({
   const users = useAssignedToUsers();
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
-  const municipalities = useMunicipalities();
-  const recentLocations = useRecentLocations();
-
-  console.log('RECENT locations', recentLocations);
-  // const recent = recentLocations?.map((location) => ({cadastralId: location.id, municipality: }))
+  const [geom, setGeom] = useState(fishStocking?.geom);
 
   const { data, isLoading: fihTypesLoading } = useQuery('fishTypes', () => api.getFishTypes(), {
     onError: () => {
@@ -118,18 +119,16 @@ const RegistrationForm = ({
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,
     stockingCustomer: fishStocking?.stockingCustomer || undefined,
     phone: fishStocking?.phone || assignedTo?.phone || user?.phone || '',
-    id: 0,
+    id: fishStocking?.id,
     fishOrigin: fishStocking?.fishOrigin || FishOriginTypes.GROWN,
     location: fishStocking?.location || undefined,
     batches: fishStocking?.batches || [{}],
-    geom: fishStocking?.geom || undefined,
   };
 
   const handleSubmit = async (values: any) => {
     const {
       eventTime,
       phone,
-      geom,
       location,
       assignedTo,
       fishOriginReservoir,
@@ -147,10 +146,14 @@ const RegistrationForm = ({
       stockingCustomer: stockingCustomer?.id,
       location: location,
       fishOrigin: fishOrigin.toUpperCase(),
-      fishOriginCompanyName,
-      ...(fishOriginReservoir && {
-        fishOriginReservoir,
-      }),
+      ...(fishOrigin === 'CAUGHT'
+        ? {
+            fishOriginReservoir: {
+              ...fishOriginReservoir,
+              municipality: fishOriginReservoir.municipality.name,
+            },
+          }
+        : { fishOriginCompanyName }),
       batches: batches.map((batch) => {
         return {
           amount: batch.amount || undefined,
@@ -215,17 +218,6 @@ const RegistrationForm = ({
     });
   };
 
-  const handleSelectLocation = (
-    data: UETKLocation,
-    setFieldValue: (name: string, value: any) => void,
-  ) => {
-    iframeRef?.current?.contentWindow?.postMessage(
-      JSON.stringify({ cadastralId: data.cadastralId }),
-      '*',
-    );
-    setFieldValue('location', data);
-  };
-
   return (
     <>
       <Formik
@@ -234,7 +226,7 @@ const RegistrationForm = ({
         validationSchema={validationSchema}
         validateOnChange={false}
       >
-        {({ values, errors, handleSubmit, handleChange, setFieldValue }: any) => {
+        {({ values, errors, handleSubmit, setFieldValue, setValues }: any) => {
           const filteredFistTypes: FishType[] = filterFishTypes(values.batches || []);
           return (
             <InnerContainer>
@@ -254,23 +246,14 @@ const RegistrationForm = ({
                 <LocationInput
                   value={values.location}
                   error={errors.location}
-                  municipalities={municipalities}
-                  onChange={(value: UETKLocation) => {
-                    handleSelectLocation(value, setFieldValue);
+                  onChange={(value: FishStockingLocation) => {
+                    setGeom(value.geom);
+                    setFieldValue('location', value);
                   }}
-                  getOptionValue={(option) => option?.cadastral_id}
-                  getOptionLabel={(option: UETKLocation) => {
-                    return `${option?.name} ${option.categoryTranslate} (${option.cadastralId}) - ${option.municipality}`;
-                  }}
-                  setSuggestionsFromApi={(input: string, page: number) => {
-                    if (!input) {
-                      return recentLocations;
-                    }
-                    return getLocationList(input, page);
-                  }}
+                  disabled={disabled}
                 />
                 <TimeRow>
-                  <Datepicker
+                  <DatePicker
                     label="Data"
                     minDate={new Date(new Date().setDate(new Date().getDate() + minTime))}
                     name="eventTime"
@@ -295,40 +278,45 @@ const RegistrationForm = ({
                   value={values.fishOrigin}
                   error={errors.fishOrigin}
                   onChange={(e: any) => {
-                    setFieldValue('fishOrigin', e);
-                    setFieldValue('fishOriginCompanyName', '');
-                    setFieldValue('fishOriginReservoir', '');
+                    setValues({
+                      ...values,
+                      fishOrigin: e,
+                      fishOriginCompanyName: '',
+                      setFieldValue: '',
+                    });
                   }}
                   disabled={disabled}
                 />
-                <Row>
-                  {values.fishOrigin === FishOriginTypes.GROWN ? (
-                    <TextField
-                      label="Žuvivaisos įmonė"
-                      name="fishOriginCompanyName"
-                      value={values.fishOriginCompanyName}
-                      error={errors.fishOriginCompanyName}
-                      onChange={(value) => setFieldValue('fishOriginCompanyName', value)}
-                      disabled={disabled}
-                    />
-                  ) : (
-                    <AsyncSelectField
-                      label="Vandens telkinys"
-                      name="fishOriginReservoir"
-                      value={values.fishOriginReservoir}
-                      error={errors.fishOriginReservoir}
-                      onChange={(value) => setFieldValue('fishOriginReservoir', value)}
-                      hasOptionKey={false}
-                      getOptionValue={(option) => option?.cadastral_id}
-                      getOptionLabel={(option) => {
-                        return option?.name;
-                      }}
-                      setSuggestionsFromApi={(input: string, page: number) =>
-                        getLocationList(input, page)
-                      }
-                    />
-                  )}
-                </Row>
+
+                {values.fishOrigin === FishOriginTypes.GROWN ? (
+                  <TextField
+                    label="Žuvivaisos įmonė"
+                    name="fishOriginCompanyName"
+                    value={values.fishOriginCompanyName}
+                    error={errors.fishOriginCompanyName}
+                    onChange={(value) => setFieldValue('fishOriginCompanyName', value)}
+                    disabled={disabled}
+                  />
+                ) : (
+                  <AsyncSelectField
+                    label="Vandens telkinys"
+                    name="fishOriginReservoir"
+                    value={values.fishOriginReservoir}
+                    error={errors.fishOriginReservoir}
+                    onChange={(value) => setFieldValue('fishOriginReservoir', value)}
+                    hasOptionKey={false}
+                    getInputLabel={(option) =>
+                      `${option?.name} (${option.cadastral_id}) - ${
+                        option.municipality?.name || option.municipality
+                      }`
+                    }
+                    getOptionLabel={(option) =>
+                      `${option?.name} (${option.cadastral_id}) - ${option.municipality?.name}`
+                    }
+                    loadOptions={(input: string, page: number) => getLocationList(input, page)}
+                  />
+                )}
+
                 {!isFreelancer && (
                   <>
                     <Subheader>{formLabels.stockingPerform}</Subheader>
@@ -340,13 +328,15 @@ const RegistrationForm = ({
                         value={values.assignedTo}
                         error={errors.assignedTo}
                         onChange={(value: any) => {
-                          setFieldValue('assignedTo', value);
-                          setFieldValue('phone', value?.phone?.trim() || '');
+                          setValues({
+                            ...values,
+                            assignedTo: value,
+                            phone: value?.phone?.trim() || '',
+                          });
                         }}
                         options={users}
                         disabled={isCustomer}
                       />
-
                       <TextField
                         label="Telefonas"
                         name="phone"
@@ -369,9 +359,7 @@ const RegistrationForm = ({
                   <AsyncSelectField
                     label="Įmonės pavadinimas"
                     name="stockingCustomer"
-                    setSuggestionsFromApi={(input: string, page: number) =>
-                      getTenantsList(input, page)
-                    }
+                    loadOptions={(input: string, page: number) => getTenantsList(input, page)}
                     getOptionLabel={(option: any) => option?.name}
                     value={values.stockingCustomer}
                     error={errors.stockingCustomer}
@@ -422,14 +410,19 @@ const RegistrationForm = ({
                   {!!fishStocking && (
                     <StyledButtons
                       type="button"
-                      variant={Button.colors.DANGER}
+                      variant={'danger'}
                       onClick={() => setShowModal(true)}
                       disabled={isCustomer}
                     >
                       {deleteInfo.name}
                     </StyledButtons>
                   )}
-                  <StyledButtons type="submit" loading={submitLoading} disabled={isCustomer}>
+                  <StyledButtons
+                    variant={'primary'}
+                    type="submit"
+                    loading={submitLoading}
+                    disabled={isCustomer}
+                  >
                     {buttonsTitles.save}
                   </StyledButtons>
                 </ButtonRow>
@@ -451,15 +444,15 @@ const RegistrationForm = ({
                 iframeRef={iframeRef}
                 display={!isMobile || showMap}
                 onClose={() => setShowMap(false)}
-                value={values.geom}
-                onSave={(geom, location) => {
-                  setFieldValue('geom', geom);
-                  setFieldValue('location', location);
+                value={geom}
+                onSave={({ geom, data }) => {
+                  setGeom(geom);
+                  setFieldValue('location', data);
                   setShowMap(false);
                 }}
                 queryString={queryString}
                 height="100%"
-                showLocationPopup={!fishStocking}
+                disabled={disabled}
               />
             </InnerContainer>
           );
@@ -525,6 +518,7 @@ const ButtonRow = styled.div`
 `;
 
 const StyledButtons = styled(Button)`
+  width: fit-content;
   @media ${device.mobileL} {
     width: 100%;
   }

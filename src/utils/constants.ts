@@ -40,8 +40,9 @@ export enum Resources {
   FISH_STOCKING_REGISTER = 'fishStockings/register',
   FISH_STOCKING_REVIEW = 'fishStockings/review',
   SETTINGS = 'settings',
-  RECENT_LOCATIONS = 'fishStockings/recentLocations',
+  RECENT_LOCATIONS = 'recentLocations',
   EXCEL = 'fishStockings/export',
+  UETK = 'locations/uetk',
 }
 
 export enum Populations {

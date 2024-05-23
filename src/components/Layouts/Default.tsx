@@ -19,7 +19,7 @@ const DefaultLayout = ({ children, maxWidth = '100%', onScroll }: DefaultLayoutP
           callback={(data) => {}}
         />
         <NavBar />
-        <Content onScroll={onScroll} maxWidth={maxWidth}>
+        <Content onScroll={onScroll} $maxWidth={maxWidth}>
           {children}
         </Content>
       </Container>
@@ -38,11 +38,11 @@ const Container = styled.div`
   background-color: white;
 `;
 
-const Content = styled.div<{ maxWidth: string }>`
+const Content = styled.div<{ $maxWidth: string }>`
   overflow: auto;
   height: 100%;
   width: 100%;
-  max-width: ${({ maxWidth }) => maxWidth};
+  max-width: ${({ $maxWidth }) => $maxWidth};
   margin: 0 auto;
 `;
 

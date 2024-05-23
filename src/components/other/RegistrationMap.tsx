@@ -6,139 +6,172 @@ import { buttonsTitles, Url } from '../../utils/texts';
 import Button from '../buttons/Button';
 import Icon from './Icon';
 import LoaderComponent from './LoaderComponent';
-import { UETKLocation } from '../../utils/types';
+import { FishStockingLocation } from '../../utils/types';
+import { useQueryClient } from 'react-query';
+import api from '../../utils/api';
 
 export interface MapProps {
   height?: string;
-  onSave?: (geom: any, data: any) => void;
+  onSave?: (params: { geom: any; data: any }) => void;
   onClose?: () => void;
   error?: string;
   queryString?: string;
-  value?: string;
+  value?: any;
   display: boolean;
   iframeRef: any;
-  showLocationPopup?: boolean;
+  disabled?: boolean;
 }
 
-const Map = ({
-  height,
-  onSave,
-  onClose,
-  value,
-  display,
-  iframeRef,
-  showLocationPopup,
-}: MapProps) => {
+const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: MapProps) => {
+  const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
-  const [geom, setGeom] = useState<any[]>();
-  const [locations, setLocations] = useState<UETKLocation[]>([]);
+  const [locations, setLocations] = useState<FishStockingLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery(device.mobileL);
+  const [geom, setGeom] = useState<any>();
+
+  const pointChanged = (geom1, geom2) => {
+    const coordinates1 = geom1?.features?.[0]?.geometry?.coordinates?.map((num) => Math.trunc(num));
+    const coordinates2 = geom2?.features?.[0]?.geometry?.coordinates?.map((num) => Math.trunc(num));
+    return coordinates1?.[0] !== coordinates2?.[0] || coordinates1?.[1] !== coordinates2?.[1];
+  };
 
   const src = `${Url.DRAW}`;
 
-  const handleLoadMap = () => {
-    setLoading(false);
-    if (value) {
-      iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
-    }
-  };
+  const sendMapMessage = () => {};
 
-  const showPopup = showLocationPopup && (locations.length === 0 || locations.length > 1);
+  const handleReceivedMapMessage = async (event: any) => {
+    if (disabled) return;
+    const selected = event?.data?.mapIframeMsg?.selected;
+    if (!onSave) return;
+    if (event.origin === import.meta.env.VITE_MAPS_HOST && selected) {
+      const { geom: postMessageGeom, items } = selected;
+      if (!postMessageGeom) return;
+      const geomObject = JSON.parse(postMessageGeom);
 
-  const handleSaveGeom = (event: any) => {
-    if (event.origin === import.meta.env.VITE_MAPS_HOST) {
-      const geom = event?.data?.mapIframeMsg?.selected?.geom;
-      const items = event?.data?.mapIframeMsg?.selected?.items;
-      console.log('showLocationPopup', showLocationPopup, items);
-
-      if (!geom) return;
-      setGeom(geom);
-      setLocations(items);
-      if (showLocationPopup && items.length === 1) {
-        onSave && onSave(geom, items[0]);
+      const geomChanged = pointChanged(geomObject, geom);
+      if (geomChanged) {
+        setGeom(geomObject);
+        const municipality = await queryClient.fetchQuery(['municipality', postMessageGeom], () =>
+          api.getMunicipality({ geom: postMessageGeom }),
+        );
+        const mappedItems: FishStockingLocation[] =
+          items?.map((item: any) => ({
+            name: item.title,
+            cadastral_id: item.cadastralId,
+            municipality: municipality,
+          })) || [];
+        if (items.length === 1) {
+          onSave({ geom: geomObject, data: { ...mappedItems[0], municipality } });
+        } else if (items.length === 0) {
+          onSave({ geom: undefined, data: undefined });
+          setLocations([]);
+          setShowModal(true);
+        } else {
+          setLocations(mappedItems);
+          setShowModal(true);
+        }
       }
     }
   };
 
   useEffect(() => {
-    window.addEventListener('message', handleSaveGeom);
-    return () => window.removeEventListener('message', handleSaveGeom);
-  }, [handleSaveGeom]);
+    window.addEventListener('message', handleReceivedMapMessage);
+    return () => {
+      window.removeEventListener('message', handleReceivedMapMessage);
+    };
+  }, [geom, disabled]);
+
+  useEffect(() => {
+    setLoading(true);
+    if (pointChanged(value, geom)) {
+      console.log('should update geom', value);
+      setGeom(value);
+      iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
+    }
+    setLoading(false);
+  }, [value]);
 
   return (
     <>
-      {loading ? <LoaderComponent /> : null}
-      <Container $display={display}>
-        {isMobile && (
-          <StyledButton
-            popup
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              if (onClose) {
-                return onClose();
-              }
-              setShowModal(!showModal);
-            }}
-          >
-            <StyledIconContainer>
-              <StyledIcon name={'close'} />
-            </StyledIconContainer>
-          </StyledButton>
-        )}
-
-        <InnerContainer>
-          {showPopup && (
-            <MapModal>
-              <ModalContainer>
-                <>
-                  <IconContainer
-                    onClick={() => {
-                      setGeom(undefined);
-                    }}
-                  >
-                    <StyledIcon name="close" />
-                  </IconContainer>
-                  <ItemContainer>
-                    {locations.length === 0
-                      ? 'Nerastas telkinys'
-                      : locations?.map((location, index) => (
-                          <Item key={`${location.cadastralId}_${index}`}>
-                            <TitleContainer>
-                              <Title>{location?.name}</Title>
-                              <Description>{`${location?.cadastralId}, ${location?.municipality}`}</Description>
-                            </TitleContainer>
-                            <Button
-                              onClick={() => {
-                                setGeom(undefined);
-                                onSave && onSave(geom, location);
-                              }}
-                            >
-                              {buttonsTitles.select}
-                            </Button>
-                          </Item>
-                        ))}
-                  </ItemContainer>
-                </>
-              </ModalContainer>
-            </MapModal>
+      {loading ? (
+        <LoaderComponent />
+      ) : (
+        <Container $display={display}>
+          {isMobile && (
+            <StyledButton
+              popup
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                if (onClose) {
+                  return onClose();
+                }
+                setShowModal(!showModal);
+              }}
+            >
+              <StyledIconContainer>
+                <StyledIcon name={'close'} />
+              </StyledIconContainer>
+            </StyledButton>
           )}
 
-          <StyledIframe
-            allow="geolocation *"
-            ref={iframeRef}
-            src={src}
-            width={'100%'}
-            height={showModal ? '100%' : `${height || '230px'}`}
-            style={{ border: 0 }}
-            allowFullScreen={true}
-            onLoad={handleLoadMap}
-            aria-hidden="false"
-            tabIndex={1}
-          />
-        </InnerContainer>
-      </Container>
+          <InnerContainer>
+            {showModal && (
+              <MapModal>
+                <ModalContainer>
+                  <>
+                    <IconContainer
+                      onClick={() => {
+                        setShowModal(false);
+                        setLocations([]);
+                      }}
+                    >
+                      <StyledIcon name="close" />
+                    </IconContainer>
+                    <ItemContainer>
+                      {locations.length === 0
+                        ? 'Nerastas telkinys'
+                        : locations?.map((location, index) => (
+                            <Item key={`${location.cadastral_id}_${index}`}>
+                              <TitleContainer>
+                                <Title>{location?.name}</Title>
+                                <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
+                              </TitleContainer>
+                              <Button
+                                onClick={() => {
+                                  if (onSave && geom) {
+                                    onSave({ geom, data: location });
+                                    setShowModal(false);
+                                    setLocations([]);
+                                  }
+                                }}
+                              >
+                                {buttonsTitles.select}
+                              </Button>
+                            </Item>
+                          ))}
+                    </ItemContainer>
+                  </>
+                </ModalContainer>
+              </MapModal>
+            )}
+
+            <StyledIframe
+              allow="geolocation *"
+              ref={iframeRef}
+              src={src}
+              width={'100%'}
+              height={showModal ? '100%' : `${height || '230px'}`}
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              onLoad={sendMapMessage}
+              aria-hidden="false"
+              tabIndex={1}
+            />
+          </InnerContainer>
+        </Container>
+      )}
     </>
   );
 };

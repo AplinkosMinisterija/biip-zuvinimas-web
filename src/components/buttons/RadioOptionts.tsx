@@ -30,13 +30,13 @@ const RadioOptions = ({
   ...rest
 }: RadioOptionsProps) => {
   return (
-    <Container oneLine={oneLine} className={className}>
+    <Container $oneLine={oneLine} className={className}>
       {label ? <Label>{label}</Label> : null}
-      <OptionsContainer column={column}>
+      <OptionsContainer $column={column}>
         {options?.map((option, index) => {
           const key = `${name}_${option.value}`;
           return (
-            <InputContainer key={key} first={index === 0}>
+            <InputContainer key={key}>
               <StyledInput
                 disabled={disabled}
                 type="radio"
@@ -47,7 +47,7 @@ const RadioOptions = ({
                 {...rest}
                 onChange={() => onChange(option.value)}
               />
-              <OptionLabel disabled={!!disabled} htmlFor={`${option.value}-${key}`}>
+              <OptionLabel $disabled={!!disabled} htmlFor={`${option.value}-${key}`}>
                 {option.label}
               </OptionLabel>
             </InputContainer>
@@ -59,14 +59,14 @@ const RadioOptions = ({
   );
 };
 
-const Container = styled.div<{ oneLine?: boolean }>`
+const Container = styled.div<{ $oneLine?: boolean }>`
   padding: 8px 0;
-  display: ${({ oneLine }) => (oneLine ? 'flex' : 'block')};
+  display: ${({ $oneLine }) => ($oneLine ? 'flex' : 'block')};
 `;
 
-const OptionsContainer = styled.div<{ column?: boolean }>`
+const OptionsContainer = styled.div<{ $column?: boolean }>`
   display: flex;
-  flex-direction: ${({ column }) => (column ? 'column' : 'row')};
+  flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
   @media ${device.mobileL} {
     flex-wrap: wrap;
     flex-direction: column;
@@ -84,7 +84,7 @@ const Label = styled.span`
   text-overflow: ellipsis;
 `;
 
-const InputContainer = styled.div<{ first: boolean }>`
+const InputContainer = styled.div`
   margin: 0 8px 0 0;
 
   @media ${device.mobileL} {
@@ -92,11 +92,11 @@ const InputContainer = styled.div<{ first: boolean }>`
   }
 `;
 
-const OptionLabel = styled.label<{ disabled: boolean }>`
+const OptionLabel = styled.label<{ $disabled: boolean }>`
   font-size: 1.4rem;
   color: #231f20;
   opacity: 1;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
 `;
 
 const ErrorMessage = styled.label`
@@ -106,7 +106,7 @@ const ErrorMessage = styled.label`
   margin-left: 8px;
 `;
 
-const StyledInput = styled.input<{ disabled?: boolean }>`
+const StyledInput = styled.input`
   & {
     display: none;
   }

@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import { default as NumericTextField } from '../fields/NumericTextField';
-import SelectField from '../fields/SelectField';
+import { SelectField, NumericTextField } from '@aplinkosministerija/design-system';
 import Icon from '../other/Icon';
 import { RegistrationFormFishRow } from '../../utils/types';
 
@@ -64,7 +63,7 @@ const FishRow = ({
         label="Kiekis"
         error={errors?.amount}
         showError={false}
-        right={<InputInnerLabel>vnt</InputInnerLabel>}
+        rightIcon={<InputInnerLabel>vnt</InputInnerLabel>}
         disabled={disabled}
         wholeNumber={true}
       />
@@ -75,7 +74,7 @@ const FishRow = ({
         label="Bendras svoris"
         showError={false}
         wholeNumber={false}
-        right={<InputInnerLabel>kg</InputInnerLabel>}
+        rightIcon={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}
       />
       {showDelete && !disabled && (

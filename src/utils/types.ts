@@ -1,4 +1,5 @@
 import { FishOriginTypes, FishStockingStatus, RolesTypes } from './constants';
+import { FeatureCollection } from '@aplinkosministerija/design-system';
 export interface User {
   id: string;
   firstName: string;
@@ -191,29 +192,21 @@ export interface RegistrationFormFishRow {
   weight?: number;
 }
 
-export type RegistrationFormValues = Omit<Partial<FishStocking>, 'eventTime' | 'batches'> & {
+export type RegistrationFormValues = Omit<
+  Partial<FishStocking>,
+  'eventTime' | 'batches' | 'geom' | 'id'
+> & {
   eventTime?: Date;
   batches: Array<RegistrationFormFishRow | object>;
+  geom?: any;
+  id?: number;
 };
 
 export type Info = Array<Array<{ type: string; label: string; value: string }>>;
 
-export type UETKLocation = {
-  area: number;
-  cadastralId: string;
-  category: string;
-  categoryTranslate: string;
-  geom: string;
-  id: string;
-  lat: number;
-  lng: number;
-  length: number;
-  municipality: string;
-  name: string;
-};
-
 export type FishStockingLocation = {
   cadastral_id: string;
   name: string;
-  municipality: { id: string; name: string } | string;
+  municipality: { id: string; name: string };
+  geom?: any;
 };

@@ -98,7 +98,7 @@ const Datepicker = ({
   const textValue = validDate(inputValue) ? format(new Date(inputValue), 'yyyy-MM-dd') : inputValue;
 
   return (
-    <Container bottom={bottom} tabIndex={1} onBlur={handleBlur} disabled={disabled}>
+    <Container $bottom={bottom} tabIndex={1} onBlur={handleBlur}>
       <div tabIndex={2} onBlur={handleBlurInput}>
         <TextField
           placeholder="2000-01-01"
@@ -110,7 +110,7 @@ const Datepicker = ({
           value={textValue}
           error={error}
           rightIcon={
-            <IconContainer disabled={disabled} onClick={() => setOpen(!open)}>
+            <IconContainer $disabled={disabled} onClick={() => setOpen(!open)}>
               <CalendarIcon name={'calendar'} />
             </IconContainer>
           }
@@ -190,14 +190,14 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
-const IconContainer = styled.div<{ disabled: boolean }>`
+const IconContainer = styled.div<{ $disabled: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
 `;
 
-const Container = styled.div<{ disabled: boolean; bottom: boolean }>`
+const Container = styled.div<{ $bottom: boolean }>`
   width: 100%;
   &:focus {
     outline: none;
@@ -260,7 +260,7 @@ const Container = styled.div<{ disabled: boolean; bottom: boolean }>`
   .react-datepicker {
     width: 364px;
     position: absolute;
-    top: ${({ bottom }) => (bottom ? '-450px' : '0px')};
+    top: ${({ $bottom }) => ($bottom ? '-450px' : '0px')};
     z-index: 2;
     background-color: #ffffff;
     box-shadow: 0px 2px 16px #121a5529;

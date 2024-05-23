@@ -281,6 +281,12 @@ class Api {
       pageSize: '999',
     });
 
+  getMunicipality = async (params: { geom: any }): Promise<any> =>
+    await this.get({
+      resource: Resources.MUNICIPALITIES + '/search',
+      ...params,
+    });
+
   getFishAges = async (): Promise<GetAllResponse<any>> =>
     await this.get({
       resource: Resources.FISH_AGES,
@@ -342,13 +348,13 @@ class Api {
       id,
     });
 
-  registerFishStocking = async (params: any): Promise<FishStocking> =>
+  registerFishStocking = async (params: FishStocking): Promise<FishStocking> =>
     await this.create({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,
     });
 
-  updateFishStocking = async (params: any, id: string): Promise<FishStocking> =>
+  updateFishStocking = async (params: FishStocking, id: string): Promise<FishStocking> =>
     await this.update({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,
@@ -377,9 +383,10 @@ class Api {
       resource: Resources.SETTINGS,
     });
 
-  getRecentLocations = async (): Promise<any> =>
+  getRecentLocations = async (params): Promise<any> =>
     await this.get({
       resource: Resources.RECENT_LOCATIONS,
+      ...params,
     });
 
   deletePhoto = async (id: string): Promise<any> =>
@@ -440,28 +447,21 @@ class Api {
   };
 
   searchLocations = async ({ search, page, cadastralIds }: any): Promise<any> => {
-    const query = JSON.stringify({
-      category: {
-        $in: [
-          'RIVER',
-          'CANAL',
-          'INTERMEDIATE_WATER_BODY',
-          'TERRITORIAL_WATER_BODY',
-          'NATURAL_LAKE',
-          'PONDED_LAKE',
-          'POND',
-          'ISOLATED_WATER_BODY',
-        ],
-      },
-      ...(cadastralIds ? { cadastralId: { $in: cadastralIds } } : {}),
-    });
+    const query = cadastralIds
+      ? JSON.stringify({
+          cadastralId: {
+            $in: cadastralIds,
+          },
+        })
+      : '';
 
-    const config = this.getCommonConfigs({
+    return this.get({
+      resource: Resources.UETK,
       query,
       search,
       page,
+      populate: ['geometry'],
     });
-    return this.errorWrapper(() => this.uetkAxios.get(`${this.riversLakesSearchUrl}`, config));
   };
 }
 
