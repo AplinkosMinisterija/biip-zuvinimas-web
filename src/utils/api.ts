@@ -1,6 +1,6 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { isFinite } from 'lodash';
-import { FishStocking, FishType, Tenant, TenantUser, User } from './types';
+import { FishStocking, FishType, RegistrationFormData, Tenant, TenantUser, User } from './types';
 
 import { isEmpty } from 'lodash';
 import Cookies from 'universal-cookie';
@@ -176,7 +176,7 @@ class Api {
 
   update = async ({ resource, id, params }: UpdateOne) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.patch(`/${resource}/${id ? `/${id}` : ''}`, params),
+      this.AuthApiAxios.patch(`/${resource}${id ? `/${id}` : ''}`, params),
     );
   };
 
@@ -348,13 +348,14 @@ class Api {
       id,
     });
 
-  registerFishStocking = async (params: FishStocking): Promise<FishStocking> =>
-    await this.create({
+  registerFishStocking = async (params: RegistrationFormData): Promise<FishStocking> => {
+    return await this.create({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,
     });
+  };
 
-  updateFishStocking = async (params: FishStocking, id: string): Promise<FishStocking> =>
+  updateFishStocking = async (params: RegistrationFormData, id: string): Promise<FishStocking> =>
     await this.update({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,

@@ -4,7 +4,7 @@ import { device } from '../../styles';
 import { Button } from '@aplinkosministerija/design-system';
 import Icon from '../other/Icon';
 export interface DeleteCardProps {
-  title: string;
+  title?: string;
   description: string;
   name: string;
   onSetClose: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,7 +16,7 @@ export interface DeleteCardProps {
 }
 
 const DeleteCard = ({
-  title,
+  title = '',
   description,
   name,
   onSetClose,

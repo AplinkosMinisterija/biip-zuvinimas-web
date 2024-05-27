@@ -6,7 +6,7 @@ import { useFilteredRoutes } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
 import { Button } from '@aplinkosministerija/design-system';
-import SimpleSelect from '../fields/SimpleSelect';
+import MobileMenu from '../fields/MobileMenu';
 import UserSwitchMenu from './ProfileDropdown';
 
 const NavBar = () => {
@@ -44,7 +44,7 @@ const NavBar = () => {
               );
             })
           ) : (
-            <SimpleSelect
+            <MobileMenu
               options={routes}
               getOptionLabel={(option: any) => option?.title}
               onChange={(option: any) => navigate(option?.slug)}

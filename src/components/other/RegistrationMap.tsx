@@ -26,9 +26,9 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
-  const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery(device.mobileL);
   const [geom, setGeom] = useState<any>();
+  const [mapLoading, setMapLoading] = useState(true);
 
   const pointChanged = (geom1, geom2) => {
     const coordinates1 = geom1?.features?.[0]?.geometry?.coordinates?.map((num) => Math.trunc(num));
@@ -38,8 +38,6 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
 
   const src = `${Url.DRAW}`;
 
-  const sendMapMessage = () => {};
-
   const handleReceivedMapMessage = async (event: any) => {
     if (disabled) return;
     const selected = event?.data?.mapIframeMsg?.selected;
@@ -48,7 +46,6 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
       const { geom: postMessageGeom, items } = selected;
       if (!postMessageGeom) return;
       const geomObject = JSON.parse(postMessageGeom);
-
       const geomChanged = pointChanged(geomObject, geom);
       if (geomChanged) {
         setGeom(geomObject);
@@ -82,96 +79,100 @@ const Map = ({ height, onSave, onClose, value, display, iframeRef, disabled }: M
     };
   }, [geom, disabled]);
 
-  useEffect(() => {
-    setLoading(true);
+  const handleChangedValue = () => {
     if (pointChanged(value, geom)) {
-      console.log('should update geom', value);
       setGeom(value);
       iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
     }
-    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!mapLoading) {
+      handleChangedValue();
+    }
   }, [value]);
 
   return (
     <>
-      {loading ? (
-        <LoaderComponent />
-      ) : (
-        <Container $display={display}>
-          {isMobile && (
-            <StyledButton
-              popup
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onClose) {
-                  return onClose();
-                }
-                setShowModal(!showModal);
-              }}
-            >
-              <StyledIconContainer>
-                <StyledIcon name={'close'} />
-              </StyledIconContainer>
-            </StyledButton>
+      <Container $display={display}>
+        {isMobile && (
+          <StyledButton
+            popup
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              if (onClose) {
+                return onClose();
+              }
+              setShowModal(!showModal);
+            }}
+          >
+            <StyledIconContainer>
+              <StyledIcon name={'close'} />
+            </StyledIconContainer>
+          </StyledButton>
+        )}
+
+        <InnerContainer>
+          {showModal && (
+            <MapModal>
+              <ModalContainer>
+                <>
+                  <IconContainer
+                    onClick={() => {
+                      setShowModal(false);
+                      setLocations([]);
+                    }}
+                  >
+                    <StyledIcon name="close" />
+                  </IconContainer>
+                  <ItemContainer>
+                    {locations.length === 0
+                      ? 'Nerastas telkinys'
+                      : locations?.map((location, index) => (
+                          <Item key={`${location.cadastral_id}_${index}`}>
+                            <TitleContainer>
+                              <Title>{location?.name}</Title>
+                              <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
+                            </TitleContainer>
+                            <PopupButton
+                              onClick={() => {
+                                if (onSave && geom) {
+                                  onSave({ geom, data: location });
+                                  setShowModal(false);
+                                  setLocations([]);
+                                }
+                              }}
+                            >
+                              {buttonsTitles.select}
+                            </PopupButton>
+                          </Item>
+                        ))}
+                  </ItemContainer>
+                </>
+              </ModalContainer>
+            </MapModal>
           )}
 
-          <InnerContainer>
-            {showModal && (
-              <MapModal>
-                <ModalContainer>
-                  <>
-                    <IconContainer
-                      onClick={() => {
-                        setShowModal(false);
-                        setLocations([]);
-                      }}
-                    >
-                      <StyledIcon name="close" />
-                    </IconContainer>
-                    <ItemContainer>
-                      {locations.length === 0
-                        ? 'Nerastas telkinys'
-                        : locations?.map((location, index) => (
-                            <Item key={`${location.cadastral_id}_${index}`}>
-                              <TitleContainer>
-                                <Title>{location?.name}</Title>
-                                <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
-                              </TitleContainer>
-                              <PopupButton
-                                onClick={() => {
-                                  if (onSave && geom) {
-                                    onSave({ geom, data: location });
-                                    setShowModal(false);
-                                    setLocations([]);
-                                  }
-                                }}
-                              >
-                                {buttonsTitles.select}
-                              </PopupButton>
-                            </Item>
-                          ))}
-                    </ItemContainer>
-                  </>
-                </ModalContainer>
-              </MapModal>
-            )}
-
-            <StyledIframe
-              allow="geolocation *"
-              ref={iframeRef}
-              src={src}
-              width={'100%'}
-              height={showModal ? '100%' : `${height || '230px'}`}
-              style={{ border: 0 }}
-              allowFullScreen={true}
-              onLoad={sendMapMessage}
-              aria-hidden="false"
-              tabIndex={1}
-            />
-          </InnerContainer>
-        </Container>
-      )}
+          <StyledIframe
+            allow="geolocation *"
+            ref={iframeRef}
+            src={src}
+            width={'100%'}
+            height={showModal ? '100%' : `${height || '230px'}`}
+            style={{ border: 0 }}
+            allowFullScreen={true}
+            onLoad={() => {
+              setTimeout(() => {
+                setMapLoading(false);
+                handleChangedValue();
+              }, 1000);
+            }}
+            aria-hidden="false"
+            tabIndex={1}
+          />
+        </InnerContainer>
+      </Container>
     </>
   );
 };

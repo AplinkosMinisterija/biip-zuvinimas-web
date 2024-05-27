@@ -9,8 +9,8 @@ interface itemProps {
   id: string;
   fishType: FishType;
   fishAge: FishType;
-  reviewAmount: number;
-  reviewWeight: number;
+  reviewAmount?: number;
+  reviewWeight?: number;
   planned: string;
 }
 

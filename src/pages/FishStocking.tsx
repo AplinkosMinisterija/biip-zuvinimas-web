@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import Done from '../components/forms/Done';
@@ -10,6 +10,9 @@ import api from '../utils/api';
 import { FishStockingStatus } from '../utils/constants';
 import { isNew } from '../utils/functions';
 import { slugs } from '../utils/routes';
+import { buttonsTitles } from '../utils/texts';
+import { useFishStockingCallbacks, useSettings } from '../utils/hooks';
+import { FishStocking, RegistrationFormData } from '../utils/types';
 
 const FishStockingPage = () => {
   const [searchParams] = useSearchParams();
@@ -34,35 +37,16 @@ const FishStockingPage = () => {
 
   if (isLoading) return <LoaderComponent />;
 
-  const showNewFishStocking = isNew(id) && !repeat;
-  const showRepeatFishStocking = isNew(id) && repeat && fishStocking;
-  const showUnfinishedFishStocking =
-    fishStocking &&
-    ![FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status);
   const showFinishedFishStocking =
     fishStocking &&
-    [FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status);
-
-  if (
-    !showNewFishStocking &&
-    !showRepeatFishStocking &&
-    !showUnfinishedFishStocking &&
-    !showFinishedFishStocking
-  ) {
-    // There is nothing to render
-    navigate(-1);
-    return null;
-  }
+    [FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status) &&
+    fishStocking.id.toString() != repeat;
 
   const renderContent = () => {
-    if (showNewFishStocking) {
-      return <RegistrationForm />;
-    } else if (showRepeatFishStocking) {
-      return <RegistrationForm fishStocking={fishStocking} />;
-    } else if (showUnfinishedFishStocking) {
-      return <Unfinished fishStocking={fishStocking} />;
-    } else if (showFinishedFishStocking) {
+    if (showFinishedFishStocking) {
       return <Done fishStocking={fishStocking} />;
+    } else {
+      return <Unfinished fishStocking={fishStocking} />;
     }
   };
 

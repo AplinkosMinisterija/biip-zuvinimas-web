@@ -75,13 +75,15 @@ export const useAssignedToUsers = () => {
 };
 
 export const useCurrentLocation = () => {
-  const [location, setLocation] = useState({});
+  const [location, setLocation] = useState<{ lat: number; lng: number } | undefined>();
 
   useEffect(() => {
     if (navigator?.geolocation) {
-      navigator.geolocation.getCurrentPosition((location) => {
+      return navigator.geolocation.getCurrentPosition((location) => {
         const { latitude, longitude } = location.coords;
-        setLocation({ x: latitude, y: longitude });
+        if (latitude && longitude) {
+          setLocation({ lat: latitude, lng: longitude });
+        }
       });
     }
   }, []);

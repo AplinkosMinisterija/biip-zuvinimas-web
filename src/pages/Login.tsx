@@ -1,8 +1,7 @@
 import { useFormik } from 'formik';
 import { useMutation } from 'react-query';
 import styled from 'styled-components';
-import PasswordField from '../components/fields/PasswordField';
-import { TextField, Button } from '@aplinkosministerija/design-system';
+import { PasswordField, TextField, Button } from '@aplinkosministerija/design-system';
 import { LoginLayout } from '../components/Layouts/Login';
 import api from '../utils/api';
 import { handleAlert, handleUpdateTokens } from '../utils/functions';
