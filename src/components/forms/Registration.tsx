@@ -29,6 +29,7 @@ const RegistrationForm = ({
   isCustomer,
   setGeom,
   disabled,
+  onShowMap,
 }: {
   renderTabs?: JSX.Element;
   values: any;
@@ -39,6 +40,7 @@ const RegistrationForm = ({
   submitLoading: boolean;
   setGeom: (geom: any) => void;
   disabled: boolean;
+  onShowMap: () => void;
 }) => {
   const fishAges = useFishAges();
   const { minTime, loading } = useSettings();
@@ -77,6 +79,7 @@ const RegistrationForm = ({
         }}
         disabled={disabled}
       />
+      <Link onClick={onShowMap}>Atidaryti žemėlapį</Link>
       <TimeRow>
         <DatePicker
           label="Data"
@@ -257,6 +260,19 @@ const Subheader = styled.div`
   font-weight: bold;
   margin-top: 12px;
   color: ${({ theme }) => theme.colors.tertiary};
+`;
+
+const Link = styled.div`
+  color: #175cd3;
+  text-decoration: underline;
+  font-size: 1.4rem;
+  :hover {
+    opacity: 0.6;
+  }
+  display: none;
+  @media ${device.mobileL} {
+    display: block;
+  }
 `;
 
 export default RegistrationForm;

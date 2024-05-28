@@ -21,9 +21,9 @@ const FishStockingPage = () => {
   if (isLoading) return <LoaderComponent />;
 
   const showFinishedFishStocking =
-    fishStocking &&
+    !!fishStocking &&
     [FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status) &&
-    isRepeating;
+    !isRepeating;
 
   const renderContent = () => {
     if (showFinishedFishStocking) {

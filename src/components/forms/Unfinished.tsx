@@ -25,7 +25,7 @@ import FishStockingPageTitle from '../other/PageTitle';
 import Modal from '../other/Modal';
 import DeleteCard from '../other/DeleteCard';
 import { Button } from '@aplinkosministerija/design-system';
-import { isEmpty, values } from 'lodash';
+import { isEmpty } from 'lodash';
 
 const tabs = [
   { label: 'Registracijos duomenys', route: FishStockingStatus.UPCOMING },
@@ -41,24 +41,17 @@ const Unfinished = () => {
   const isMobile = useMediaQuery(device.mobileL);
   const iframeRef = useRef<any>(null);
   const [showModal, setShowModal] = useState(false);
-
   const [geom, setGeom] = useState(fishStocking?.geom);
-
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
-
   const user = useAppSelector((state) => state?.user?.userData);
-
   const currentLocation = useCurrentLocation();
-
   const [selectedTab, setSelectedTab] = useState(
     !fishStocking || fishStocking?.status === FishStockingStatus.UPCOMING || isRepeating
       ? FishStockingStatus.UPCOMING
       : FishStockingStatus.ONGOING,
   );
-
   const callBacks = useFishStockingCallbacks();
-
   const createOrUpdateFishStockingMutation = useMutation(
     (params: RegistrationFormData) =>
       fishStocking?.id && !isRepeating
@@ -66,22 +59,12 @@ const Unfinished = () => {
         : api.registerFishStocking(params),
     { ...callBacks },
   );
-
   const fishStockingId = fishStocking?.id.toString();
-
   const reviewFishStockingMutation = useMutation((params: any) => api.reviewFishStocking(params), {
     ...callBacks,
   });
-
-  const cancelFishStockingMutation = useMutation(
+  const cancelOrRemoveFishStockingMutation = useMutation(
     () => (fishStockingId ? api.cancelFishStocking(fishStockingId) : Promise.resolve(undefined)),
-    {
-      ...callBacks,
-    },
-  );
-
-  const deleteFishStockingMutation = useMutation(
-    () => (fishStockingId ? api.deleteFishStocking(fishStockingId) : Promise.resolve(undefined)),
     {
       ...callBacks,
     },
@@ -90,21 +73,10 @@ const Unfinished = () => {
   const submitLoading = [
     createOrUpdateFishStockingMutation.isLoading,
     reviewFishStockingMutation.isLoading,
-    cancelFishStockingMutation.isLoading,
-    deleteFishStockingMutation.isLoading,
+    cancelOrRemoveFishStockingMutation.isLoading,
   ].some((loading) => loading);
 
   const isCustomer = fishStocking?.stockingCustomer?.id === cookies.get('profileId');
-  const isDisabledSubmit = isCustomer || submitLoading;
-
-  const handleDelete = async () => {
-    await deleteFishStockingMutation.mutateAsync();
-  };
-
-  const handleCancel = async () => {
-    await cancelFishStockingMutation.mutateAsync();
-  };
-
   const getDeleteInfo = () => {
     const canDelete =
       fishStocking?.eventTime &&
@@ -115,14 +87,14 @@ const Unfinished = () => {
       return {
         name: buttonsTitles.delete,
         description: 'Ar tikrai norite ištrinti būsimą įžuvinimą?',
-        function: handleDelete,
+        function: cancelOrRemoveFishStockingMutation.mutateAsync,
       };
     }
 
     return {
       name: buttonsTitles.cancelFishStcoking,
       description: 'Ar tikrai norite atšaukti būsimą įžuvinimą?',
-      function: handleCancel,
+      function: cancelOrRemoveFishStockingMutation.mutateAsync,
     };
   };
 
@@ -285,10 +257,9 @@ const Unfinished = () => {
 
   const disabledRegistration =
     !!fishStocking &&
-    (fishStocking?.status !== FishStockingStatus.UPCOMING ||
-      fishStocking?.stockingCustomer?.id === cookies.get('profileId')) &&
-    !isRepeating;
-
+    !isRepeating &&
+    (fishStocking.status !== FishStockingStatus.UPCOMING ||
+      fishStocking.stockingCustomer?.id === cookies.get('profileId'));
   const disabledReview = !isRepeating && fishStocking?.status !== FishStockingStatus.ONGOING;
 
   const renderContent = ({ errors, values, setFieldValue, setValues }: any) => {
@@ -314,6 +285,7 @@ const Unfinished = () => {
         submitLoading={submitLoading}
         setGeom={setGeom}
         disabled={disabledRegistration}
+        onShowMap={() => setShowMap(true)}
       />
     );
   };
@@ -346,7 +318,7 @@ const Unfinished = () => {
                 {renderTabs}
                 {renderContent(formikParams)}
                 <ButtonRow>
-                  {!!fishStocking && (
+                  {!!fishStocking && !isRepeating && (
                     <StyledButtons
                       type="button"
                       variant="danger"
@@ -375,17 +347,18 @@ const Unfinished = () => {
               </StyledForm>
               <Map
                 iframeRef={iframeRef}
-                display={!isMobile || showMap}
-                onClose={() => setShowMap(false)}
+                showMobileMap={showMap}
+                onClose={() => {
+                  setShowMap(false);
+                }}
                 value={geom}
                 onSave={({ geom, data }) => {
                   setGeom(geom);
                   setFieldValue('location', data);
-                  setShowMap(false);
                 }}
                 queryString={queryString}
                 height="100%"
-                disabled={!!fishStocking?.id}
+                disabled={disabledRegistration}
               />
             </InnerContainer>
           );

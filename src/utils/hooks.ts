@@ -221,7 +221,6 @@ export const useFishStocking = () => {
   const [searchParams] = useSearchParams();
   const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
   const { id } = useParams();
-
   const getStocking = async () => {
     if (isNew(id) && repeat) {
       return await api.getFishStocking(repeat);
@@ -233,7 +232,10 @@ export const useFishStocking = () => {
 
   const { data: fishStocking, isLoading, isError } = useQuery(['fishStocking', id], getStocking);
 
-  console.log('HOOK USE FISH STOCKING', fishStocking);
-
-  return { fishStocking, isLoading, isError, isRepeating: fishStocking?.id.toString() != repeat };
+  return {
+    fishStocking,
+    isLoading,
+    isError,
+    isRepeating: !!repeat && fishStocking?.id.toString() === repeat,
+  };
 };

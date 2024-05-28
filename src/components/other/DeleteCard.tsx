@@ -52,9 +52,9 @@ const DeleteCard = ({
       <Description>{description}</Description>
       <Name>{name}</Name>
       <ButtonRow>
-        <StyledButton type="button" onClick={() => onSetClose(false)} variant="transparent">
+        <StyledDeclineButton type="button" onClick={() => onSetClose(false)} variant="transparent">
           {declineLabel}
-        </StyledButton>
+        </StyledDeclineButton>
         <StyledButton
           type="button"
           onClick={() => handleDelete()}
@@ -103,6 +103,13 @@ const Name = styled.div`
 `;
 
 const StyledButton = styled(Button)`
+  margin-top: 32px;
+  @media ${device.mobileL} {
+    margin-top: 16px;
+  }
+`;
+
+const StyledDeclineButton = styled(Button)`
   margin-top: 32px;
   border: 1px solid #121a55;
   @media ${device.mobileL} {
