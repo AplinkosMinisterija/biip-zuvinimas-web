@@ -2,12 +2,9 @@ import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import Cookies from 'universal-cookie';
 import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
-import { FishStocking, RegistrationFormData, ReviewFormData } from '../../utils/types';
+import { RegistrationFormData, ReviewFormData } from '../../utils/types';
 import Registration from './Registration';
 import Review from './Review';
-import { handleAlert } from '../../utils/functions';
-import { useSearchParams } from 'react-router-dom';
-import { useParams } from 'react-router';
 import Map from '../other/RegistrationMap';
 import { Form, Formik } from 'formik';
 import { device } from '../../styles';
@@ -15,10 +12,11 @@ import { useMediaQuery } from '@material-ui/core';
 import { buttonsTitles } from '../../utils/texts';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import { useAppSelector } from '../../state/hooks';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import api from '../../utils/api';
 import {
   useCurrentLocation,
+  useFishStocking,
   useFishStockingCallbacks,
   useIsFreelancer,
   useSettings,
@@ -27,7 +25,7 @@ import FishStockingPageTitle from '../other/PageTitle';
 import Modal from '../other/Modal';
 import DeleteCard from '../other/DeleteCard';
 import { Button } from '@aplinkosministerija/design-system';
-import { isEmpty } from 'lodash';
+import { isEmpty, values } from 'lodash';
 
 const tabs = [
   { label: 'Registracijos duomenys', route: FishStockingStatus.UPCOMING },
@@ -36,9 +34,10 @@ const tabs = [
 
 const cookies = new Cookies();
 
-const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
+const Unfinished = () => {
+  const { fishStocking, isLoading, isError, isRepeating } = useFishStocking();
   const [showMap, setShowMap] = useState(false);
-  const [queryString, setQueryString] = useState('');
+  const [queryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
   const iframeRef = useRef<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -50,47 +49,43 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
 
   const user = useAppSelector((state) => state?.user?.userData);
 
-  const [searchParams] = useSearchParams();
-  const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
-  const { id } = useParams();
-
   const currentLocation = useCurrentLocation();
 
-  const repeating = fishStocking?.id.toString() === repeat;
-
   const [selectedTab, setSelectedTab] = useState(
-    !fishStocking || fishStocking?.status === FishStockingStatus.UPCOMING || repeating
+    !fishStocking || fishStocking?.status === FishStockingStatus.UPCOMING || isRepeating
       ? FishStockingStatus.UPCOMING
       : FishStockingStatus.ONGOING,
   );
-
-  const { data, isLoading: fihTypesLoading } = useQuery('fishTypes', () => api.getFishTypes(), {
-    onError: () => {
-      handleAlert();
-    },
-  });
 
   const callBacks = useFishStockingCallbacks();
 
   const createOrUpdateFishStockingMutation = useMutation(
     (params: RegistrationFormData) =>
-      fishStocking?.id && !repeating
+      fishStocking?.id && !isRepeating
         ? api.updateFishStocking(params, fishStocking.id.toString())
         : api.registerFishStocking(params),
     { ...callBacks },
   );
 
+  const fishStockingId = fishStocking?.id.toString();
+
   const reviewFishStockingMutation = useMutation((params: any) => api.reviewFishStocking(params), {
     ...callBacks,
   });
 
-  const cancelFishStockingMutation = useMutation(() => api.cancelFishStocking(id!), {
-    ...callBacks,
-  });
+  const cancelFishStockingMutation = useMutation(
+    () => (fishStockingId ? api.cancelFishStocking(fishStockingId) : Promise.resolve(undefined)),
+    {
+      ...callBacks,
+    },
+  );
 
-  const deleteFishStockingMutation = useMutation(() => api.cancelFishStocking(id!), {
-    ...callBacks,
-  });
+  const deleteFishStockingMutation = useMutation(
+    () => (fishStockingId ? api.deleteFishStocking(fishStockingId) : Promise.resolve(undefined)),
+    {
+      ...callBacks,
+    },
+  );
 
   const submitLoading = [
     createOrUpdateFishStockingMutation.isLoading,
@@ -145,21 +140,21 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
   const initialBatches = () => {
     if (fishStocking) {
       return fishStocking?.batches.map((batch) => ({
-        id: repeating ? undefined : batch.id,
+        id: isRepeating ? undefined : batch.id,
         fishType: batch.fishType,
         fishAge: batch.fishAge,
         amount: batch.amount || '',
         weight: batch.weight || '',
-        reviewWeight: repeating ? undefined : batch.reviewWeight || '',
-        reviewAmount: repeating ? undefined : batch.reviewAmount || '',
+        reviewWeight: isRepeating ? undefined : batch.reviewWeight || '',
+        reviewAmount: isRepeating ? undefined : batch.reviewAmount || '',
       }));
     }
     return [{}];
   };
 
   const initialValues = {
-    id: repeating ? fishStocking?.id : undefined,
-    eventTime: repeating || !fishStocking ? undefined : new Date(fishStocking.eventTime),
+    id: isRepeating ? fishStocking?.id : undefined,
+    eventTime: isRepeating || !fishStocking ? undefined : new Date(fishStocking.eventTime),
     fishOriginCompanyName: fishStocking?.fishOriginCompanyName || '',
     assignedTo: fishStocking?.assignedTo || user || undefined,
     fishOriginReservoir: fishStocking?.fishOriginReservoir || undefined,
@@ -168,14 +163,14 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
     fishOrigin: fishStocking?.fishOrigin || FishOriginTypes.GROWN,
     location: fishStocking?.location || undefined,
     batches: initialBatches(),
-    containerWaterTemp: repeating ? undefined : fishStocking?.containerWaterTemp || 0,
-    waterTemp: repeating ? undefined : fishStocking?.waterTemp || 0,
-    images: repeating ? undefined : fishStocking?.images || [],
-    veterinaryApprovalNo: repeating ? undefined : fishStocking?.veterinaryApprovalNo,
-    waybillNo: repeating ? undefined : fishStocking?.waybillNo,
-    veterinaryApprovalOrderNo: repeating ? undefined : fishStocking?.veterinaryApprovalOrderNo,
-    comment: repeating ? undefined : fishStocking?.comment || '',
-    signatures: repeating
+    containerWaterTemp: isRepeating ? undefined : fishStocking?.containerWaterTemp || 0,
+    waterTemp: isRepeating ? undefined : fishStocking?.waterTemp || 0,
+    images: isRepeating ? undefined : fishStocking?.images || [],
+    veterinaryApprovalNo: isRepeating ? undefined : fishStocking?.veterinaryApprovalNo,
+    waybillNo: isRepeating ? undefined : fishStocking?.waybillNo,
+    veterinaryApprovalOrderNo: isRepeating ? undefined : fishStocking?.veterinaryApprovalOrderNo,
+    comment: isRepeating ? undefined : fishStocking?.comment || '',
+    signatures: isRepeating
       ? []
       : !isEmpty(inspector)
       ? [
@@ -292,9 +287,9 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
     !!fishStocking &&
     (fishStocking?.status !== FishStockingStatus.UPCOMING ||
       fishStocking?.stockingCustomer?.id === cookies.get('profileId')) &&
-    !repeating;
+    !isRepeating;
 
-  const disabledReview = !repeating && fishStocking?.status !== FishStockingStatus.ONGOING;
+  const disabledReview = !isRepeating && fishStocking?.status !== FishStockingStatus.ONGOING;
 
   const renderContent = ({ errors, values, setFieldValue, setValues }: any) => {
     if (selectedTab === FishStockingStatus.ONGOING) {
@@ -311,7 +306,6 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
 
     return (
       <Registration
-        fishStocking={fishStocking}
         errors={errors}
         values={values}
         isCustomer={isCustomer}
@@ -331,6 +325,7 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
         onSubmit={handleSubmit}
         validationSchema={validationSchema}
         validateOnChange={false}
+        enableReinitialize={true}
       >
         {(formikParams: any) => {
           const { setFieldValue, handleSubmit } = formikParams;
@@ -390,7 +385,7 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
                 }}
                 queryString={queryString}
                 height="100%"
-                disabled={!!id}
+                disabled={!!fishStocking?.id}
               />
             </InnerContainer>
           );

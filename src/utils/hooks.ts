@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import Cookies from 'universal-cookie';
 import { useAppDispatch, useAppSelector } from '../state/hooks';
 import { actions, UserReducerProps } from '../state/user/reducer';
@@ -14,8 +14,10 @@ import {
   handleAlert,
   handleGetCurrentUser,
   handleSetProfile,
+  isNew,
 } from './functions';
 import { routes, slugs } from './routes';
+import { useSearchParams } from 'react-router-dom';
 
 const cookies = new Cookies();
 
@@ -213,4 +215,25 @@ export const useLogoutMutation = () => {
   });
 
   return { mutateAsync };
+};
+
+export const useFishStocking = () => {
+  const [searchParams] = useSearchParams();
+  const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
+  const { id } = useParams();
+
+  const getStocking = async () => {
+    if (isNew(id) && repeat) {
+      return await api.getFishStocking(repeat);
+    } else if (id && !isNew(id)) {
+      return api.getFishStocking(id);
+    }
+    return undefined;
+  };
+
+  const { data: fishStocking, isLoading, isError } = useQuery(['fishStocking', id], getStocking);
+
+  console.log('HOOK USE FISH STOCKING', fishStocking);
+
+  return { fishStocking, isLoading, isError, isRepeating: fishStocking?.id.toString() != repeat };
 };

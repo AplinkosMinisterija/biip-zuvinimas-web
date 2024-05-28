@@ -7,7 +7,7 @@ import { FishOriginTypes } from '../../utils/constants';
 import { getLocationList, getTenantsList, handleAlert, isNew } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
 import { buttonsTitles, formLabels } from '../../utils/texts';
-import { FishStocking, FishStockingLocation, FishType } from '../../utils/types';
+import { FishStockingLocation, FishType } from '../../utils/types';
 import RadioOptions from '../buttons/RadioOptionts';
 import SimpleButton from '../buttons/SimpleButton';
 import {
@@ -30,7 +30,6 @@ const RegistrationForm = ({
   setGeom,
   disabled,
 }: {
-  fishStocking?: FishStocking;
   renderTabs?: JSX.Element;
   values: any;
   errors: any;
@@ -46,7 +45,7 @@ const RegistrationForm = ({
   const isFreelancer = useIsFreelancer();
   const users = useAssignedToUsers();
 
-  const { data, isLoading: fihTypesLoading } = useQuery('fishTypes', () => api.getFishTypes(), {
+  const { data } = useQuery('fishTypes', () => api.getFishTypes(), {
     onError: () => {
       handleAlert();
     },

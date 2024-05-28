@@ -3,38 +3,10 @@ import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import api from '../../utils/api';
-import { FishStocking } from '../../utils/types';
 import PhotoUploadField from '../fields/PhotoUploadField';
 import { TextField, TextAreaField, NumericTextField } from '@aplinkosministerija/design-system';
 import ApproveFishRow from '../other/ApproveFishRow';
 import SignatureRow from '../other/SignatureRow';
-
-export interface FishStockingFactFormProps {
-  fishStocking: FishStocking;
-  disabled?: boolean;
-  renderTabs: JSX.Element;
-}
-
-interface ReviewProps {
-  containerWaterTemp: number;
-  waterTemp: number;
-  reviewLocation?: {
-    lat: number;
-    lng: number;
-  };
-  comment: string;
-  images: any[];
-  batches: any[];
-  veterinaryApprovalNo: string | undefined;
-  waybillNo: string | undefined;
-  veterinaryApprovalOrderNo: string | undefined;
-  signatures?: {
-    organization?: string;
-    signedBy: string;
-    signature?: string;
-    phone?: string;
-  }[];
-}
 
 const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) => {
   return (

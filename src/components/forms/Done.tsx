@@ -18,6 +18,7 @@ import PreviewMap from '../other/PreviewMap';
 import SignatureList from '../other/SignatureList';
 import FishStockingTable from '../other/Table';
 import { fishOriginOptions } from '../../utils/options';
+import { useFishStocking } from '../../utils/hooks';
 
 export interface FishStockingCompletedProps {
   fishStocking: FishStocking;
@@ -31,10 +32,13 @@ const locale = {
   fish_origin_reservoir: 'Vandens telkinio pavadinimas',
 };
 
-const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => {
-  const status = fishStocking.status;
+const FishStockingCompleted = () => {
+  const { fishStocking } = useFishStocking();
+
+  const status = fishStocking?.status;
   const navigate = useNavigate();
   const isMobile = useMediaQuery(device.mobileL);
+
   if (!fishStocking) {
     return null;
   }
