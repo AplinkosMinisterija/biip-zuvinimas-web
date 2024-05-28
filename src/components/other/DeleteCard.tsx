@@ -104,6 +104,7 @@ const Name = styled.div`
 
 const StyledButton = styled(Button)`
   margin-top: 32px;
+  border: 1px solid #121a55;
   @media ${device.mobileL} {
     margin-top: 16px;
   }

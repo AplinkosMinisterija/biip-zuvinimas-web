@@ -1,10 +1,9 @@
 import { FieldArray } from 'formik';
-import { useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import api from '../../utils/api';
-import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
+import { FishOriginTypes } from '../../utils/constants';
 import { getLocationList, getTenantsList, handleAlert, isNew } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
 import { buttonsTitles, formLabels } from '../../utils/texts';
@@ -21,18 +20,13 @@ import LocationInput from '../fields/LocationInput';
 import TimePicker from '../fields/TimePicker';
 import FishRow from '../other/FishRow';
 import { fishOriginOptions } from '../../utils/options';
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
 
 const RegistrationForm = ({
-  fishStocking,
   values,
   errors,
   setFieldValue,
   setValues,
   isCustomer,
-  submitLoading,
   setGeom,
   disabled,
 }: {

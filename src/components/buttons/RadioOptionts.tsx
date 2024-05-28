@@ -31,7 +31,11 @@ const RadioOptions = ({
 }: RadioOptionsProps) => {
   return (
     <Container $oneLine={oneLine} className={className}>
-      {label ? <Label>{label}</Label> : null}
+      {label ? (
+        <LaberWrapper>
+          <Label>{label}</Label>
+        </LaberWrapper>
+      ) : null}
       <OptionsContainer $column={column}>
         {options?.map((option, index) => {
           const key = `${name}_${option.value}`;
@@ -73,6 +77,11 @@ const OptionsContainer = styled.div<{ $column?: boolean }>`
   }
 `;
 
+const LaberWrapper = styled.div`
+  height: 2.4rem;
+  margin-bottom: 0.4rem;
+`;
+
 const Label = styled.span`
   text-align: left;
   font-size: 1.4rem;
@@ -94,7 +103,7 @@ const InputContainer = styled.div`
 
 const OptionLabel = styled.label<{ $disabled: boolean }>`
   font-size: 1.4rem;
-  color: #231f20;
+  color: #121a55;
   opacity: 1;
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
 `;

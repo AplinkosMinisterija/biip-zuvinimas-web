@@ -2,10 +2,10 @@ import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import Cookies from 'universal-cookie';
 import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
-import { FishStocking, FishType, RegistrationFormData, ReviewFormData } from '../../utils/types';
+import { FishStocking, RegistrationFormData, ReviewFormData } from '../../utils/types';
 import Registration from './Registration';
 import Review from './Review';
-import { handleAlert, isNew } from '../../utils/functions';
+import { handleAlert } from '../../utils/functions';
 import { useSearchParams } from 'react-router-dom';
 import { useParams } from 'react-router';
 import Map from '../other/RegistrationMap';
@@ -69,8 +69,6 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
       handleAlert();
     },
   });
-
-  const fishTypesFullList = data?.rows || [];
 
   const callBacks = useFishStockingCallbacks();
 
@@ -147,7 +145,7 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
   const initialBatches = () => {
     if (fishStocking) {
       return fishStocking?.batches.map((batch) => ({
-        id: batch.id,
+        id: repeating ? undefined : batch.id,
         fishType: batch.fishType,
         fishAge: batch.fishAge,
         amount: batch.amount || '',
@@ -159,7 +157,7 @@ const Unfinished = ({ fishStocking }: { fishStocking?: FishStocking }) => {
     return [{}];
   };
 
-  const initialValues: any = {
+  const initialValues = {
     id: repeating ? fishStocking?.id : undefined,
     eventTime: repeating || !fishStocking ? undefined : new Date(fishStocking.eventTime),
     fishOriginCompanyName: fishStocking?.fishOriginCompanyName || '',
