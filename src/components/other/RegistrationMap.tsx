@@ -1,4 +1,3 @@
-import { useMediaQuery } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
@@ -8,6 +7,7 @@ import { FishStockingLocation } from '../../utils/types';
 import { useQueryClient } from 'react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
+import { checkIfPointChanged } from '../../utils/functions';
 
 export interface MapProps {
   height?: string;
@@ -28,13 +28,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const [geom, setGeom] = useState<any>();
   const [mapLoading, setMapLoading] = useState(true);
 
-  const pointChanged = (geom1, geom2) => {
-    const coordinates1 = geom1?.features?.[0]?.geometry?.coordinates?.map((num) => Math.trunc(num));
-    const coordinates2 = geom2?.features?.[0]?.geometry?.coordinates?.map((num) => Math.trunc(num));
-    return coordinates1?.[0] !== coordinates2?.[0] || coordinates1?.[1] !== coordinates2?.[1];
-  };
-
-  const src = `${Url.DRAW}`;
+  const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
   const handleReceivedMapMessage = async (event: any) => {
     if (disabled) return;
@@ -46,7 +40,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       if (!postMessageGeom) return;
       const geomObject = JSON.parse(postMessageGeom);
 
-      const geomChanged = pointChanged(geomObject, geom);
+      const geomChanged = checkIfPointChanged(geomObject, geom);
       if (geomChanged) {
         setGeom(geomObject);
         const municipality = await queryClient.fetchQuery(['municipality', postMessageGeom], () =>
@@ -79,7 +73,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   }, [geom, disabled]);
 
   const handleChangedValue = () => {
-    if (value && pointChanged(value, geom)) {
+    if (value && checkIfPointChanged(value, geom)) {
       setGeom(value);
       iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
     }
@@ -96,17 +90,19 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       <StyledIframe
         allow="geolocation *"
         ref={iframeRef}
-        src={src}
+        src={src(disabled)}
         width={'100%'}
         height={showLocationPopup ? '100%' : `${height || '230px'}`}
         style={{ border: 0 }}
         allowFullScreen={true}
         onLoad={() => {
-          console.log('onLoad', iframeRef, value);
+          // On initial map load, map marks incorrect location (coordinates different than provided in sent post message - somewhere outside Lithuania)
+          // for one initially sent post message it responds with two post messages containing incorrect coordinates in geom
+          // TODO: timeout could be removed, if map issue would be solved to properly handle post messages on map load
           setTimeout(() => {
             setMapLoading(false);
             handleChangedValue();
-          }, 2000);
+          }, 1000);
         }}
         aria-hidden="false"
         tabIndex={1}

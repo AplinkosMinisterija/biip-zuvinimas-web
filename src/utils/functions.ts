@@ -248,3 +248,18 @@ export const checkIfDateIsAfter = (value: Date | undefined, minTime: number) => 
   const minDate = new Date(new Date().setDate(new Date().getDate() + minTime));
   return selectedDate && selectedDate > minDate;
 };
+
+export const checkIfPointChanged = (geom1, geom2) => {
+  const coordinates1 = geom1?.features?.[0]?.geometry?.coordinates?.map((num) =>
+    Math.trunc(num),
+  ) || [0, 0];
+  const coordinates2 = geom2?.features?.[0]?.geometry?.coordinates?.map((num) =>
+    Math.trunc(num),
+  ) || [0, 0];
+  const xdiff = coordinates1?.[0] - coordinates2?.[0];
+  const ydiff = coordinates1?.[1] - coordinates2?.[1];
+  const xChanged = xdiff > 1 || xdiff < -1;
+  const yChanged = ydiff > 1 || ydiff < -1;
+
+  return xChanged || yChanged;
+};
