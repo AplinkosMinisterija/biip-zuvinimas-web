@@ -80,7 +80,6 @@ class Api {
   private AuthApiAxios: AxiosInstance;
   private uetkAxios: AxiosInstance;
   private readonly proxy: string = '/api';
-  private readonly riversLakesSearchUrl: string = `${import.meta.env.VITE_UETK_URL}/objects/search`;
 
   constructor() {
     this.AuthApiAxios = Axios.create();
