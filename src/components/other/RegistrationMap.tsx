@@ -222,9 +222,7 @@ const InnerContainer = styled.div`
   }
 `;
 
-const StyledIframe = styled.iframe`
-  z-index: 555;
-`;
+const StyledIframe = styled.iframe``;
 
 const ModalContainer = styled.div`
   background-color: white;
