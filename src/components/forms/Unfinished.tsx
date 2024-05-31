@@ -10,7 +10,11 @@ import { Form, Formik } from 'formik';
 import { device } from '../../styles';
 import { useMediaQuery } from '@material-ui/core';
 import { buttonsTitles } from '../../utils/texts';
-import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
+import {
+  validateFishStocking,
+  validateFishStockingReview,
+  validateFreelancerFishStocking,
+} from '../../utils/validations';
 import { useAppSelector } from '../../state/hooks';
 import { useMutation } from 'react-query';
 import api from '../../utils/api';
@@ -101,6 +105,9 @@ const Unfinished = () => {
   const deleteInfo = getDeleteInfo();
 
   const validationSchema = () => {
+    if (selectedTab === FishStockingStatus.ONGOING) {
+      return validateFishStockingReview;
+    }
     const applySchema = isFreelancer ? validateFreelancerFishStocking : validateFishStocking;
     return applySchema(minTime);
   };
@@ -189,7 +196,6 @@ const Unfinished = () => {
         };
       }),
     };
-
     await reviewFishStockingMutation.mutateAsync(params);
   };
 
@@ -234,6 +240,7 @@ const Unfinished = () => {
   };
 
   const handleSubmit = async (values: any) => {
+    alert('handle submit ' + selectedTab);
     if (selectedTab === FishStockingStatus.UPCOMING) {
       await submitRegistration(values);
     } else {
@@ -300,7 +307,8 @@ const Unfinished = () => {
         enableReinitialize={true}
       >
         {(formikParams: any) => {
-          const { setFieldValue, handleSubmit } = formikParams;
+          const { setFieldValue, handleSubmit, errors } = formikParams;
+          console.log('errors', errors);
           return (
             <InnerContainer>
               <StyledForm
