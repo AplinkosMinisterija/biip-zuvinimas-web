@@ -7,7 +7,7 @@ import Cookies from 'universal-cookie';
 import { FilterConfig } from '../components/other/DynamicFilter/Filter';
 import { UserReducerProps } from '../state/user/reducer';
 import api from './api';
-import { FishStockingStatus, RolesTypes } from './constants';
+import { FishStockingStatus } from './constants';
 import { fishStockingStatusLabels, validationTexts } from './texts';
 import { FishStockingFilters, FishStockingParams, Profile, ProfileId } from './types';
 

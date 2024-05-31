@@ -270,7 +270,7 @@ const Unfinished = () => {
           fishStocking={fishStocking!}
           values={values}
           errors={errors}
-          setFieldvalue={setFieldValue}
+          setFieldValue={setFieldValue}
         />
       );
     }
