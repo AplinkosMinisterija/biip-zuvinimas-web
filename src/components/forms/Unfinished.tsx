@@ -240,7 +240,6 @@ const Unfinished = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    alert('handle submit ' + selectedTab);
     if (selectedTab === FishStockingStatus.UPCOMING) {
       await submitRegistration(values);
     } else {
