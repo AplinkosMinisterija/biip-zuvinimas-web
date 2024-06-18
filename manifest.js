@@ -29,6 +29,7 @@ export const manifestForPlugIn = {
     orientation: 'portrait',
   },
   workbox: {
+    navigateFallbackDenylist: [/^\/(api)\/.*/],
     runtimeCaching: [
       {
         urlPattern: /\.(png|jpg|jpeg|svg|gif)$/,
