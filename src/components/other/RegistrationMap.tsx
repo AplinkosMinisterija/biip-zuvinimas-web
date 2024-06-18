@@ -1,166 +1,187 @@
-import { useMediaQuery } from '@material-ui/core';
-import { isEmpty } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import api from '../../utils/api';
-import { handleAlert } from '../../utils/functions';
 import { buttonsTitles, Url } from '../../utils/texts';
-import Button from '../buttons/Button';
 import Icon from './Icon';
-import LoaderComponent from './LoaderComponent';
+import { FishStockingLocation } from '../../utils/types';
+import { useQueryClient } from 'react-query';
+import api from '../../utils/api';
+import { Button } from '@aplinkosministerija/design-system';
+import { checkIfPointChanged } from '../../utils/functions';
 
 export interface MapProps {
   height?: string;
-  onSave?: (geom: any, data: any) => void;
+  onSave?: (params: { geom: any; data: any }) => void;
   onClose?: () => void;
   error?: string;
   queryString?: string;
-  value?: string;
-  display: boolean;
+  value?: any;
   iframeRef: any;
+  disabled?: boolean;
+  showMobileMap?: boolean;
 }
 
-const Map = ({ height, onSave, onClose, value, display, iframeRef }: MapProps) => {
-  const [showModal, setShowModal] = useState(false);
-  const [geom, setGeom] = useState<any[]>();
-  const [loading, setLoading] = useState(true);
-  const isMobile = useMediaQuery(device.mobileL);
+const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMap }: MapProps) => {
+  const queryClient = useQueryClient();
+  const [showLocationPopup, setShowLocationPopup] = useState(false);
+  const [locations, setLocations] = useState<FishStockingLocation[]>([]);
+  const [geom, setGeom] = useState<any>();
+  const [mapLoading, setMapLoading] = useState(true);
 
-  const src = `${Url.DRAW}`;
+  const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
-  const handleLoadMap = () => {
-    setLoading(false);
+  const handleReceivedMapMessage = async (event: any) => {
+    if (disabled) return;
+    const selected = event?.data?.mapIframeMsg?.selected;
+    if (!onSave) return;
+    if (event.origin === import.meta.env.VITE_MAPS_HOST && selected) {
+      const { geom: postMessageGeom, items } = selected;
 
-    iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
+      if (!postMessageGeom) return;
+      const geomObject = JSON.parse(postMessageGeom);
+
+      const geomChanged = checkIfPointChanged(geomObject, geom);
+      if (geomChanged) {
+        setGeom(geomObject);
+        const municipality = await queryClient.fetchQuery(['municipality', postMessageGeom], () =>
+          api.getMunicipality({ geom: postMessageGeom }),
+        );
+        const mappedItems: FishStockingLocation[] =
+          items?.map((item: any) => ({
+            name: item.title,
+            cadastral_id: item.cadastralId,
+            municipality: municipality,
+          })) || [];
+        if (items.length === 1) {
+          onSave({ geom: geomObject, data: { ...mappedItems[0], municipality } });
+        } else if (items.length === 0) {
+          setLocations([]);
+          setShowLocationPopup(true);
+        } else {
+          setLocations(mappedItems);
+          setShowLocationPopup(true);
+        }
+      }
+    }
   };
 
-  const locationMutation = useMutation(
-    (location: any) =>
-      api.getLocations({
-        geom: JSON.stringify(location),
-      }),
-    {
-      onError: () => {
-        handleAlert();
-      },
-    },
-  );
-  const locationMutationMutateAsync = locationMutation.mutateAsync;
-  const handleGetLocations = useCallback(
-    async (location: any) => {
-      setGeom(location);
-      locationMutationMutateAsync(location);
-    },
-    [locationMutationMutateAsync],
-  );
+  useEffect(() => {
+    window.addEventListener('message', handleReceivedMapMessage);
+    return () => {
+      window.removeEventListener('message', handleReceivedMapMessage);
+    };
+  }, [geom, disabled]);
 
-  const handleSaveGeom = useCallback(
-    (event: any) => {
-      if (!event?.data?.mapIframeMsg) return;
-
-      const userObjects = JSON.parse(event?.data?.mapIframeMsg?.userObjects);
-      if (!userObjects) return;
-
-      if (isEmpty(userObjects.features)) return;
-
-      handleGetLocations(userObjects);
-    },
-    [handleGetLocations],
-  );
+  const handleChangedValue = () => {
+    if (value && checkIfPointChanged(value, geom)) {
+      setGeom(value);
+      iframeRef?.current?.contentWindow?.postMessage(JSON.stringify({ geom: value }), '*');
+    }
+  };
 
   useEffect(() => {
-    window.addEventListener('message', handleSaveGeom);
-    return () => window.removeEventListener('message', handleSaveGeom);
-  }, [handleSaveGeom]);
+    if (!mapLoading && iframeRef) {
+      handleChangedValue();
+    }
+  }, [value, iframeRef]);
+
+  const renderContent = () => (
+    <>
+      <StyledIframe
+        allow="geolocation *"
+        ref={iframeRef}
+        src={src(disabled)}
+        width={'100%'}
+        height={showLocationPopup ? '100%' : `${height || '230px'}`}
+        style={{ border: 0 }}
+        allowFullScreen={true}
+        onLoad={() => {
+          // On initial map load, map marks incorrect location (coordinates different than provided in sent post message - somewhere outside Lithuania)
+          // for one initially sent post message it responds with two post messages containing incorrect coordinates in geom
+          // TODO: timeout could be removed, if map issue would be solved to properly handle post messages on map load
+          setTimeout(() => {
+            setMapLoading(false);
+            handleChangedValue();
+          }, 1000);
+        }}
+        aria-hidden="false"
+        tabIndex={1}
+      />
+      {showLocationPopup && (
+        <MapModal>
+          <ModalContainer>
+            <>
+              <IconContainer
+                onClick={() => {
+                  setShowLocationPopup(false);
+                  setLocations([]);
+                }}
+              >
+                <StyledIcon name="close" />
+              </IconContainer>
+              <ItemContainer>
+                {locations.length === 0
+                  ? 'Nerastas telkinys'
+                  : locations?.map((location, index) => (
+                      <Item key={`${location.cadastral_id}_${index}`}>
+                        <TitleContainer>
+                          <Title>{location?.name}</Title>
+                          <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
+                        </TitleContainer>
+                        <PopupButton
+                          onClick={() => {
+                            if (onSave && geom) {
+                              onSave({ geom, data: location });
+                              setShowLocationPopup(false);
+                              setLocations([]);
+                            }
+                          }}
+                        >
+                          {buttonsTitles.select}
+                        </PopupButton>
+                      </Item>
+                    ))}
+              </ItemContainer>
+            </>
+          </ModalContainer>
+        </MapModal>
+      )}
+    </>
+  );
 
   return (
     <>
-      {loading ? <LoaderComponent /> : null}
-      <Container $display={display}>
-        {isMobile && (
-          <StyledButton
-            popup
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
+      <Container $show={showMobileMap}>
+        <CloseWrapper>
+          <CloseButton
+            onClick={() => {
               if (onClose) {
                 return onClose();
               }
-
-              setShowModal(!showModal);
+              setShowLocationPopup(!showLocationPopup);
             }}
           >
-            <StyledIconContainer>
-              <StyledIcon name={'close'} />
-            </StyledIconContainer>
-          </StyledButton>
-        )}
-
-        <InnerContainer>
-          {geom && (
-            <MapModal>
-              <ModalContainer>
-                {locationMutation.isLoading ? (
-                  <LoaderComponent />
-                ) : (
-                  <>
-                    <IconContainer
-                      onClick={() => {
-                        setGeom(undefined);
-                      }}
-                    >
-                      <StyledIcon name="close" />
-                    </IconContainer>
-                    <ItemContainer>
-                      {!isEmpty(locationMutation.data)
-                        ? locationMutation?.data?.map((location, index) => (
-                            <Item key={`${location.cadastral_id}_${index}`}>
-                              <TitleContainer>
-                                <Title>{location?.name}</Title>
-                                <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
-                              </TitleContainer>
-                              <Button
-                                onClick={() => {
-                                  setGeom(undefined);
-                                  onSave && onSave(geom, location);
-                                }}
-                              >
-                                {buttonsTitles.select}
-                              </Button>
-                            </Item>
-                          ))
-                        : 'Nerastas telkinys'}
-                    </ItemContainer>
-                  </>
-                )}
-              </ModalContainer>
-            </MapModal>
-          )}
-
-          <StyledIframe
-            allow="geolocation *"
-            ref={iframeRef}
-            src={src}
-            width={'100%'}
-            height={showModal ? '100%' : `${height || '230px'}`}
-            style={{ border: 0 }}
-            allowFullScreen={true}
-            onLoad={handleLoadMap}
-            aria-hidden="false"
-            tabIndex={1}
-          />
-        </InnerContainer>
+            <StyledIcon name="close" />
+          </CloseButton>
+        </CloseWrapper>
+        <InnerContainer>{renderContent()}</InnerContainer>
       </Container>
     </>
   );
 };
 
-const Container = styled.div<{ $display: boolean }>`
+const Container = styled.div<{ $show?: boolean }>`
   width: 100%;
   height: 100%;
-  display: ${({ $display }) => ($display ? 'flex' : 'none')};
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  @media ${device.mobileL} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: ${({ $show }) => ($show ? 'flex' : 'none')};
+  }
 `;
 
 const IconContainer = styled.div`
@@ -175,27 +196,18 @@ const StyledIcon = styled(Icon)`
 `;
 
 const MapModal = styled.div`
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%
-z-index:999;
-top: 0;
+  position: absolute;
+  top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
   overflow-y: auto;
-  position: absolute;
-  width: 100%;
-  height: 100%;
   background-color: #0b1b607a;
-  top: 0;
-  left: 0;
-  overflow-y: auto;
 `;
 
 const InnerContainer = styled.div`
@@ -205,21 +217,14 @@ const InnerContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   @media ${device.mobileL} {
     padding: 0;
   }
 `;
 
-const StyledIframe = styled.iframe<{
-  height: string;
-  width: string;
-}>`
-  width: ${({ width }) => width};
-  height: ${({ height }) => height};
-`;
+const StyledIframe = styled.iframe``;
 
-const ModalContainer = styled.div<{ width?: string }>`
+const ModalContainer = styled.div`
   background-color: white;
   padding: 16px;
   border: 1px solid #dfdfdf;
@@ -227,8 +232,6 @@ const ModalContainer = styled.div<{ width?: string }>`
   position: relative;
   height: fit-content;
   min-width: 440px;
-  width: ${({ width }) => width};
-  background-color: white;
   flex-basis: auto;
   margin: auto;
   display: flex;
@@ -267,32 +270,33 @@ const Item = styled.div`
   align-items: center;
 `;
 
-const StyledButton = styled(Button)<{ popup: boolean }>`
+const CloseWrapper = styled.div`
+  display: none;
   position: absolute;
-  z-index: 10;
-  top: 100px;
-  right: ${({ popup }) => (popup ? 28 : 11)}px;
-  min-width: 28px;
-
-  height: 28px;
+  top: 0;
+  right: 0;
+  z-index: 888;
+  cursor: pointer;
+  padding: 15px;
   @media ${device.mobileL} {
-    top: 180px;
-    right: 10px;
-  }
-  button {
-    border-color: #e5e7eb;
-    background-color: white !important;
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    box-shadow: 0px 18px 41px #121a5529;
+    display: flex;
   }
 `;
 
-const StyledIconContainer = styled.div`
+const CloseButton = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: white;
+  margin-left: auto;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 0.4rem;
+  height: 25px;
+  width: 25px;
+`;
+
+const PopupButton = styled(Button)`
+  width: fit-content;
 `;
 
 export default Map;

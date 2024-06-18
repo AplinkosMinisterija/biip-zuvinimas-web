@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import Cookies from 'universal-cookie';
 import { useAppDispatch, useAppSelector } from '../state/hooks';
 import { actions, UserReducerProps } from '../state/user/reducer';
@@ -14,8 +14,10 @@ import {
   handleAlert,
   handleGetCurrentUser,
   handleSetProfile,
+  isNew,
 } from './functions';
 import { routes, slugs } from './routes';
+import { useSearchParams } from 'react-router-dom';
 
 const cookies = new Cookies();
 
@@ -60,7 +62,6 @@ export const useSignatureUsers = (id = '') => {
       handleAlert();
     },
   });
-
   return data || [];
 };
 
@@ -76,13 +77,15 @@ export const useAssignedToUsers = () => {
 };
 
 export const useCurrentLocation = () => {
-  const [location, setLocation] = useState({});
+  const [location, setLocation] = useState<{ lat: number; lng: number } | undefined>();
 
   useEffect(() => {
     if (navigator?.geolocation) {
-      navigator.geolocation.getCurrentPosition((location) => {
+      return navigator.geolocation.getCurrentPosition((location) => {
         const { latitude, longitude } = location.coords;
-        setLocation({ x: latitude, y: longitude });
+        if (latitude && longitude) {
+          setLocation({ lat: latitude, lng: longitude });
+        }
       });
     }
   }, []);
@@ -99,23 +102,12 @@ export const useSettings = () => {
   return { loading: isLoading, minTime: data?.minTimeTillFishStocking || 0 };
 };
 
-export const useRecentLocations = () => {
-  const { data } = useQuery('location', () => api.getRecentLocations(), {
-    onError: () => {
-      handleAlert();
-    },
-  });
-
-  return data || [];
-};
-
 export const useFishAges = () => {
   const { data } = useQuery('fishAges', () => api.getFishAges(), {
     onError: () => {
       handleAlert();
     },
   });
-
   return data?.rows || [];
 };
 
@@ -223,4 +215,27 @@ export const useLogoutMutation = () => {
   });
 
   return { mutateAsync };
+};
+
+export const useFishStocking = () => {
+  const [searchParams] = useSearchParams();
+  const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
+  const { id } = useParams();
+  const getStocking = async () => {
+    if (isNew(id) && repeat) {
+      return await api.getFishStocking(repeat);
+    } else if (id && !isNew(id)) {
+      return api.getFishStocking(id);
+    }
+    return undefined;
+  };
+
+  const { data: fishStocking, isLoading, isError } = useQuery(['fishStocking', id], getStocking);
+
+  return {
+    fishStocking,
+    isLoading,
+    isError,
+    isRepeating: !!repeat && fishStocking?.id.toString() === repeat,
+  };
 };

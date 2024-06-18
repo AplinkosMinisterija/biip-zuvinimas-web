@@ -4,9 +4,7 @@ import { Form, Formik } from 'formik';
 import styled from 'styled-components';
 
 import Cookies from 'universal-cookie';
-import Button from '../components/buttons/Button';
-import SelectField from '../components/fields/SelectField';
-import TextField from '../components/fields/TextField';
+import { SelectField, TextField, Button } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import Avatar from '../components/other/Avatar';
 import DeleteCard from '../components/other/DeleteCard';
@@ -143,12 +141,11 @@ const NariaiPage = () => {
           </H1>
           <div style={{ width: 160 }}>
             <Button
-              height={40}
               onClick={() => {
                 setCurrentUser(initUser);
                 setOpen('form');
               }}
-              variant={Button.colors.SECONDARY}
+              variant="secondary"
             >
               {buttonsTitles.add}
             </Button>
@@ -287,7 +284,7 @@ const NariaiPage = () => {
                     />
                     <DownBar>
                       <Button
-                        variant={Button.colors.TRANSPARENT}
+                        variant="transparent"
                         type="reset"
                         onClick={() => {
                           setOpen('');
@@ -297,7 +294,7 @@ const NariaiPage = () => {
                       </Button>
                       <Button
                         loading={submitLoading}
-                        variant={Button.colors.PRIMARY}
+                        variant="primary"
                         type="submit"
                         disabled={submitLoading}
                       >

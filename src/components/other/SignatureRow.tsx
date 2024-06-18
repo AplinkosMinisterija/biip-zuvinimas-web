@@ -5,7 +5,7 @@ import { device } from '../../styles';
 import { useSignatureUsers } from '../../utils/hooks';
 import { buttonsTitles } from '../../utils/texts';
 import SimpleButton from '../buttons/SimpleButton';
-import NumericTextField from '../fields/NumericTextField';
+import { NumericTextField } from '@aplinkosministerija/design-system';
 import SuggestionsSelect from '../fields/SuggestionsSelect';
 import Icon from '../other/Icon';
 import SignatureField from './Signature';

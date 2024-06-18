@@ -9,7 +9,7 @@ import { FishStockingStatus } from '../../utils/constants';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
 import { FishStocking, Info } from '../../utils/types';
-import Button from '../buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import PhotoUploadField from '../fields/PhotoUploadField';
 import FishStockingInfo from '../other/Info';
 import InfoColumn from '../other/InfoColumn';
@@ -18,6 +18,7 @@ import PreviewMap from '../other/PreviewMap';
 import SignatureList from '../other/SignatureList';
 import FishStockingTable from '../other/Table';
 import { fishOriginOptions } from '../../utils/options';
+import { useFishStocking } from '../../utils/hooks';
 
 export interface FishStockingCompletedProps {
   fishStocking: FishStocking;
@@ -31,10 +32,13 @@ const locale = {
   fish_origin_reservoir: 'Vandens telkinio pavadinimas',
 };
 
-const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => {
-  const status = fishStocking.status;
+const FishStockingCompleted = () => {
+  const { fishStocking } = useFishStocking();
+
+  const status = fishStocking?.status;
   const navigate = useNavigate();
   const isMobile = useMediaQuery(device.mobileL);
+
   if (!fishStocking) {
     return null;
   }
@@ -158,7 +162,7 @@ const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => 
             )}
           </div>
           <ButtonRow>
-            <Button
+            <StyledButton
               onClick={() => {
                 navigate({
                   pathname: slugs.newFishStockings,
@@ -169,7 +173,7 @@ const FishStockingCompleted = ({ fishStocking }: FishStockingCompletedProps) => 
               }}
             >
               {buttonsTitles.repeat}
-            </Button>
+            </StyledButton>
           </ButtonRow>
         </FishStockingMobile>
       </Container>
@@ -234,6 +238,10 @@ const SignedContainer = styled.div`
   display: flex;
   margin: 40px 0px;
   flex-direction: column;
+`;
+
+const StyledButton = styled(Button)`
+  width: fit-content;
 `;
 
 export default FishStockingCompleted;

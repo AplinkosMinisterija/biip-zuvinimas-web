@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import SignatureCanvas from 'react-signature-canvas';
 import styled from 'styled-components';
-import Button from '../../components/buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import { device } from '../../styles';
 import Icon from '../other/Icon';
 
@@ -49,7 +49,7 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
             });
           }
         }}
-        visible={visible}
+        $visible={visible}
         ref={ref}
       >
         {!isMObile && (
@@ -69,22 +69,11 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
         />
         <BottomRow>
           <SubRow>
-            <StyledButtonLarge
-              variant={Button.colors.TRANSPARENT}
-              onClick={onClear}
-              height={44}
-              type="button"
-            >
+            <StyledButtonLarge variant="transparent" onClick={onClear} type="button">
               Išvalyti
             </StyledButtonLarge>
 
-            <StyledButton
-              type="button"
-              signature={true}
-              variant={Button.colors.TRANSPARENT}
-              onClick={onClose}
-              height={44}
-            >
+            <StyledButton type="button" signature={true} variant="transparent" onClick={onClose}>
               Atšaukti
             </StyledButton>
           </SubRow>
@@ -97,7 +86,6 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
                 sign: signature.current.toDataURL('image/png'),
               })
             }
-            height={44}
           >
             Atlikta
           </StyledButton>
@@ -107,11 +95,11 @@ const SignatureComponent = ({ onSubmit, onClose, visible }: SignatureProps) => {
   );
 };
 
-const Container = styled.div<{ visible: boolean }>`
+const Container = styled.div<{ $visible: boolean }>`
   background: #ffffff 0% 0% no-repeat padding-box;
   box-shadow: 0px 18px 41px #121a5529;
   border-radius: 10px;
-  display: ${({ visible }) => (visible ? 'flex' : 'none')};
+  display: ${({ $visible }) => ($visible ? 'flex' : 'none')};
   flex-direction: column;
   width: 767px;
   margin: auto;

@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { FishStockingStatus } from '../../utils/constants';
 import { buttonsTitles } from '../../utils/texts';
-import Button from '../buttons/Button';
 import Icon from './Icon';
 import FishStockingStatusIcon from './StatusIcon';
 
@@ -29,13 +28,8 @@ const FishStockingPageTitle = ({
         onClick={() => {
           navigate(-1);
         }}
-        leftIcon={<StyledBackIcon name="back" />}
-        variant={Button.colors.TRANSPARENT}
-        type="button"
-        height={32}
-        buttonPadding="6px 8px"
-        color="black"
       >
+        <StyledBackIcon name="back" />
         {buttonsTitles.back}
       </BackButton>
       <InnerContainer>
@@ -45,6 +39,7 @@ const FishStockingPageTitle = ({
     </Heading>
   );
 };
+
 const Heading = styled.div`
   display: flex;
   flex-direction: column;
@@ -64,15 +59,14 @@ const StyledStatusIcon = styled(FishStockingStatusIcon)`
   margin: auto 16px auto 0;
 `;
 
-const BackButton = styled(Button)`
-  min-width: 0px;
+const BackButton = styled.div`
   width: fit-content;
-  button {
-    padding: 0px;
-    border: none;
-    font-size: 1.6rem;
-    color: #121926;
-  }
+  display: flex;
+  font-size: 1.6rem;
+  color: #121926;
+  height: 4rem;
+  justify-items: center;
+  align-items: center;
 `;
 
 const StyledBackIcon = styled(Icon)`

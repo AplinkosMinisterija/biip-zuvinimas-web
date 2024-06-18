@@ -38,17 +38,17 @@ const PhotoField = ({
   };
 
   return (
-    <ImageContainer main={isMain} isOpen={!!isOpen} onClick={onImageClick} key={`photo-${index}`}>
+    <ImageContainer $main={isMain} $isOpen={!!isOpen} onClick={onImageClick} key={`photo-${index}`}>
       {!isOpen && !disabled && !loading && (
         <StyledCloseIconContainer onClick={handleDeleteClickClick}>
           <StyledCloseIcon name="close" />
         </StyledCloseIconContainer>
       )}
       <StyledImg
-        isOpen={!!isOpen}
-        height={height}
-        display={!loading}
-        disabled={disabled}
+        $isOpen={!!isOpen}
+        $height={height}
+        $display={!loading}
+        $disabled={disabled}
         key={index}
         src={getSrc(photo)}
         onLoad={() => setLoading(false)}
@@ -118,25 +118,25 @@ const MainPhotoText = styled.div`
 `;
 
 const StyledImg = styled.img<{
-  height: number;
-  disabled: boolean;
-  display: boolean;
-  isOpen: boolean;
+  $height: number;
+  $disabled: boolean;
+  $display?: boolean;
+  $isOpen: boolean;
 }>`
   width: fit-content;
-  height: ${({ height }) => `${height}px`};
+  height: ${({ $height }) => `${$height}px`};
   object-fit: cover;
   border-radius: 4px;
-  cursor: ${({ isOpen }) => (isOpen ? 'block' : 'pointer')};
+  cursor: ${({ $isOpen }) => ($isOpen ? 'block' : 'pointer')};
   opacity: 1;
-  display: ${({ display }) => (display ? 'block' : 'none')};
+  display: ${({ $display }) => ($display ? 'block' : 'none')};
   max-width: 100%;
   transition: 0.5s ease;
   backface-visibility: hidden;
   max-width: 100%;
 
-  ${({ isOpen }) =>
-    isOpen &&
+  ${({ $isOpen }) =>
+    $isOpen &&
     `@media ${device.mobileL} {
     height: 100%;
     width: 100%;
@@ -145,18 +145,18 @@ const StyledImg = styled.img<{
 `;
 
 const ImageContainer = styled.div<{
-  isOpen: boolean;
-  main: boolean;
+  $isOpen: boolean;
+  $main: boolean;
 }>`
   position: relative;
   height: 100%;
   min-width: 100px;
   min-height: 100px;
   border-radius: 4px;
-  border: ${({ main }) => (main ? '2px solid #FEBC1D' : 'none')};
+  border: ${({ $main }) => ($main ? '2px solid #FEBC1D' : 'none')};
 
-  ${({ isOpen }) =>
-    !isOpen &&
+  ${({ $isOpen }) =>
+    !$isOpen &&
     `
    &:hover ${StyledCloseIconContainer} {
     opacity: 1;

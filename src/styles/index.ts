@@ -1,44 +1,11 @@
 import { createGlobalStyle } from 'styled-components';
-
-declare module 'styled-components' {
-  export interface DefaultTheme extends Theme {}
+import { Theme } from '@aplinkosministerija/design-system';
+export enum ButtonColors {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  DANGER = 'danger',
+  TRANSPARENT = 'transparent',
 }
-export interface Theme {
-  colors: {
-    primary: string;
-    secondary: string;
-    tertiary: string;
-    transparent: string;
-    danger: string;
-    success: string;
-    hover: {
-      primary: string;
-      secondary: string;
-      tertiary: string;
-      danger: string;
-      success: string;
-      transparent: string;
-    };
-    tertiaryMedium: string;
-    tertiaryLight: string;
-    UPCOMING: string;
-    NOT_FINISHED: string;
-    FINISHED: string;
-    INSPECTED: string;
-    ONGOING: string;
-    input: string;
-    border: string;
-    label: string;
-    error: string;
-    light: string;
-    white: string;
-    darkerWhite: string;
-    pending: string;
-    grey: string;
-    CANCELED: string;
-  };
-}
-
 export const theme: Theme = {
   colors: {
     primary: '#121A55',
@@ -47,6 +14,45 @@ export const theme: Theme = {
     transparent: 'transparent',
     danger: '#FE5B78',
     success: '#4FB922',
+    buttons: {
+      [ButtonColors.PRIMARY]: {
+        background: '#121A55',
+        text: 'white',
+        border: 'transparent',
+        hover: '#13C9E7',
+      },
+      [ButtonColors.SECONDARY]: {
+        background: '#13C9E7',
+        text: 'white',
+        border: 'transparent',
+        hover: '#13C9E78F',
+      },
+      [ButtonColors.TRANSPARENT]: {
+        background: 'transparent',
+        text: '#0b1f51',
+        border: '#0b1f51',
+        hover: 'transparent',
+      },
+      [ButtonColors.DANGER]: {
+        background: '#FE5B78',
+        text: 'white',
+        border: 'transparent',
+        hover: '#ff92a5',
+      },
+    },
+    fields: {
+      border: '#121A553D',
+      borderFocus: '#121A55',
+      text: '#0b1f51',
+      background: 'white',
+      error: '#FE5B78',
+      label: '#0b1f51',
+    },
+    text: {
+      primary: '#0b1f51',
+    },
+    border: '#121A553D',
+    link: '#13C9E7',
     hover: {
       primary: '#13C9E7',
       secondary: '#13C9E78F',
@@ -64,7 +70,6 @@ export const theme: Theme = {
     CANCELED: '#FE5B78',
     ONGOING: '#FEBC1D',
     input: '#F3F3F7',
-    border: '#121A553D',
     label: '#0B1F51',
     error: '#FE5B78',
     light: '#f3f3f7',
@@ -72,6 +77,16 @@ export const theme: Theme = {
     darkerWhite: '#A4A7BD',
     pending: '#fea700',
     grey: '#B3B5C4',
+  },
+  height: {
+    fields: 4,
+  },
+  fontWeight: {
+    buttons: 400,
+  },
+  fontSize: {
+    fields: 1.6,
+    buttons: 1.6,
   },
 };
 
@@ -94,7 +109,7 @@ export const GlobalStyle = createGlobalStyle`
   } 
   h1 {
     font-size: 3.2rem;
-    color: "#121A55";
+    color: #121A55;
   }
   a {
     text-decoration: none;

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
-import TextField from '../fields/TextField';
+import { TextField } from '@aplinkosministerija/design-system';
 import Icon from '../other/Icon';
 
 registerLocale('lt', lt);
