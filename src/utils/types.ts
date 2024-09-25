@@ -255,6 +255,8 @@ export type FishStockingLocation = {
   cadastral_id: string;
   name: string;
   municipality: { id: string; name: string };
+  category: string;
   geom?: any;
   area?: number;
+  length?: number;
 };

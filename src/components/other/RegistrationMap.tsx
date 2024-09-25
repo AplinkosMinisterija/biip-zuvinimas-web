@@ -51,6 +51,9 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
             name: item.title,
             cadastral_id: item.cadastralId,
             municipality: municipality,
+            category: item.category,
+            area: item.area || undefined,
+            length: item.length || undefined,
           })) || [];
         if (items.length === 1) {
           onSave({ geom: geomObject, data: { ...mappedItems[0], municipality } });
