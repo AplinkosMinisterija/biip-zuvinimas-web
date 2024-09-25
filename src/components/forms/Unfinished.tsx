@@ -302,7 +302,7 @@ const Unfinished = () => {
         enableReinitialize={true}
       >
         {(formikParams: any) => {
-          const { setFieldValue, handleSubmit, errors } = formikParams;
+          const { setFieldValue, handleSubmit } = formikParams;
           return (
             <InnerContainer>
               <StyledForm
