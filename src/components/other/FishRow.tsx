@@ -71,8 +71,9 @@ const FishRow = ({
         name={`batches.${index}.weight`}
         value={weight}
         onChange={(e) => setFieldValue(`batches.${index}.weight`, e)}
-        label="Bendras svoris"
+        label="Bendras svoris (Neprivaloma)"
         showError={false}
+        error={errors?.weight}
         wholeNumber={false}
         rightIcon={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}

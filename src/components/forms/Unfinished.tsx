@@ -215,12 +215,7 @@ const Unfinished = () => {
     const params: RegistrationFormData = {
       geom,
       eventTime,
-      location: {
-        name: location?.name,
-        cadastral_id: location?.cadastral_id,
-        municipality: location?.municipality,
-        area: location?.area || 0,
-      },
+      location: location,
       stockingCustomer: stockingCustomer?.id,
       fishOrigin: fishOrigin.toUpperCase(),
       ...(fishOrigin === 'CAUGHT' ? { fishOriginReservoir } : { fishOriginCompanyName }),
@@ -240,6 +235,7 @@ const Unfinished = () => {
   };
 
   const handleSubmit = async (values: any) => {
+    console.log('submit', values);
     if (selectedTab === FishStockingStatus.UPCOMING) {
       await submitRegistration(values);
     } else {
@@ -306,8 +302,7 @@ const Unfinished = () => {
         enableReinitialize={true}
       >
         {(formikParams: any) => {
-          const { setFieldValue, handleSubmit, errors } = formikParams;
-          console.log('errors', errors);
+          const { setFieldValue, handleSubmit } = formikParams;
           return (
             <InnerContainer>
               <StyledForm

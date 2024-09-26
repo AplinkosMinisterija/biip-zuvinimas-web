@@ -8,6 +8,7 @@ export const validationTexts: any = {
   userDeniedLocation: 'Turite leisti nustatyti jūsų buvimo vietą',
   requireSpeciesType: 'Privalote pasirinkti bent vieną rūšių tipą',
   requireText: 'Privalomas laukelis',
+  invalidWeight: 'Neteisingas žuvų svoris',
   requireSelect: 'Privalote pasirinkti',
   badEmailFormat: 'Blogas el. pašto adresas',
   badPhoneFormat: 'Blogai įvestas telefono numeris',
