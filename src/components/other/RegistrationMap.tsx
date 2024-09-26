@@ -8,6 +8,7 @@ import { useQueryClient } from 'react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
 import { checkIfPointChanged } from '../../utils/functions';
+import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
   height?: string;
@@ -27,44 +28,36 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
   const [geom, setGeom] = useState<any>();
   const [mapLoading, setMapLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
   const handleReceivedMapMessage = async (event: any) => {
     if (disabled) return;
-    const selected = event?.data?.mapIframeMsg?.selected;
-    if (!onSave) return;
-    if (event.origin === import.meta.env.VITE_MAPS_HOST && selected) {
-      const { geom: postMessageGeom, items } = selected;
+    const selected = event?.data?.mapIframeMsg?.userObjects;
+    if (!onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+    const postMessageGeom = JSON.parse(selected);
 
-      if (!postMessageGeom) return;
-      const geomObject = JSON.parse(postMessageGeom);
+    if (!postMessageGeom) return;
 
-      const geomChanged = checkIfPointChanged(geomObject, geom);
-      if (geomChanged) {
-        setGeom(geomObject);
-        const municipality = await queryClient.fetchQuery(['municipality', postMessageGeom], () =>
-          api.getMunicipality({ geom: postMessageGeom }),
-        );
-        const mappedItems: FishStockingLocation[] =
-          items?.map((item: any) => ({
-            name: item.title,
-            cadastral_id: item.cadastralId,
-            municipality: municipality,
-            category: item.category,
-            area: item.area || undefined,
-            length: item.length || undefined,
-          })) || [];
-        if (items.length === 1) {
-          onSave({ geom: geomObject, data: { ...mappedItems[0], municipality } });
-        } else if (items.length === 0) {
-          setLocations([]);
-          setShowLocationPopup(true);
-        } else {
-          setLocations(mappedItems);
-          setShowLocationPopup(true);
-        }
+    const geomChanged = checkIfPointChanged(postMessageGeom, geom);
+    if (geomChanged) {
+      setLoading(true);
+      setShowLocationPopup(true);
+      setGeom(postMessageGeom);
+
+      const items = await queryClient.fetchQuery(['locations', selected], () =>
+        api.getLocations({ geom: selected }),
+      );
+
+      if (items.length === 1) {
+        onSave({ geom: postMessageGeom, data: { ...items[0] } });
+        setShowLocationPopup(false);
+      } else if (items.length === 0) {
+        setLocations([]);
+      } else {
+        setLocations(items);
       }
+      setLoading(false);
     }
   };
 
@@ -99,9 +92,6 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
         style={{ border: 0 }}
         allowFullScreen={true}
         onLoad={() => {
-          // On initial map load, map marks incorrect location (coordinates different than provided in sent post message - somewhere outside Lithuania)
-          // for one initially sent post message it responds with two post messages containing incorrect coordinates in geom
-          // TODO: timeout could be removed, if map issue would be solved to properly handle post messages on map load
           setTimeout(() => {
             setMapLoading(false);
             handleChangedValue();
@@ -112,41 +102,45 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       />
       {showLocationPopup && (
         <MapModal>
-          <ModalContainer>
-            <>
-              <IconContainer
-                onClick={() => {
-                  setShowLocationPopup(false);
-                  setLocations([]);
-                }}
-              >
-                <StyledIcon name="close" />
-              </IconContainer>
-              <ItemContainer>
-                {locations.length === 0
-                  ? 'Nerastas telkinys'
-                  : locations?.map((location, index) => (
-                      <Item key={`${location.cadastral_id}_${index}`}>
-                        <TitleContainer>
-                          <Title>{location?.name}</Title>
-                          <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
-                        </TitleContainer>
-                        <PopupButton
-                          onClick={() => {
-                            if (onSave && geom) {
-                              onSave({ geom, data: location });
-                              setShowLocationPopup(false);
-                              setLocations([]);
-                            }
-                          }}
-                        >
-                          {buttonsTitles.select}
-                        </PopupButton>
-                      </Item>
-                    ))}
-              </ItemContainer>
-            </>
-          </ModalContainer>
+          {loading ? (
+            <LoaderComponent />
+          ) : (
+            <ModalContainer>
+              <>
+                <IconContainer
+                  onClick={() => {
+                    setShowLocationPopup(false);
+                    setLocations([]);
+                  }}
+                >
+                  <StyledIcon name="close" />
+                </IconContainer>
+                <ItemContainer>
+                  {locations.length === 0
+                    ? 'Nerastas telkinys'
+                    : locations?.map((location, index) => (
+                        <Item key={`${location.cadastral_id}_${index}`}>
+                          <TitleContainer>
+                            <Title>{location?.name}</Title>
+                            <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
+                          </TitleContainer>
+                          <PopupButton
+                            onClick={() => {
+                              if (onSave && geom) {
+                                onSave({ geom, data: location });
+                                setShowLocationPopup(false);
+                                setLocations([]);
+                              }
+                            }}
+                          >
+                            {buttonsTitles.select}
+                          </PopupButton>
+                        </Item>
+                      ))}
+                </ItemContainer>
+              </>
+            </ModalContainer>
+          )}
         </MapModal>
       )}
     </>
