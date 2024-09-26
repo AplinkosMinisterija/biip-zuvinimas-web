@@ -136,10 +136,10 @@ const RegistrationForm = ({
           }}
           hasOptionKey={false}
           getInputLabel={(option) =>
-            `${option?.name} (${option.cadastral_id}) - ${option.municipality?.name}`
+            `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
           }
           getOptionLabel={(option) =>
-            `${option?.name} (${option.cadastral_id}) - ${option.municipality?.name}`
+            `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
           }
           loadOptions={(input: string, page: number) => getLocationList(input, page)}
         />
