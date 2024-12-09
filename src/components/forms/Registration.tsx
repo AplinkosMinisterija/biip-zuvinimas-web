@@ -18,7 +18,7 @@ import {
   useIsFreelancer,
   useSettings,
 } from '../../utils/hooks';
-import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
+import { buttonsTitles, formLabels, inputLabels, queryStrings } from '../../utils/texts';
 import { FishStocking, FishType, RegistrationFormValues } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import Button from '../buttons/Button';
@@ -37,6 +37,7 @@ import Modal from '../other/Modal';
 import FishStockingPageTitle from '../other/PageTitle';
 import Map from '../other/RegistrationMap';
 import { fishOriginOptions } from '../../utils/options';
+import NumericTextField from '../fields/NumericTextField';
 const cookies = new Cookies();
 
 const RegistrationForm = ({
@@ -326,18 +327,14 @@ const RegistrationForm = ({
                         disabled={isCustomer}
                       />
 
-                      <TextField
-                        label="Telefonas"
-                        name="phone"
+                      <NumericTextField
                         value={values.phone}
-                        placeholder=""
-                        error={errors.phone}
-                        onChange={(e: any) => {
-                          if (/^\+?[0-9\s]{0,11}$/.test(e)) {
-                            setFieldValue('phone', e.trim());
-                          }
-                        }}
+                        label={inputLabels.phone}
+                        name="phone"
+                        placeholder="064222222"
+                        onChange={(value) => setFieldValue('phone', value)}
                         disabled={isCustomer}
+                        error={errors.phone}
                       />
                     </Row>
                   </>

@@ -25,6 +25,8 @@ import { intersectionObserverConfig } from '../utils/configs';
 import { buttonsTitles, descriptions, formLabels, inputLabels } from '../utils/texts';
 import { User } from '../utils/types';
 import { validateNewTenantUser, validateUpdateTenantUser } from '../utils/validations';
+import NumericTextField from '../components/fields/NumericTextField';
+
 const options = [
   { label: 'Administratorius', value: RolesTypes.USER_ADMIN },
   { label: 'Naudotojas', value: RolesTypes.USER },
@@ -134,6 +136,8 @@ const NariaiPage = () => {
     }
   };
 
+  const validationSchema = currentUser.id ? validateUpdateTenantUser : validateNewTenantUser;
+
   return (
     <DefaultLayout maxWidth="830px">
       <Container>
@@ -214,7 +218,7 @@ const NariaiPage = () => {
               initialValues={currentUser}
               onSubmit={handleSubmit}
               validateOnChange={false}
-              validationSchema={currentUser.id ? validateUpdateTenantUser : validateNewTenantUser}
+              validationSchema={validationSchema}
             >
               {({ values, errors, handleSubmit, setFieldValue }) => {
                 const disabled = !!currentUser?.id;
@@ -250,12 +254,12 @@ const NariaiPage = () => {
                       disabled={disabled}
                       error={errors.lastName}
                     />
-                    <TextField
+                    <NumericTextField
                       value={values.phone}
                       label={inputLabels.phone}
                       name="phone"
-                      placeholder="864222222"
-                      onChange={(value) => setFieldValue('phone', value?.trim())}
+                      placeholder="064222222"
+                      onChange={(value) => setFieldValue('phone', value)}
                       disabled={disabled}
                       error={errors.phone}
                     />
@@ -268,7 +272,7 @@ const NariaiPage = () => {
                       error={errors.email}
                     />
                     {!currentUser?.id && (
-                      <TextField
+                      <NumericTextField
                         value={values.personalCode}
                         label={inputLabels.personalCode}
                         name="personalCode"
