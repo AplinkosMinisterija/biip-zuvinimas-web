@@ -11,6 +11,7 @@ import { handleAlert, handleSuccess } from '../utils/functions';
 import { useCheckAuthMutation } from '../utils/hooks';
 import { buttonsTitles, descriptions, inputLabels, toasts } from '../utils/texts';
 import { validateMyProfile } from '../utils/validations';
+import NumericTextField from '../components/fields/NumericTextField';
 
 interface ProfileProps {
   email?: string;
@@ -89,12 +90,12 @@ const MyProfile = () => {
                   disabled={true}
                   error={errors.lastName}
                 />
-                <TextField
+                <NumericTextField
                   value={values.phone}
                   label={inputLabels.phone}
                   name="phone"
-                  placeholder="864222222"
-                  onChange={(value) => setFieldValue('phone', value?.trim())}
+                  placeholder="064222222"
+                  onChange={(value) => setFieldValue('phone', value)}
                   disabled={disabled}
                   error={errors.phone}
                 />
