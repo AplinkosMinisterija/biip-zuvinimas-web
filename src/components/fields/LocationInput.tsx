@@ -4,15 +4,17 @@ import { FishStockingLocation } from '../../utils/types';
 import api from '../../utils/api';
 
 export interface LocationFieldProps {
+  name?: string;
   value?: any;
   error?: string;
   onChange: (option: FishStockingLocation) => void;
   disabled?: boolean;
 }
 
-const LocationField = ({ value, error, onChange, disabled }: LocationFieldProps) => {
+const LocationField = ({ name, value, error, onChange, disabled }: LocationFieldProps) => {
   return (
     <AsyncSelectField
+      name={name || 'location'}
       label={inputLabels.location}
       hasOptionKey={false}
       value={value}

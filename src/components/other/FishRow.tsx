@@ -63,7 +63,7 @@ const FishRow = ({
         label="Kiekis"
         error={errors?.amount}
         showError={false}
-        rightIcon={<InputInnerLabel>vnt</InputInnerLabel>}
+        right={<InputInnerLabel>vnt</InputInnerLabel>}
         disabled={disabled}
         wholeNumber={true}
       />
@@ -75,7 +75,7 @@ const FishRow = ({
         showError={false}
         error={errors?.weight}
         wholeNumber={false}
-        rightIcon={<InputInnerLabel>kg</InputInnerLabel>}
+        right={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}
       />
       {showDelete && !disabled && (

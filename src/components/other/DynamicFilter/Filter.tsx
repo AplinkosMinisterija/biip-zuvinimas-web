@@ -120,9 +120,6 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
                   getOptionLabel={(option) =>
                     hasOptionLabelFunction ? optionLabel(option) : option.name
                   }
-                  getInputLabel={(option) =>
-                    hasOptionLabelFunction ? optionLabel(option) : option.name
-                  }
                   loadOptions={(input, page) => filter.optionsApi && filter.optionsApi(input, page)}
                 />
               </InputWrapper>

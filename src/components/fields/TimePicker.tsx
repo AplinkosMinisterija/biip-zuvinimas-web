@@ -87,7 +87,7 @@ const TimePicker = ({
         padding={padding}
         value={time ? format(new Date(time), 'HH:mm') : ''}
         error={error}
-        rightIcon={<TimeIcon name={'time'} />}
+        right={<TimeIcon name={'time'} />}
         disabled={disabled}
       />
       {open && !disabled ? (

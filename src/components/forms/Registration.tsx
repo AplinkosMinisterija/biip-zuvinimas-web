@@ -43,7 +43,6 @@ const RegistrationForm = ({
   disabled: boolean;
   onShowMap: () => void;
 }) => {
-  console.log('render registration');
   const fishAges = useFishAges();
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();

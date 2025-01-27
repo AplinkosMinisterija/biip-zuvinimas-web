@@ -29,7 +29,7 @@ const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) 
           value={values.containerWaterTemp}
           error={errors.containerWaterTemp}
           onChange={(e) => setFieldValue(`containerWaterTemp`, e)}
-          rightIcon={<InputInnerLabel>°C</InputInnerLabel>}
+          right={<InputInnerLabel>°C</InputInnerLabel>}
           disabled={disabled}
         />
         <TempStyledTextInput
@@ -38,7 +38,7 @@ const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) 
           value={values.waterTemp}
           error={errors.waterTemp}
           onChange={(e) => setFieldValue(`waterTemp`, e)}
-          rightIcon={<InputInnerLabel>°C</InputInnerLabel>}
+          right={<InputInnerLabel>°C</InputInnerLabel>}
           disabled={disabled}
         />
       </Row>

@@ -59,7 +59,7 @@ const FishStockingApproveFishRow = ({
           label="Kiekis"
           error={errors?.reviewAmount}
           showError={false}
-          rightIcon={<InputInnerLabel>vnt</InputInnerLabel>}
+          right={<InputInnerLabel>vnt</InputInnerLabel>}
           bottomLabel={showBottomLabel && item.planned ? item.planned : ''}
           disabled={disabled}
           wholeNumber={true}
@@ -71,7 +71,7 @@ const FishStockingApproveFishRow = ({
           label="Bendras svoris"
           showError={false}
           wholeNumber={false}
-          rightIcon={<InputInnerLabel>kg</InputInnerLabel>}
+          right={<InputInnerLabel>kg</InputInnerLabel>}
           disabled={disabled}
         />
       </Inputs>
