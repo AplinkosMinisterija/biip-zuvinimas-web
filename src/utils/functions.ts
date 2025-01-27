@@ -18,19 +18,6 @@ interface SetResponseProps {
   isOffline?: () => void;
 }
 
-export const handleResponse = async ({ endpoint, onSuccess, onError }: SetResponseProps) => {
-  const response = await endpoint();
-  if (onError && response?.error) {
-    return onError(response?.error.code);
-  }
-
-  if (!response || response?.error) {
-    return handleAlert(response?.error?.type);
-  }
-
-  return onSuccess(response);
-};
-
 export const validateFileTypes = (files: File[], availableMimeTypes: string[]) => {
   for (let i = 0; i < files.length; i++) {
     const availableType = availableMimeTypes.find((type) => type === files[i].type);
@@ -41,7 +28,9 @@ export const validateFileTypes = (files: File[], availableMimeTypes: string[]) =
 
 export const handleAlert = (responseError?: string) => {
   toast.error(
-    validationTexts[responseError as keyof typeof validationTexts] || validationTexts.error,
+    validationTexts[responseError as keyof typeof validationTexts] ||
+      responseError ||
+      validationTexts.error,
     {
       position: 'top-center',
       autoClose: 5000,

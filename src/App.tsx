@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import {
   Location,
   Navigate,
@@ -46,7 +46,8 @@ function App() {
   const isInvalidProfile =
     !profiles?.map((profile) => profile?.id?.toString()).includes(profileId) && loggedIn;
 
-  const updateTokensMutation = useMutation(api.refreshToken, {
+  const { mutateAsync: updateTokenMutation, isPending: updateTokenLoading } = useMutation({
+    mutationFn: api.refreshToken,
     onError: ({ response }: any) => {
       if (isEqual(response.status, ServerErrorCodes.NOT_FOUND)) {
         cookies.remove('refreshToken', { path: '/' });
@@ -57,19 +58,18 @@ function App() {
     },
   });
 
-  const updateTokensMutationMutateAsyncFunction = updateTokensMutation.mutateAsync;
-
   const shouldUpdateTokens = useCallback(async () => {
     if (!cookies.get('token') && cookies.get('refreshToken')) {
-      await updateTokensMutationMutateAsyncFunction();
+      await updateTokenMutation();
     }
-  }, [updateTokensMutationMutateAsyncFunction]);
+  }, [updateTokenMutation]);
 
   const { mutateAsync: eGateSignsMutation, isLoading: eGatesSignLoading } = useEGatesSign();
 
   const { mutateAsync: checkAuthMutation } = useCheckAuthMutation();
 
-  const eGatesLoginMutation = useMutation((ticket: string) => api.eGatesLogin({ ticket }), {
+  const { mutateAsync: eGatesLoginMutation, isPending: eGatesLoginLoading } = useMutation({
+    mutationFn: (ticket: string) => api.eGatesLogin({ ticket }),
     onError: () => {
       navigate(slugs.cantLogin);
     },
@@ -82,9 +82,7 @@ function App() {
 
   const isLoading =
     initialLoading ||
-    [eGatesLoginMutation.isLoading, eGatesSignLoading, updateTokensMutation.isLoading].some(
-      (loading) => loading,
-    );
+    [eGatesLoginLoading, eGatesSignLoading, updateTokenLoading].some((loading) => loading);
 
   useEffect(() => {
     (async () => {
@@ -94,7 +92,7 @@ function App() {
     })();
   }, [location.pathname, checkAuthMutation, shouldUpdateTokens]);
 
-  const eGatesLoginMutationMutateAsync = eGatesLoginMutation.mutateAsync;
+  const eGatesLoginMutationMutateAsync = eGatesLoginMutation;
 
   useEffect(() => {
     (async () => {

@@ -1,5 +1,5 @@
 import { FieldArray } from 'formik';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import api from '../../utils/api';
@@ -20,6 +20,7 @@ import LocationInput from '../fields/LocationInput';
 import TimePicker from '../fields/TimePicker';
 import FishRow from '../other/FishRow';
 import { fishOriginOptions } from '../../utils/options';
+import { useEffect } from 'react';
 
 const RegistrationForm = ({
   values,
@@ -42,16 +43,20 @@ const RegistrationForm = ({
   disabled: boolean;
   onShowMap: () => void;
 }) => {
+  console.log('render registration');
   const fishAges = useFishAges();
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
   const users = useAssignedToUsers();
 
-  const { data } = useQuery('fishTypes', () => api.getFishTypes(), {
-    onError: () => {
-      handleAlert();
-    },
+  const { data, error: fishTypesError } = useQuery({
+    queryKey: ['fishTypes'],
+    queryFn: () => api.getFishTypes(),
   });
+
+  useEffect(() => {
+    if (fishTypesError) handleAlert();
+  }, [fishTypesError]);
 
   const fishTypesFullList = data?.rows || [];
 
@@ -135,9 +140,9 @@ const RegistrationForm = ({
             setFieldValue('fishOriginReservoir', value);
           }}
           hasOptionKey={false}
-          getInputLabel={(option) =>
-            `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
-          }
+          // getInputLabel={(option) =>
+          //   `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
+          // }
           getOptionLabel={(option) =>
             `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
           }

@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 import { Form, Formik } from 'formik';
-import { useMutation } from 'react-query';
-import { TextField, Button } from '@aplinkosministerija/design-system';
+import { useMutation } from '@tanstack/react-query';
+import { TextField, Button, NumericTextField } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import { useAppSelector } from '../state/hooks';
 import { device } from '../styles';
@@ -11,7 +11,6 @@ import { handleAlert, handleSuccess } from '../utils/functions';
 import { useCheckAuthMutation } from '../utils/hooks';
 import { buttonsTitles, descriptions, inputLabels, toasts } from '../utils/texts';
 import { validateMyProfile } from '../utils/validations';
-import NumericTextField from '../components/fields/NumericTextField';
 
 interface ProfileProps {
   email?: string;
@@ -23,7 +22,8 @@ const MyProfile = () => {
 
   const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } = useCheckAuthMutation();
 
-  const profileMutation = useMutation((data: ProfileProps) => api.updateMyProfile(data), {
+  const profileMutation = useMutation({
+    mutationFn: (data: ProfileProps) => api.updateMyProfile(data),
     onError: () => {
       handleAlert();
     },
@@ -33,7 +33,7 @@ const MyProfile = () => {
     },
   });
 
-  const isLoading = [checkAuthLoading, profileMutation.isLoading].some((loading) => loading);
+  const isLoading = [checkAuthLoading, profileMutation.isPending].some((loading) => loading);
 
   const initialValues = {
     firstName: user?.firstName,

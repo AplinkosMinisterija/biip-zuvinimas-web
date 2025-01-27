@@ -4,7 +4,12 @@ import { Form, Formik } from 'formik';
 import styled from 'styled-components';
 
 import Cookies from 'universal-cookie';
-import { SelectField, TextField, Button } from '@aplinkosministerija/design-system';
+import {
+  SelectField,
+  TextField,
+  Button,
+  NumericTextField,
+} from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import Avatar from '../components/other/Avatar';
 import DeleteCard from '../components/other/DeleteCard';
@@ -18,12 +23,11 @@ import { handleAlert } from '../utils/functions';
 import { useGetCurrentProfile } from '../utils/hooks';
 
 import React from 'react';
-import { useInfiniteQuery, useMutation } from 'react-query';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { intersectionObserverConfig } from '../utils/configs';
 import { buttonsTitles, descriptions, formLabels, inputLabels } from '../utils/texts';
 import { User } from '../utils/types';
 import { validateNewTenantUser, validateUpdateTenantUser } from '../utils/validations';
-import NumericTextField from '../components/fields/NumericTextField';
 
 const options = [
   { label: 'Administratorius', value: RolesTypes.USER_ADMIN },
@@ -64,9 +68,11 @@ const NariaiPage = () => {
   };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isFetching } =
-    useInfiniteQuery('tenantUsers', ({ pageParam }) => fetchTenantUsers(pageParam), {
+    useInfiniteQuery({
+      queryKey: ['tenantUsers'],
+      queryFn: ({ pageParam }) => fetchTenantUsers(pageParam),
+      initialPageParam: 1,
       getNextPageParam: (lastPage) => lastPage.page,
-      cacheTime: 60000,
     });
 
   const observerRef = useRef(null);
@@ -90,7 +96,8 @@ const NariaiPage = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, data]);
 
-  const deleteUserMutation = useMutation((id: string) => api.deleteTenantUser(id), {
+  const deleteUserMutation = useMutation({
+    mutationFn: (id: string) => api.deleteTenantUser(id),
     onError: () => {
       handleAlert();
     },
@@ -100,22 +107,21 @@ const NariaiPage = () => {
     },
   });
 
-  const createUserMutation = useMutation((params: User) => api.createTenantUser(params), {
+  const createUserMutation = useMutation({
+    mutationFn: (params: User) => api.createTenantUser(params),
     onError: () => {
       handleAlert();
     },
   });
 
-  const updateUserMutation = useMutation(
-    (user: User) => api.updateTenantUser({ role: user.role }, user?.id),
-    {
-      onError: () => {
-        handleAlert();
-      },
+  const updateUserMutation = useMutation({
+    mutationFn: (user: User) => api.updateTenantUser({ role: user.role }, user?.id),
+    onError: () => {
+      handleAlert();
     },
-  );
+  });
 
-  const submitLoading = [updateUserMutation.isLoading, createUserMutation.isLoading].some(
+  const submitLoading = [updateUserMutation.isPaused, createUserMutation.isPending].some(
     (loading) => loading,
   );
 
@@ -156,7 +162,7 @@ const NariaiPage = () => {
           </div>
         </TopLine>
         <CardContainer>
-          {data?.pages.map((page, pageIndex) => {
+          {data?.pages.map((page: any, pageIndex) => {
             return (
               <React.Fragment key={pageIndex}>
                 {page.data.map((user, index) => {
@@ -321,7 +327,7 @@ const NariaiPage = () => {
               handleDelete={() =>
                 currentUser?.id ? deleteUserMutation.mutateAsync(currentUser.id) : {}
               }
-              deleteInProgress={deleteUserMutation.isLoading}
+              deleteInProgress={deleteUserMutation.isPending}
             />
           </DeleteCardContainer>
         )}

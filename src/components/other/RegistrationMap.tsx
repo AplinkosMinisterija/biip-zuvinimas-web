@@ -4,7 +4,7 @@ import { device } from '../../styles';
 import { buttonsTitles, Url } from '../../utils/texts';
 import Icon from './Icon';
 import { FishStockingLocation } from '../../utils/types';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
 import { checkIfPointChanged } from '../../utils/functions';
@@ -45,9 +45,10 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       setShowLocationPopup(true);
       setGeom(postMessageGeom);
 
-      const items = await queryClient.fetchQuery(['locations', selected], () =>
-        api.getLocations({ geom: selected }),
-      );
+      const items = await queryClient.fetchQuery({
+        queryKey: ['locations', selected],
+        queryFn: () => api.getLocations({ geom: selected }),
+      });
 
       if (items.length === 1) {
         onSave({ geom: postMessageGeom, data: { ...items[0] } });

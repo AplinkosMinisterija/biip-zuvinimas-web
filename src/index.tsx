@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react';
 import { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import {
   BrowserRouter,
@@ -44,8 +44,8 @@ if (env.VITE_SENTRY_DSN) {
 
 root.render(
   <>
-    <NetworkStatusIndicator />
     <QueryClientProvider client={queryClient}>
+      <NetworkStatusIndicator />
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <ThemeProvider theme={theme}>

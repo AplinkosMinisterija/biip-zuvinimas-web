@@ -16,7 +16,7 @@ import {
   validateFreelancerFishStocking,
 } from '../../utils/validations';
 import { useAppSelector } from '../../state/hooks';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import api from '../../utils/api';
 import {
   useCurrentLocation,
@@ -56,28 +56,28 @@ const Unfinished = () => {
       : FishStockingStatus.ONGOING,
   );
   const callBacks = useFishStockingCallbacks();
-  const createOrUpdateFishStockingMutation = useMutation(
-    (params: RegistrationFormData) =>
+  const createOrUpdateFishStockingMutation = useMutation({
+    mutationFn: (params: RegistrationFormData) =>
       fishStocking?.id && !isRepeating
         ? api.updateFishStocking(params, fishStocking.id.toString())
         : api.registerFishStocking(params),
-    { ...callBacks },
-  );
-  const fishStockingId = fishStocking?.id.toString();
-  const reviewFishStockingMutation = useMutation((params: any) => api.reviewFishStocking(params), {
     ...callBacks,
   });
-  const cancelOrRemoveFishStockingMutation = useMutation(
-    () => (fishStockingId ? api.cancelFishStocking(fishStockingId) : Promise.resolve(undefined)),
-    {
-      ...callBacks,
-    },
-  );
+  const fishStockingId = fishStocking?.id.toString();
+  const reviewFishStockingMutation = useMutation({
+    mutationFn: (params: any) => api.reviewFishStocking(params),
+    ...callBacks,
+  });
+  const cancelOrRemoveFishStockingMutation = useMutation({
+    mutationFn: () =>
+      fishStockingId ? api.cancelFishStocking(fishStockingId) : Promise.resolve(undefined),
+    ...callBacks,
+  });
 
   const submitLoading = [
-    createOrUpdateFishStockingMutation.isLoading,
-    reviewFishStockingMutation.isLoading,
-    cancelOrRemoveFishStockingMutation.isLoading,
+    createOrUpdateFishStockingMutation.isPending,
+    reviewFishStockingMutation.isPending,
+    cancelOrRemoveFishStockingMutation.isPending,
   ].some((loading) => loading);
 
   const isCustomer = fishStocking?.stockingCustomer?.id === cookies.get('profileId');

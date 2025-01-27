@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@material-ui/core';
 import { map } from 'lodash';
 import { useEffect, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { device } from '../../../styles';
 import api from '../../../utils/api';
@@ -88,7 +88,8 @@ const DynamicFilter = ({
 
   const params = mapFishStockingsRequestParams(filters);
 
-  const excelMutation = useMutation((filter: any) => api.getExcel({ filter }), {
+  const excelMutation = useMutation({
+    mutationFn: (filter: any) => api.getExcel({ filter }),
     onError: () => {
       handleAlert();
     },

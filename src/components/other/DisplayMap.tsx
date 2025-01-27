@@ -1,13 +1,12 @@
 import { format } from 'date-fns';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import Cookies from 'universal-cookie';
 import { useAppSelector } from '../../state/hooks';
 import { device } from '../../styles';
 import api from '../../utils/api';
-
 import { handleAlert } from '../../utils/functions';
 import { useIsFreelancer } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
@@ -33,7 +32,8 @@ const DisplayMap = () => {
     setLoading(false);
   };
 
-  const fishStockingMutation = useMutation((id: string) => api.getFishStocking(id), {
+  const fishStockingMutation = useMutation({
+    mutationFn: (id: string) => api.getFishStocking(id),
     onError: () => {
       handleAlert();
     },
@@ -63,7 +63,7 @@ const DisplayMap = () => {
         {fishStockingMutation.data && (
           <MapModal>
             <ModalContainer>
-              {fishStockingMutation.isLoading ? (
+              {fishStockingMutation.isPending ? (
                 <LoaderComponent />
               ) : (
                 <>
@@ -213,13 +213,13 @@ const StyledIcon = styled(Icon)`
 `;
 
 const MapModal = styled.div`
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%
-z-index:999;
-top: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
@@ -269,11 +269,9 @@ const ModalContainer = styled.div<{ width?: string }>`
   background-color: white;
   flex-basis: auto;
   margin: auto;
-  display:flex
+  display: flex;
   flex-direction: column;
   gap: 12px;
-
-
 `;
 
 const ItemContainer = styled.div`
