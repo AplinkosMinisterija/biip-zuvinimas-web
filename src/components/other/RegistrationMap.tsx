@@ -7,7 +7,7 @@ import { FishStockingLocation } from '../../utils/types';
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
-import { checkIfPointChanged } from '../../utils/functions';
+import { checkIfPointChanged, handleSuccess } from '../../utils/functions';
 import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
@@ -53,6 +53,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       if (items.length === 1) {
         onSave({ geom: postMessageGeom, data: { ...items[0] } });
         setShowLocationPopup(false);
+        handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
       } else if (items.length === 0) {
         setLocations([]);
       } else {
@@ -131,6 +132,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
                                 onSave({ geom, data: location });
                                 setShowLocationPopup(false);
                                 setLocations([]);
+                                handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
                               }
                             }}
                           >
