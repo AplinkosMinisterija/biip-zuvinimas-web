@@ -83,7 +83,7 @@ const RegistrationForm = ({
         }}
         disabled={disabled}
       />
-      <Link onClick={onShowMap}>Atidaryti žemėlapį</Link>
+      <Link onClick={onShowMap}>Žymėti žemėlapyje</Link>
       <TimeRow>
         <DatePicker
           label="Data"
