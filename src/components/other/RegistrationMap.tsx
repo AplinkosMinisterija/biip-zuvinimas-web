@@ -32,9 +32,8 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
   const handleReceivedMapMessage = async (event: any) => {
-    if (disabled) return;
     const selected = event?.data?.mapIframeMsg?.userObjects;
-    if (!onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+    if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
     const postMessageGeom = JSON.parse(selected);
 
     if (!postMessageGeom) return;
