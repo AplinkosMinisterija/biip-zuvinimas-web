@@ -16,7 +16,7 @@ import DeleteCard from '../components/other/DeleteCard';
 import Icon from '../components/other/Icon';
 import LoaderComponent from '../components/other/LoaderComponent';
 import Modal from '../components/other/Modal';
-import { device } from '../styles';
+import { ButtonColors, device } from '../styles';
 import api from '../utils/api';
 import { RolesTypes } from '../utils/constants';
 import { handleAlert } from '../utils/functions';
@@ -155,7 +155,7 @@ const NariaiPage = () => {
                 setCurrentUser(initUser);
                 setOpen('form');
               }}
-              variant="secondary"
+              variant={ButtonColors.SECONDARY}
             >
               {buttonsTitles.add}
             </Button>

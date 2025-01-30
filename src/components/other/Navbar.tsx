@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@material-ui/core';
 import { useLocation, useNavigate } from 'react-router';
 import styled, { css } from 'styled-components';
-import { device } from '../../styles';
+import { ButtonColors, device } from '../../styles';
 import { useFilteredRoutes } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
@@ -22,7 +22,7 @@ const NavBar = () => {
         <Logo onClick={() => navigate('/')} src="/logo.svg" />
         <HeaderLeft>
           <StyledButton
-            variant="secondary"
+            variant={ButtonColors.SECONDARY}
             onClick={() => navigate(slugs.newFishStockings)}
             disabled={false}
           >
