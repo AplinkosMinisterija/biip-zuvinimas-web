@@ -51,7 +51,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
         });
 
         if (items.length === 1) {
-          onSave({ geom: postMessageGeom, data: { ...items[0] } });
+          onSave({ geom: postMessageGeom, data: items[0] });
           setShowLocationPopup(false);
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
         } else if (items.length === 0) {
