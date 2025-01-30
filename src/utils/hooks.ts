@@ -228,7 +228,7 @@ export const useLogoutMutation = () => {
 
 export const useFishStocking = () => {
   const [searchParams] = useSearchParams();
-  const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
+  const repeat = searchParams.get('repeat');
   const { id } = useParams();
 
   const fishStockingId = repeat || id;
@@ -239,7 +239,7 @@ export const useFishStocking = () => {
     isError,
   } = useQuery({
     queryKey: ['fishStocking', id],
-    queryFn: () => api.getFishStocking(fishStockingId!),
+    queryFn: () => api.getFishStocking(fishStockingId),
     enabled: !!fishStockingId && !isNew(fishStockingId),
   });
 

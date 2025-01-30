@@ -328,7 +328,7 @@ class Api {
       pageSize: '12',
     });
 
-  getFishStocking = async (id: string): Promise<FishStocking> =>
+  getFishStocking = async (id?: string): Promise<FishStocking> =>
     await this.getOne({
       resource: Resources.FISH_STOCKING,
       populate: [
