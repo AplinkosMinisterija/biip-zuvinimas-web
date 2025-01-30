@@ -34,31 +34,35 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const handleReceivedMapMessage = async (event: any) => {
     const selected = event?.data?.mapIframeMsg?.userObjects;
     if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
-    const postMessageGeom = JSON.parse(selected);
+    try {
+      const postMessageGeom = JSON.parse(selected);
 
-    if (!postMessageGeom) return;
+      if (!postMessageGeom) return;
 
-    const geomChanged = checkIfPointChanged(postMessageGeom, geom);
-    if (geomChanged) {
-      setLoading(true);
-      setShowLocationPopup(true);
-      setGeom(postMessageGeom);
+      const geomChanged = checkIfPointChanged(postMessageGeom, geom);
+      if (geomChanged) {
+        setLoading(true);
+        setShowLocationPopup(true);
+        setGeom(postMessageGeom);
 
-      const items = await queryClient.fetchQuery({
-        queryKey: ['locations', selected],
-        queryFn: () => api.getLocations({ geom: selected }),
-      });
+        const items = await queryClient.fetchQuery({
+          queryKey: ['locations', selected],
+          queryFn: () => api.getLocations({ geom: selected }),
+        });
 
-      if (items.length === 1) {
-        onSave({ geom: postMessageGeom, data: { ...items[0] } });
-        setShowLocationPopup(false);
-        handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-      } else if (items.length === 0) {
-        setLocations([]);
-      } else {
-        setLocations(items);
+        if (items.length === 1) {
+          onSave({ geom: postMessageGeom, data: { ...items[0] } });
+          setShowLocationPopup(false);
+          handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
+        } else if (items.length === 0) {
+          setLocations([]);
+        } else {
+          setLocations(items);
+        }
+        setLoading(false);
       }
-      setLoading(false);
+    } catch (e) {
+      return;
     }
   };
 
