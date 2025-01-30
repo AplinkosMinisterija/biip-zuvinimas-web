@@ -2,7 +2,7 @@ import { personalCode } from 'lt-codes';
 import * as Yup from 'yup';
 import { FishOriginTypes } from './constants';
 import { validationTexts } from './texts';
-import { FishBatch, FishType } from './types';
+import { phoneNumberRegexPattern } from '@aplinkosministerija/design-system';
 import { checkIfDateIsAfter } from './functions';
 
 export const loginSchema = Yup.object().shape({
@@ -28,8 +28,7 @@ export const validateNewTenantUser = Yup.object().shape({
     }),
   phone: Yup.string()
     .required(validationTexts.requireText)
-    .trim()
-    .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+    .matches(phoneNumberRegexPattern, validationTexts.badPhoneFormat),
   personalCode: Yup.string()
     .required(validationTexts.requireText)
     .trim()
@@ -44,8 +43,7 @@ export const validateMyProfile = Yup.object().shape({
   email: Yup.string().required(validationTexts.requireText).email(validationTexts.badEmailFormat),
   phone: Yup.string()
     .required(validationTexts.requireText)
-    .trim()
-    .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+    .matches(phoneNumberRegexPattern, validationTexts.badPhoneFormat),
 });
 
 export const validateFishStocking = (minTime: number) =>
@@ -59,8 +57,7 @@ export const validateFishStocking = (minTime: number) =>
     assignedTo: Yup.object().required(validationTexts.requireText).nullable(),
     phone: Yup.string()
       .required(validationTexts.requireText)
-      .trim()
-      .matches(/^(86|\+3706)\d{7}$/, validationTexts.badPhoneFormat),
+      .matches(phoneNumberRegexPattern, validationTexts.badPhoneFormat),
     batches: Yup.array().of(
       Yup.object().shape({
         fishType: Yup.object()

@@ -294,7 +294,11 @@ const Review = ({ fishStocking, disabled, renderTabs }: FishStockingFactFormProp
                       {buttonsTitles.cancelFishStcoking}
                     </StyledButtons>
                   )}
-                  <StyledButtons type="submit" loading={submitLoading} disabled={disabled}>
+                  <StyledButtons
+                    type="submit"
+                    loading={submitLoading}
+                    disabled={disabled || submitLoading}
+                  >
                     {buttonsTitles.save}
                   </StyledButtons>
                 </ButtonRow>

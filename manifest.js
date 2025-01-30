@@ -1,5 +1,5 @@
 export const manifestForPlugIn = {
-  registerType: 'prompt',
+  registerType: 'autoUpdate',
   includeAssests: ['favicon.ico', 'apple-touc-icon.png', 'masked-icon.svg'],
   manifest: {
     short_name: 'Įžuvinimas',
@@ -29,6 +29,7 @@ export const manifestForPlugIn = {
     orientation: 'portrait',
   },
   workbox: {
+    navigateFallbackDenylist: [/^\/(api)\/.*/],
     runtimeCaching: [
       {
         urlPattern: /\.(png|jpg|jpeg|svg|gif)$/,

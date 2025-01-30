@@ -15,11 +15,10 @@ import {
   useAssignedToUsers,
   useFishAges,
   useFishStockingCallbacks,
-  useFishTypes,
   useIsFreelancer,
   useSettings,
 } from '../../utils/hooks';
-import { buttonsTitles, formLabels, queryStrings } from '../../utils/texts';
+import { buttonsTitles, formLabels, inputLabels, queryStrings } from '../../utils/texts';
 import { FishStocking, FishType, RegistrationFormValues } from '../../utils/types';
 import { validateFishStocking, validateFreelancerFishStocking } from '../../utils/validations';
 import Button from '../buttons/Button';
@@ -38,6 +37,7 @@ import Modal from '../other/Modal';
 import FishStockingPageTitle from '../other/PageTitle';
 import Map from '../other/RegistrationMap';
 import { fishOriginOptions } from '../../utils/options';
+import NumericTextField from '../fields/NumericTextField';
 const cookies = new Cookies();
 
 const RegistrationForm = ({
@@ -99,6 +99,7 @@ const RegistrationForm = ({
   ].some((loading) => loading);
 
   const isCustomer = fishStocking?.stockingCustomer?.id === cookies.get('profileId');
+  const isDisabledSubmit = isCustomer || submitLoading;
 
   const { id } = useParams();
 
@@ -326,24 +327,20 @@ const RegistrationForm = ({
                         error={errors.assignedTo}
                         onChange={(value: any) => {
                           setFieldValue('assignedTo', value);
-                          setFieldValue('phone', value?.phone || '');
+                          setFieldValue('phone', value?.phone?.trim() || '');
                         }}
                         options={users}
                         disabled={isCustomer}
                       />
 
-                      <TextField
-                        label="Telefonas"
-                        name="phone"
+                      <NumericTextField
                         value={values.phone}
-                        placeholder=""
-                        error={errors.phone}
-                        onChange={(e: any) => {
-                          if (/^\+?[0-9\s]{0,11}$/.test(e)) {
-                            setFieldValue('phone', e);
-                          }
-                        }}
+                        label={inputLabels.phone}
+                        name="phone"
+                        placeholder="064222222"
+                        onChange={(value) => setFieldValue('phone', value)}
                         disabled={isCustomer}
+                        error={errors.phone}
                       />
                     </Row>
                   </>
@@ -409,12 +406,12 @@ const RegistrationForm = ({
                       type="button"
                       variant={Button.colors.DANGER}
                       onClick={() => setShowModal(true)}
-                      disabled={isCustomer}
+                      disabled={isDisabledSubmit}
                     >
                       {deleteInfo.name}
                     </StyledButtons>
                   )}
-                  <StyledButtons type="submit" loading={submitLoading} disabled={isCustomer}>
+                  <StyledButtons type="submit" loading={submitLoading} disabled={isDisabledSubmit}>
                     {buttonsTitles.save}
                   </StyledButtons>
                 </ButtonRow>

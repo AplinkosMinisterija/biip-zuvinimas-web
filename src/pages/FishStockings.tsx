@@ -156,6 +156,7 @@ const FishStockings = () => {
 
     return (
       <>
+        {isFetching && !isFetchingNextPage && <LoaderComponent />}
         {data?.pages.map((page, pageIndex) => {
           return (
             <React.Fragment key={pageIndex}>
@@ -174,7 +175,7 @@ const FishStockings = () => {
           );
         })}
         {observerRef && <Invisible ref={observerRef} />}
-        {isFetching && <LoaderComponent />}
+        {isFetchingNextPage && <LoaderComponent />}
       </>
     );
   };
