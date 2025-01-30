@@ -1,6 +1,6 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { isFinite } from 'lodash';
-import { FishStocking, FishType, Tenant, TenantUser, User } from './types';
+import { FishStocking, FishType, RegistrationFormData, Tenant, TenantUser, User } from './types';
 
 import { isEmpty } from 'lodash';
 import Cookies from 'universal-cookie';
@@ -78,6 +78,7 @@ interface Create {
 
 class Api {
   private AuthApiAxios: AxiosInstance;
+  private uetkAxios: AxiosInstance;
   private readonly proxy: string = '/api';
 
   constructor() {
@@ -97,6 +98,7 @@ class Api {
         Promise.reject(error);
       },
     );
+    this.uetkAxios = Axios.create();
   }
 
   errorWrapper = async (endpoint: () => Promise<AxiosResponse<any, any>>) => {
@@ -166,9 +168,14 @@ class Api {
     );
   };
 
+  getPublic = async ({ resource, id, ...rest }: GetAll) => {
+    const config = this.getCommonConfigs(rest);
+    return this.errorWrapper(() => this.uetkAxios.get(`${resource}${id ? `/${id}` : ''}`, config));
+  };
+
   update = async ({ resource, id, params }: UpdateOne) => {
     return this.errorWrapper(() =>
-      this.AuthApiAxios.patch(`/${resource}/${id ? `/${id}` : ''}`, params),
+      this.AuthApiAxios.patch(`/${resource}${id ? `/${id}` : ''}`, params),
     );
   };
 
@@ -273,6 +280,12 @@ class Api {
       pageSize: '999',
     });
 
+  getMunicipality = async (params: { geom: any }): Promise<any> =>
+    await this.get({
+      resource: Resources.MUNICIPALITIES + '/search',
+      ...params,
+    });
+
   getFishAges = async (): Promise<GetAllResponse<any>> =>
     await this.get({
       resource: Resources.FISH_AGES,
@@ -315,7 +328,7 @@ class Api {
       pageSize: '12',
     });
 
-  getFishStocking = async (id: string): Promise<FishStocking> =>
+  getFishStocking = async (id?: string): Promise<FishStocking> =>
     await this.getOne({
       resource: Resources.FISH_STOCKING,
       populate: [
@@ -334,13 +347,14 @@ class Api {
       id,
     });
 
-  registerFishStocking = async (params: any): Promise<FishStocking> =>
-    await this.create({
+  registerFishStocking = async (params: RegistrationFormData): Promise<FishStocking> => {
+    return await this.create({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,
     });
+  };
 
-  updateFishStocking = async (params: any, id: string): Promise<FishStocking> =>
+  updateFishStocking = async (params: RegistrationFormData, id: string): Promise<FishStocking> =>
     await this.update({
       resource: Resources.FISH_STOCKING_REGISTER,
       params,
@@ -369,9 +383,10 @@ class Api {
       resource: Resources.SETTINGS,
     });
 
-  getRecentLocations = async (): Promise<any> =>
+  getRecentLocations = async (params): Promise<any> =>
     await this.get({
       resource: Resources.RECENT_LOCATIONS,
+      ...params,
     });
 
   deletePhoto = async (id: string): Promise<any> =>
@@ -429,6 +444,24 @@ class Api {
     const data = await response.blob();
 
     return data;
+  };
+
+  searchLocations = async ({ search, page, cadastralIds }: any): Promise<any> => {
+    const query = cadastralIds
+      ? JSON.stringify({
+          cadastralId: {
+            $in: cadastralIds,
+          },
+        })
+      : '';
+
+    return this.get({
+      resource: Resources.UETK,
+      query,
+      search,
+      page,
+      populate: ['geometry'],
+    });
   };
 }
 

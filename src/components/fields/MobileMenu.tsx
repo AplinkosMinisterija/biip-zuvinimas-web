@@ -15,7 +15,7 @@ interface SImpleSelectProps {
   showLabel?: boolean;
 }
 
-const SimpleSelect = ({
+const MobileMenu = ({
   value,
   options,
   className,
@@ -129,4 +129,4 @@ const MenuIcon = styled(Icon)`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-export default SimpleSelect;
+export default MobileMenu;

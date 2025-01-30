@@ -79,9 +79,7 @@ const TextInput = styled.input<{ readOnly: boolean; selectedValue: boolean }>`
   padding: 0 12px;
   width: 100%;
   height: 100%;
-
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'text')};
-
   background-color: white;
   font-size: 1.6rem;
   color: ${({ theme }) => theme.colors.label};

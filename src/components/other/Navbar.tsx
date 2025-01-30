@@ -1,12 +1,12 @@
 import { useMediaQuery } from '@material-ui/core';
 import { useLocation, useNavigate } from 'react-router';
 import styled, { css } from 'styled-components';
-import { device } from '../../styles';
+import { ButtonColors, device } from '../../styles';
 import { useFilteredRoutes } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
-import Button from '../buttons/Button';
-import SimpleSelect from '../fields/SimpleSelect';
+import { Button } from '@aplinkosministerija/design-system';
+import MobileMenu from '../fields/MobileMenu';
 import UserSwitchMenu from './ProfileDropdown';
 
 const NavBar = () => {
@@ -22,10 +22,8 @@ const NavBar = () => {
         <Logo onClick={() => navigate('/')} src="/logo.svg" />
         <HeaderLeft>
           <StyledButton
-            variant={Button.colors.SECONDARY}
+            variant={ButtonColors.SECONDARY}
             onClick={() => navigate(slugs.newFishStockings)}
-            height={40}
-            padding="0"
             disabled={false}
           >
             {buttonsTitles.new}
@@ -38,7 +36,7 @@ const NavBar = () => {
               return (
                 <MenuButton
                   key={`${tab.title}-${index}`}
-                  isSelected={locationSlug?.includes(slugRoot)}
+                  $isSelected={locationSlug?.includes(slugRoot)}
                   onClick={() => navigate(tab.slug)}
                 >
                   {tab.title}
@@ -46,14 +44,13 @@ const NavBar = () => {
               );
             })
           ) : (
-            <SimpleSelect
+            <MobileMenu
               options={routes}
               getOptionLabel={(option: any) => option?.title}
               onChange={(option: any) => navigate(option?.slug)}
               iconRight="menu"
             />
           )}
-
           <UserSwitchMenu />
         </HeaderLeft>
       </Header>
@@ -61,14 +58,14 @@ const NavBar = () => {
   );
 };
 
-const MenuButton = styled.div<{ isSelected: boolean }>`
+const MenuButton = styled.div<{ $isSelected: boolean }>`
   font-size: 1.6rem;
   color: #121926;
   width: 100%;
   white-space: nowrap;
   cursor: pointer;
   position: relative;
-  ${({ isSelected: current }) =>
+  ${({ $isSelected: current }) =>
     current &&
     css`
       &::after {

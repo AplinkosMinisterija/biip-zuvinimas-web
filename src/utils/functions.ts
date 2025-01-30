@@ -7,7 +7,7 @@ import Cookies from 'universal-cookie';
 import { FilterConfig } from '../components/other/DynamicFilter/Filter';
 import { UserReducerProps } from '../state/user/reducer';
 import api from './api';
-import { FishStockingStatus, RolesTypes } from './constants';
+import { FishStockingStatus } from './constants';
 import { fishStockingStatusLabels, validationTexts } from './texts';
 import { FishStockingFilters, FishStockingParams, Profile, ProfileId } from './types';
 
@@ -17,19 +17,6 @@ interface SetResponseProps {
   onError?: (data: any) => void;
   isOffline?: () => void;
 }
-
-export const handleResponse = async ({ endpoint, onSuccess, onError }: SetResponseProps) => {
-  const response = await endpoint();
-  if (onError && response?.error) {
-    return onError(response?.error.code);
-  }
-
-  if (!response || response?.error) {
-    return handleAlert(response?.error?.type);
-  }
-
-  return onSuccess(response);
-};
 
 export const validateFileTypes = (files: File[], availableMimeTypes: string[]) => {
   for (let i = 0; i < files.length; i++) {
@@ -41,7 +28,9 @@ export const validateFileTypes = (files: File[], availableMimeTypes: string[]) =
 
 export const handleAlert = (responseError?: string) => {
   toast.error(
-    validationTexts[responseError as keyof typeof validationTexts] || validationTexts.error,
+    validationTexts[responseError as keyof typeof validationTexts] ||
+      responseError ||
+      validationTexts.error,
     {
       position: 'top-center',
       autoClose: 5000,
@@ -150,7 +139,7 @@ export const handleSetProfile = (profiles?: Profile[]) => {
 };
 
 export const getLocationList = async (input: string, page: number) => {
-  return await api.getLocations({ search: input, page });
+  return await api.searchLocations({ search: input, page });
 };
 
 export const getTenantsList = async (input: string, page: number) => {
@@ -247,4 +236,19 @@ export const checkIfDateIsAfter = (value: Date | undefined, minTime: number) => 
   const selectedDate = value && new Date(value);
   const minDate = new Date(new Date().setDate(new Date().getDate() + minTime));
   return selectedDate && selectedDate > minDate;
+};
+
+export const checkIfPointChanged = (geom1, geom2) => {
+  const coordinates1 = geom1?.features?.[0]?.geometry?.coordinates?.map((num) =>
+    Math.trunc(num),
+  ) || [0, 0];
+  const coordinates2 = geom2?.features?.[0]?.geometry?.coordinates?.map((num) =>
+    Math.trunc(num),
+  ) || [0, 0];
+  const xdiff = coordinates1?.[0] - coordinates2?.[0];
+  const ydiff = coordinates1?.[1] - coordinates2?.[1];
+  const xChanged = xdiff > 1 || xdiff < -1;
+  const yChanged = ydiff > 1 || ydiff < -1;
+
+  return xChanged || yChanged;
 };

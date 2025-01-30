@@ -1,143 +1,36 @@
-import { isEmpty } from 'lodash';
-import { useState } from 'react';
-import styled from 'styled-components';
-import { useRecentLocations } from '../../utils/hooks';
 import { inputLabels } from '../../utils/texts';
-import Icon from '../other/Icon';
-import FieldWrapper from './components/FieldWrapper';
-import TextFieldInput from './components/TextFieldInput';
+import { AsyncSelectField } from '@aplinkosministerija/design-system';
+import { FishStockingLocation } from '../../utils/types';
+import api from '../../utils/api';
 
-const LocationInput = ({ onChange, error, disabled, value, handleSelectMap }: any) => {
-  const [showSelect, setShowSelect] = useState(false);
+export interface LocationFieldProps {
+  name?: string;
+  value?: any;
+  error?: string;
+  onChange: (option: FishStockingLocation) => void;
+  disabled?: boolean;
+}
 
-  const recentLocations = useRecentLocations();
-
-  const handleBlur = (event: any) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      setShowSelect(false);
-    }
-  };
-  const handleToggleSelect = () => {
-    !disabled && setShowSelect(!showSelect);
-  };
-
+const LocationField = ({ name, value, error, onChange, disabled }: LocationFieldProps) => {
   return (
-    <FieldWrapper
-      onClick={handleToggleSelect}
-      handleBlur={handleBlur}
+    <AsyncSelectField
+      name={name || 'location'}
       label={inputLabels.location}
+      hasOptionKey={false}
+      value={value}
       error={error}
-    >
-      <TextFieldInput
-        error={error}
-        value={value}
-        readOnly={true}
-        disabled={disabled}
-        rightIcon={<StyledIcon name={'Searchlocation'} />}
-      />
-      {showSelect && !disabled ? (
-        <OptionsContainer>
-          <OptionRowContainer
-            onClick={() => {
-              setShowSelect(false);
-              handleSelectMap();
-            }}
-          >
-            <StyledOptionhIcon name={'map'} />
-            <Options>{inputLabels.selectFromMap}</Options>
-          </OptionRowContainer>
-
-          {!isEmpty(recentLocations) && (
-            <>
-              <HistoryTitle>Paskutinės paieškos</HistoryTitle>
-              {recentLocations.map((recentLocation: any) => {
-                return (
-                  <OptionRowContainer
-                    onClick={() => onChange(recentLocation)}
-                    key={recentLocation?.cadastral_id}
-                  >
-                    <StyledOptionhIcon name={'Searchlocation'} />
-
-                    <Options>
-                      {recentLocation?.name}
-                      {', '}
-                      {recentLocation?.municipality?.name}{' '}
-                    </Options>
-                  </OptionRowContainer>
-                );
-              })}
-            </>
-          )}
-        </OptionsContainer>
-      ) : null}
-    </FieldWrapper>
+      onChange={(e: FishStockingLocation) => {
+        onChange(e);
+      }}
+      getOptionLabel={(option: FishStockingLocation) =>
+        `${option.name} (${option.cadastral_id}) - ${option.municipality.name}`
+      }
+      loadOptions={(input: string, page: number) =>
+        api.getRecentLocations({ filter: { name: input }, page })
+      }
+      disabled={disabled}
+    />
   );
 };
 
-const OptionsContainer = styled.div`
-  position: absolute;
-  z-index: 9999;
-  width: 100%;
-  background-color: #ffffff;
-  padding: 19px 0px 20px 0px;
-  box-shadow: 0px 2px 16px #121a5529;
-  border-radius: 4px;
-  top: 70px;
-
-  border: none;
-  > * {
-    &:first-child {
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-    }
-  }
-  > * {
-    &:last-child {
-      border-bottom-left-radius: 4px;
-      border-bottom-right-radius: 4px;
-    }
-  }
-`;
-
-const StyledIcon = styled(Icon)`
-  color: rgb(122, 126, 159);
-  font-size: 2.4rem;
-  margin-right: 8px;
-`;
-
-const StyledOptionhIcon = styled(Icon)`
-  margin: 0px 30px;
-  font-size: 1.9rem;
-  color: #13c9e7;
-`;
-
-const HistoryTitle = styled.div`
-  font-size: 1.2rem;
-  line-height: 40px;
-  letter-spacing: 0.48px;
-  color: #b3b5c4;
-  margin-left: 23px;
-`;
-
-const Options = styled.div`
-  cursor: pointer;
-  font-size: 1.6rem;
-  line-height: 38px;
-  color: #0b1f51;
-  border: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-right: 10px;
-`;
-
-const OptionRowContainer = styled.div`
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  &:hover {
-    background-color: #f3f3f7;
-  }
-`;
-
-export default LocationInput;
+export default LocationField;

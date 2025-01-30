@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { intersectionObserverConfig } from '../../../utils/configs';
 import { getFilteredOptions } from './functions';
 
@@ -32,15 +32,13 @@ export const useAsyncSelectData = ({
     };
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery(
-    [name, input],
-    ({ pageParam }) => fetchData(pageParam),
-    {
-      getNextPageParam: (lastPage) => lastPage.page,
-      enabled: !isEmpty(input),
-      cacheTime: 60000,
-    },
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery({
+    queryKey: [name, input],
+    queryFn: ({ pageParam }) => fetchData(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.page,
+    enabled: !isEmpty(input),
+  });
 
   useEffect(() => {
     const currentObserver = observerRef.current;

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import Button from '../buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import Icon from '../other/Icon';
 export interface DeleteCardProps {
-  title: string;
+  title?: string;
   description: string;
   name: string;
   onSetClose: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,7 +16,7 @@ export interface DeleteCardProps {
 }
 
 const DeleteCard = ({
-  title,
+  title = '',
   description,
   name,
   onSetClose,
@@ -52,17 +52,13 @@ const DeleteCard = ({
       <Description>{description}</Description>
       <Name>{name}</Name>
       <ButtonRow>
-        <StyledButton
-          type="button"
-          onClick={() => onSetClose(false)}
-          variant={Button.colors.TRANSPARENT}
-        >
+        <StyledDeclineButton type="button" onClick={() => onSetClose(false)} variant="transparent">
           {declineLabel}
-        </StyledButton>
+        </StyledDeclineButton>
         <StyledButton
           type="button"
           onClick={() => handleDelete()}
-          variant={Button.colors.DANGER}
+          variant="danger"
           loading={deleteInProgress}
         >
           {agreeLabel}
@@ -78,7 +74,6 @@ const Container = styled.div`
   border-radius: 10px;
   max-width: 410px;
   padding: 40px;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -106,12 +101,22 @@ const Name = styled.div`
   font: normal normal bold 16px/26px;
   color: #121a55;
 `;
+
 const StyledButton = styled(Button)`
   margin-top: 32px;
   @media ${device.mobileL} {
     margin-top: 16px;
   }
 `;
+
+const StyledDeclineButton = styled(Button)`
+  margin-top: 32px;
+  border: 1px solid #121a55;
+  @media ${device.mobileL} {
+    margin-top: 16px;
+  }
+`;
+
 const ButtonRow = styled.div`
   display: flex;
   gap: 12px;

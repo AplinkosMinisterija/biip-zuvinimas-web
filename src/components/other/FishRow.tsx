@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import { default as NumericTextField } from '../fields/NumericTextField';
-import SelectField from '../fields/SelectField';
+import { SelectField, NumericTextField } from '@aplinkosministerija/design-system';
 import Icon from '../other/Icon';
 import { RegistrationFormFishRow } from '../../utils/types';
 
@@ -57,7 +56,7 @@ const FishRow = ({
         showError={false}
         disabled={disabled}
       />
-      <StyledNumericTextInput
+      <NumericTextField
         name={`batches.${index}.amount`}
         value={amount}
         onChange={(e) => setFieldValue(`batches.${index}.amount`, e)}
@@ -68,12 +67,13 @@ const FishRow = ({
         disabled={disabled}
         wholeNumber={true}
       />
-      <StyledNumericTextInput
+      <NumericTextField
         name={`batches.${index}.weight`}
         value={weight}
         onChange={(e) => setFieldValue(`batches.${index}.weight`, e)}
-        label="Bendras svoris"
+        label="Bendras svoris (Neprivaloma)"
         showError={false}
+        error={errors?.weight}
         wholeNumber={false}
         right={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}
@@ -99,8 +99,6 @@ const Row = styled.div<{ $showDelete: boolean }>`
   }
 `;
 
-const StyledNumericTextInput = styled(NumericTextField)``;
-
 const DeleteButton = styled.div`
   margin-top: auto;
   height: 40px;
@@ -120,6 +118,7 @@ const DeleteIcon = styled(Icon)`
     margin: 8px 0 16px 0;
   }
 `;
+
 const InputInnerLabel = styled.div`
   margin: auto 8px;
   font-size: 1.4rem;

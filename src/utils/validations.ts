@@ -71,6 +71,9 @@ export const validateFishStocking = (minTime: number) =>
             id: Yup.number().required(validationTexts.requireText),
           }),
         amount: Yup.string().required(validationTexts.requireText),
+        weight: Yup.number()
+          .notRequired()
+          .test('weightNotZero', validationTexts.invalidWeight, (value) => !!value),
       }),
     ),
     fishOriginCompanyName: Yup.string().when('fishOrigin', (fishOrigin: any, schema: any) =>
@@ -106,6 +109,9 @@ export const validateFreelancerFishStocking = (minTime: number) =>
             id: Yup.number().required(validationTexts.requireText),
           }),
         amount: Yup.string().required(validationTexts.requireText),
+        weight: Yup.number()
+          .notRequired()
+          .test('weightNotZero', validationTexts.invalidWeight, (value) => !!value),
       }),
     ),
     fishOriginCompanyName: Yup.string().when('fishOrigin', (fishOrigin: any, schema: any) =>

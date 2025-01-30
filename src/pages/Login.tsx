@@ -1,9 +1,7 @@
 import { useFormik } from 'formik';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import styled from 'styled-components';
-import Button from '../components/buttons/Button';
-import PasswordField from '../components/fields/PasswordField';
-import TextField from '../components/fields/TextField';
+import { PasswordField, TextField, Button } from '@aplinkosministerija/design-system';
 import { LoginLayout } from '../components/Layouts/Login';
 import api from '../utils/api';
 import { handleAlert, handleUpdateTokens } from '../utils/functions';
@@ -22,7 +20,8 @@ export const Login = () => {
     loginMutation.mutateAsync(params);
   };
 
-  const loginMutation = useMutation((params: LoginProps) => api.login(params), {
+  const loginMutation = useMutation({
+    mutationFn: (params: LoginProps) => api.login(params),
     onError: ({ response }: any) => {
       const text = validationTexts[response?.data?.type];
 
@@ -43,7 +42,7 @@ export const Login = () => {
 
   const { mutateAsync: checkAuthMutation, isLoading: checkAuthLoading } = useCheckAuthMutation();
 
-  const loading = [loginMutation.isLoading, checkAuthLoading].some((loading) => loading);
+  const loading = [loginMutation.isPending, checkAuthLoading].some((loading) => loading);
 
   const { values, errors, setFieldValue, handleSubmit, setErrors } = useFormik({
     initialValues: {

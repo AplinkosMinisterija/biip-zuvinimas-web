@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react';
 import { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import {
   BrowserRouter,
@@ -14,7 +14,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { ThemeProvider } from 'styled-components';
 import App from './App';
 import NetworkStatusIndicator from './components/other/NetworkStatusIndicator';
-import reportWebVitals from './reportWebVitals';
 import redux from './state/store';
 import { GlobalStyle, theme } from './styles/index';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -45,8 +44,8 @@ if (env.VITE_SENTRY_DSN) {
 
 root.render(
   <>
-    <NetworkStatusIndicator />
     <QueryClientProvider client={queryClient}>
+      <NetworkStatusIndicator />
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <ThemeProvider theme={theme}>
@@ -64,4 +63,3 @@ root.render(
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

@@ -41,7 +41,7 @@ const PhotoUploadField = ({
 
   const handleSetFiles = async (currentFiles: File[]) => {
     const isValidFileTypes = validateFileTypes(currentFiles, availablePhotoMimeTypes);
-    if (!isValidFileTypes) return handleAlert('badFileTypes');
+    if (!isValidFileTypes) return handleAlert();
     if (onUpload) {
       const promises = map(currentFiles, async (file: any) => {
         const compressedObj = await compressImageSize(file);

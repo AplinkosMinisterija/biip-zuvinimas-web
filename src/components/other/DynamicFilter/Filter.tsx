@@ -4,13 +4,15 @@ import styled from 'styled-components';
 import { device } from '../../../styles';
 import { handleDateRestriction } from '../../../utils/functions';
 import { buttonsTitles } from '../../../utils/texts';
-import Button from '../../buttons/Button';
-import AsyncMultiSelect from '../../fields/AsyncMultiSelect';
-import AsyncSelectField from '../../fields/AsyncSelect';
-import Datepicker from '../../fields/DatePicker';
-import MultiSelect from '../../fields/MultiSelect';
-import SelectField from '../../fields/SelectField';
-import TextField from '../../fields/TextField';
+import {
+  AsyncMultiSelectField,
+  AsyncSelectField,
+  MultiSelectField,
+  SelectField,
+  TextField,
+  DatePicker,
+  Button,
+} from '@aplinkosministerija/design-system';
 import { FilterInputTypes } from '../../../utils/constants';
 
 export interface LabelsProps {
@@ -63,7 +65,7 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
           if (filter.inputType === FilterInputTypes.date) {
             return (
               <InputWrapper single={singleItem} key={filter.key} isLast={index === row.length - 1}>
-                <Datepicker
+                <DatePicker
                   name={filter.key}
                   value={values[filter.key]}
                   {...(!!handleDateRestriction(filter, values) &&
@@ -81,7 +83,6 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
                   label={filter.label}
                   value={values[filter.key]}
                   dependantId={filter.getDependId && filter.getDependId(values)}
-                  isClearable={true}
                   options={filter.options || []}
                   onChange={(value) =>
                     customSetValue
@@ -91,7 +92,6 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
                   getOptionLabel={(option) =>
                     hasOptionLabelFunction ? optionLabel(option) : option.label
                   }
-                  getInputLabel={(option) => option.label}
                   refreshOptions={filter.refreshOptions}
                 />
               </InputWrapper>
@@ -99,8 +99,7 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
           } else if (filter.inputType === FilterInputTypes.multiselect) {
             return (
               <InputWrapper single={singleItem} key={filter.key} isLast={index === row.length - 1}>
-                <MultiSelect
-                  name={filter.key}
+                <MultiSelectField
                   label={filter.label}
                   values={values[filter.key] || []}
                   options={filter.options || []}
@@ -121,16 +120,14 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
                   getOptionLabel={(option) =>
                     hasOptionLabelFunction ? optionLabel(option) : option.name
                   }
-                  setSuggestionsFromApi={(input, page) =>
-                    filter.optionsApi && filter.optionsApi(input, page)
-                  }
+                  loadOptions={(input, page) => filter.optionsApi && filter.optionsApi(input, page)}
                 />
               </InputWrapper>
             );
           } else if (filter.inputType === FilterInputTypes.asyncMultiSelect) {
             return (
               <InputWrapper single={singleItem} key={filter.key} isLast={index === row.length - 1}>
-                <AsyncMultiSelect
+                <AsyncMultiSelectField
                   name={filter.key}
                   label={filter.label}
                   values={values[filter.key] || []}
@@ -138,9 +135,7 @@ const Filter = ({ values, filters, rowConfig, onSubmit }: LoginLayoutProps) => {
                   getOptionLabel={(option) =>
                     hasOptionLabelFunction ? optionLabel(option) : option.name
                   }
-                  setSuggestionsFromApi={(input, page) =>
-                    filter.optionsApi && filter.optionsApi(input, page)
-                  }
+                  loadOptions={(input, page) => filter.optionsApi && filter.optionsApi(input, page)}
                   getOptionValue={(option) => (hasOptionValue ? optionValue(option) : option.id)}
                 />
               </InputWrapper>

@@ -1,4 +1,5 @@
 import { FishOriginTypes, FishStockingStatus, RolesTypes } from './constants';
+import { FeatureCollection } from '@aplinkosministerija/design-system';
 export interface User {
   id: string;
   firstName: string;
@@ -113,27 +114,18 @@ export interface FishBatch {
 
 export interface FishStocking {
   id: number;
-  geom: any;
   status: FishStockingStatus;
+  geom: any;
+  location?: FishStockingLocation;
   eventTime: Date;
   comment?: string;
-  tenant?: Tenant;
   stockingCustomer?: Tenant;
   fishOrigin: FishOriginTypes;
   fishOriginCompanyName?: string;
-  fishOriginReservoir?: {
-    cadastral_id: string;
-    name: string;
-    municipality: { id: string; name: string };
-  };
-  location?: {
-    cadastral_id: string;
-    name: string;
-    municipality: { id: string; name: string };
-  };
-  batches: Array<FishBatch>;
+  fishOriginReservoir?: FishStockingLocation;
   assignedTo: User;
   phone: string;
+  batches: Array<FishBatch>;
   reviewedBy?: User;
   reviewLocation?: { lat: number; lng: number };
   reviewTime?: string;
@@ -158,11 +150,59 @@ export interface FishStocking {
     email?: string;
     phone?: string;
   };
+  tenant?: Tenant;
   createdBy?: User;
   createdAt?: Date;
   updatedBy?: User;
   updatedAt?: Date;
   deletedBy?: User;
+}
+
+export interface RegistrationFormData {
+  id?: number;
+  geom: any;
+  location?: FishStockingLocation;
+  eventTime: Date;
+  stockingCustomer?: Tenant;
+  fishOrigin: FishOriginTypes;
+  fishOriginCompanyName?: string;
+  fishOriginReservoir?: FishStockingLocation;
+  assignedTo: User;
+  phone: string;
+  batches: Array<FishBatch>;
+}
+
+export interface ReviewFormData {
+  id: number;
+  reviewLocation?: { lat: number; lng: number };
+  reviewTime?: string;
+  waybillNo?: string;
+  veterinaryApprovalNo?: string;
+  veterinaryApprovalOrderNo?: string;
+  containerWaterTemp?: number;
+  waterTemp?: number;
+  images?: any[];
+  signatures?: {
+    organization: string;
+    signedBy: string;
+    phone?: string;
+    signature: string;
+  }[];
+  assignedToInspector?: User;
+  inspector?: {
+    firstName: string;
+    lastName: string;
+    id: number;
+    organization: string;
+    email?: string;
+    phone?: string;
+  };
+  comment: string;
+  batches: Array<{
+    id: number;
+    reviewAmount: number;
+    reviewWeight?: number;
+  }>;
 }
 
 export interface FishType {
@@ -199,9 +239,24 @@ export interface RegistrationFormFishRow {
   weight?: number;
 }
 
-export type RegistrationFormValues = Omit<Partial<FishStocking>, 'eventTime' | 'batches'> & {
+export type RegistrationFormValues = Omit<
+  Partial<FishStocking>,
+  'eventTime' | 'batches' | 'geom' | 'id'
+> & {
   eventTime?: Date;
   batches: Array<RegistrationFormFishRow | object>;
+  geom?: any;
+  id?: number;
 };
 
 export type Info = Array<Array<{ type: string; label: string; value: string }>>;
+
+export type FishStockingLocation = {
+  cadastral_id: string;
+  name: string;
+  municipality: { id: string; name: string };
+  category: string;
+  geom?: any;
+  area?: number;
+  length?: number;
+};

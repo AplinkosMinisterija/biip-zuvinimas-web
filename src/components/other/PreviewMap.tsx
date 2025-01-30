@@ -31,13 +31,13 @@ const PreviewMap = ({ height, value, display }: MapProps) => {
   return (
     <>
       {loading ? <LoaderComponent /> : null}
-      <Container display={display}>
+      <Container $display={display}>
         <InnerContainer>
           <StyledIframe
             ref={iframeRef}
             src={src}
-            width={'100%'}
-            height={height}
+            $width={'100%'}
+            $height={height}
             style={{ border: 0 }}
             allowFullScreen={true}
             onLoad={handleLoadMap}
@@ -50,10 +50,10 @@ const PreviewMap = ({ height, value, display }: MapProps) => {
   );
 };
 
-const Container = styled.div<{ display: boolean }>`
+const Container = styled.div<{ $display?: boolean }>`
   width: 100%;
   height: 100%;
-  display: ${({ display }) => (display ? 'flex' : 'none')};
+  display: ${({ $display }) => ($display ? 'flex' : 'none')};
 `;
 
 const InnerContainer = styled.div`
@@ -70,11 +70,11 @@ const InnerContainer = styled.div`
 `;
 
 const StyledIframe = styled.iframe<{
-  height: string;
-  width: string;
+  $height: string;
+  $width: string;
 }>`
-  width: ${({ width }) => width};
-  height: ${({ height }) => height};
+  width: ${({ $width }) => $width};
+  height: ${({ $height }) => $height};
 `;
 
 export default PreviewMap;

@@ -1,11 +1,11 @@
 import { useMediaQuery } from '@material-ui/core';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import Button from '../components/buttons/Button';
+import { Button } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import DisplayMap from '../components/other/DisplayMap';
 import DynamicFilter from '../components/other/DynamicFilter';
@@ -98,14 +98,12 @@ const FishStockings = () => {
     };
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery(
-    ['fishStockings', filters],
-    ({ pageParam }) => getStockings(pageParam),
-    {
-      getNextPageParam: (lastPage) => lastPage.page,
-      cacheTime: 60000,
-    },
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery({
+    queryKey: ['fishStockings', filters],
+    queryFn: ({ pageParam }) => getStockings(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.page,
+  });
 
   const observerRef = useRef<any>(null);
 
@@ -142,12 +140,7 @@ const FishStockings = () => {
               : descriptions.stockingsNotFoundbyFilter}
           </Description>
           {isNoFishStockings && (
-            <StyledButton
-              onClick={() => navigate(slugs.newFishStockings)}
-              height={40}
-              padding="0"
-              disabled={false}
-            >
+            <StyledButton onClick={() => navigate(slugs.newFishStockings)} disabled={false}>
               {buttonsTitles.newFishStocking}
             </StyledButton>
           )}

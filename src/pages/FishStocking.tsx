@@ -1,69 +1,35 @@
-import { useQuery } from 'react-query';
-import { useNavigate, useParams } from 'react-router';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import Done from '../components/forms/Done';
-import RegistrationForm from '../components/forms/Registration';
 import Unfinished from '../components/forms/Unfinished';
 import DefaultLayout from '../components/Layouts/Default';
 import LoaderComponent from '../components/other/LoaderComponent';
-import api from '../utils/api';
 import { FishStockingStatus } from '../utils/constants';
-import { isNew } from '../utils/functions';
 import { slugs } from '../utils/routes';
+import { useFishStocking } from '../utils/hooks';
+import { useEffect } from 'react';
 
 const FishStockingPage = () => {
-  const [searchParams] = useSearchParams();
-  const { repeat } = Object.fromEntries([...Array.from(searchParams)]);
-  const { id } = useParams();
-
   const navigate = useNavigate();
+  const { fishStocking, isLoading, isError, isRepeating } = useFishStocking();
 
-  const getStocking = async () => {
-    if (isNew(id) && repeat) {
-      return await api.getFishStocking(repeat);
-    } else if (id && !isNew(id)) {
-      return api.getFishStocking(id);
-    }
-    return;
-  };
-
-  const { data: fishStocking, isLoading } = useQuery(['fishStocking', id], getStocking, {
-    onError: () => {
+  useEffect(() => {
+    if (isError) {
       navigate(slugs.fishStockings);
-    },
-  });
+    }
+  }, [isError]);
 
   if (isLoading) return <LoaderComponent />;
 
-  const showNewFishStocking = isNew(id) && !repeat;
-  const showRepeatFishStocking = isNew(id) && repeat && fishStocking;
-  const showUnfinishedFishStocking =
-    fishStocking &&
-    ![FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status);
   const showFinishedFishStocking =
-    fishStocking &&
-    [FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status);
-
-  if (
-    !showNewFishStocking &&
-    !showRepeatFishStocking &&
-    !showUnfinishedFishStocking &&
-    !showFinishedFishStocking
-  ) {
-    // There is nothing to render
-    navigate(-1);
-    return null;
-  }
+    !!fishStocking &&
+    [FishStockingStatus.FINISHED, FishStockingStatus.INSPECTED].includes(fishStocking.status) &&
+    !isRepeating;
 
   const renderContent = () => {
-    if (showNewFishStocking) {
-      return <RegistrationForm />;
-    } else if (showRepeatFishStocking) {
-      return <RegistrationForm fishStocking={fishStocking} />;
-    } else if (showUnfinishedFishStocking) {
-      return <Unfinished fishStocking={fishStocking} />;
-    } else if (showFinishedFishStocking) {
-      return <Done fishStocking={fishStocking} />;
+    if (showFinishedFishStocking) {
+      return <Done />;
+    } else {
+      return <Unfinished />;
     }
   };
 

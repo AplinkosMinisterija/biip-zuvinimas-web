@@ -3,14 +3,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { FishType } from '../../utils/types';
-import NumericTextField from '../fields/NumericTextField';
+import { NumericTextField } from '@aplinkosministerija/design-system';
 
 interface itemProps {
   id: string;
   fishType: FishType;
   fishAge: FishType;
-  reviewAmount: number;
-  reviewWeight: number;
+  reviewAmount?: number;
+  reviewWeight?: number;
   planned: string;
 }
 
@@ -104,7 +104,8 @@ const FishInfo = styled.div<{ last: boolean }>`
 
 const FishName = styled.span`
   text-align: left;
-  font: 600 1.6rem;
+  font-size: 1.6rem;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.primary};
   margin-top: auto;
   @media ${device.mobileL} {
@@ -114,7 +115,8 @@ const FishName = styled.span`
 
 const FishAge = styled.span`
   text-align: left;
-  font: 600 1.4rem;
+  font-size: 1.4rem;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.primary + '8F'};
   opacity: 1;
   @media ${device.mobileL} {
