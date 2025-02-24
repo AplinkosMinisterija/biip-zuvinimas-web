@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
-import { getLocationList, getTenantsList, handleAlert, isNew } from '../../utils/functions';
+import { getLocationList, getTenantsList, handleAlert } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
-import { buttonsTitles, formLabels } from '../../utils/texts';
+import { buttonsTitles, formLabels, inputLabels } from '../../utils/texts';
 import { FishStockingLocation, FishType } from '../../utils/types';
 import RadioOptions from '../buttons/RadioOptionts';
 import SimpleButton from '../buttons/SimpleButton';
@@ -15,6 +15,7 @@ import {
   TextField,
   SelectField,
   AsyncSelectField,
+  PhoneField,
 } from '@aplinkosministerija/design-system';
 import LocationInput from '../fields/LocationInput';
 import TimePicker from '../fields/TimePicker';
@@ -169,17 +170,12 @@ const RegistrationForm = ({
               options={users}
               disabled={isCustomer}
             />
-            <TextField
-              label="Telefonas"
+            <PhoneField
+              label={inputLabels.phone}
               name="phone"
               value={values.phone}
-              placeholder=""
               error={errors.phone}
-              onChange={(e: any) => {
-                if (/^\+?[0-9\s]{0,11}$/.test(e)) {
-                  setFieldValue('phone', e.trim());
-                }
-              }}
+              onChange={(value) => setFieldValue('phone', value)}
               disabled={isCustomer}
             />
           </Row>

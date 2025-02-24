@@ -3,9 +3,9 @@ import { find } from 'lodash';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { useSignatureUsers } from '../../utils/hooks';
-import { buttonsTitles } from '../../utils/texts';
+import { buttonsTitles, inputLabels } from '../../utils/texts';
 import SimpleButton from '../buttons/SimpleButton';
-import { NumericTextField } from '@aplinkosministerija/design-system';
+import { PhoneField } from '@aplinkosministerija/design-system';
 import SuggestionsSelect from '../fields/SuggestionsSelect';
 import Icon from '../other/Icon';
 import SignatureField from './Signature';
@@ -90,12 +90,10 @@ const SignatureRow = ({
                     return option;
                   }}
                 />
-                <NumericTextField
-                  label="Telefonas"
+                <PhoneField
+                  label={inputLabels.phone}
                   name="phone"
                   value={item?.phone}
-                  wholeNumber={true}
-                  placeholder=""
                   error={error?.phone}
                   onChange={(value) => {
                     setFieldValue(`signatures.${index}.phone`, value);

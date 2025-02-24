@@ -235,7 +235,6 @@ const Unfinished = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log('submit', values);
     if (selectedTab === FishStockingStatus.UPCOMING) {
       await submitRegistration(values);
     } else {
