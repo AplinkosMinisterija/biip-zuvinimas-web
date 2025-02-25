@@ -77,6 +77,7 @@ const FishRow = ({
         wholeNumber={false}
         right={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}
+        returnNumber={true}
       />
       {showDelete && !disabled && (
         <DeleteButton onClick={() => handleDelete(index)}>

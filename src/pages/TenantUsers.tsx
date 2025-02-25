@@ -279,7 +279,7 @@ const NariaiPage = () => {
                         value={values.personalCode}
                         label={inputLabels.personalCode}
                         name="personalCode"
-                        onChange={(value) => setFieldValue('personalCode', value.toString())}
+                        onChange={(value) => setFieldValue('personalCode', value)}
                         error={errors.personalCode}
                       />
                     )}
