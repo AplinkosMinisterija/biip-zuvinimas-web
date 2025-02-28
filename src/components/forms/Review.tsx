@@ -31,6 +31,7 @@ const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) 
           onChange={(e) => setFieldValue(`containerWaterTemp`, e)}
           right={<InputInnerLabel>°C</InputInnerLabel>}
           disabled={disabled}
+          returnNumber={true}
         />
         <TempStyledTextInput
           label="Telkininyje"
@@ -40,6 +41,7 @@ const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) 
           onChange={(e) => setFieldValue(`waterTemp`, e)}
           right={<InputInnerLabel>°C</InputInnerLabel>}
           disabled={disabled}
+          returnNumber={true}
         />
       </Row>
       <Subheader>INFORMACIJA IŠ VETERINAJOS</Subheader>

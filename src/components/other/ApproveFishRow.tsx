@@ -63,6 +63,7 @@ const FishStockingApproveFishRow = ({
           bottomLabel={showBottomLabel && item.planned ? item.planned : ''}
           disabled={disabled}
           wholeNumber={true}
+          returnNumber={true}
         />
         <StyledNumericTextInput
           name={`batches.${index}.reviewWeight`}
@@ -73,6 +74,7 @@ const FishStockingApproveFishRow = ({
           wholeNumber={false}
           right={<InputInnerLabel>kg</InputInnerLabel>}
           disabled={disabled}
+          returnNumber={true}
         />
       </Inputs>
     </Row>

@@ -66,6 +66,7 @@ const FishRow = ({
         right={<InputInnerLabel>vnt</InputInnerLabel>}
         disabled={disabled}
         wholeNumber={true}
+        returnNumber={true}
       />
       <NumericTextField
         name={`batches.${index}.weight`}
