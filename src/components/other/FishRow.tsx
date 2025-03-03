@@ -66,6 +66,7 @@ const FishRow = ({
         right={<InputInnerLabel>vnt</InputInnerLabel>}
         disabled={disabled}
         wholeNumber={true}
+        returnNumber={true}
       />
       <NumericTextField
         name={`batches.${index}.weight`}
@@ -77,6 +78,7 @@ const FishRow = ({
         wholeNumber={false}
         right={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}
+        returnNumber={true}
       />
       {showDelete && !disabled && (
         <DeleteButton onClick={() => handleDelete(index)}>

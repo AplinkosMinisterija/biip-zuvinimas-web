@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import { Form, Formik } from 'formik';
 import { useMutation } from '@tanstack/react-query';
-import { TextField, Button, NumericTextField } from '@aplinkosministerija/design-system';
+import { TextField, Button, PhoneField } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import { useAppSelector } from '../state/hooks';
 import { device } from '../styles';
@@ -90,11 +90,10 @@ const MyProfile = () => {
                   disabled={true}
                   error={errors.lastName}
                 />
-                <NumericTextField
+                <PhoneField
                   value={values.phone}
                   label={inputLabels.phone}
                   name="phone"
-                  placeholder="064222222"
                   onChange={(value) => setFieldValue('phone', value)}
                   disabled={disabled}
                   error={errors.phone}

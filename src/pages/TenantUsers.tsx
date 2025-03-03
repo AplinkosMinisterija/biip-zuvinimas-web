@@ -9,6 +9,7 @@ import {
   TextField,
   Button,
   NumericTextField,
+  PhoneField,
 } from '@aplinkosministerija/design-system';
 import DefaultLayout from '../components/Layouts/Default';
 import Avatar from '../components/other/Avatar';
@@ -257,11 +258,10 @@ const NariaiPage = () => {
                       disabled={disabled}
                       error={errors.lastName}
                     />
-                    <NumericTextField
+                    <PhoneField
                       value={values.phone}
                       label={inputLabels.phone}
                       name="phone"
-                      placeholder="064222222"
                       onChange={(value) => setFieldValue('phone', value)}
                       disabled={disabled}
                       error={errors.phone}

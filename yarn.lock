@@ -81,10 +81,10 @@
   resolved "https://registry.yarnpkg.com/@aplinkosministerija/biip-prettier-config/-/biip-prettier-config-1.1.0.tgz#f62b0dde76107ab3f646cce2d54d02bd783ce388"
   integrity sha512-DxWGfBY2KuK8OgP2KUb96ieGlqE5gYuxI22Yt1FfoIldlDENW5I8kXj+YFB4iG65i7e1neXPZd9RGHmxxDxxSQ==
 
-"@aplinkosministerija/design-system@^1.1.5":
-  version "1.2.13"
-  resolved "https://registry.yarnpkg.com/@aplinkosministerija/design-system/-/design-system-1.2.13.tgz#f36764766d84946edf3edfb6e8a07f5782327de6"
-  integrity sha512-dRyIIEfe/OhTc2yMejXj2cUbWhg2I3Ruou/I4kd3NawUEvL2j5mdTTRU0eoqlCQnRvwmnyZnKfxbNVYYk82nfg==
+"@aplinkosministerija/design-system@^1.2.25":
+  version "1.2.25"
+  resolved "https://registry.yarnpkg.com/@aplinkosministerija/design-system/-/design-system-1.2.25.tgz#1cf789e690afc7d5b93a841947b8f8b460491a96"
+  integrity sha512-VO6lM7QeroPY5iYZsMfqpSbPx/dh1NdglmF5tPXk73CinsxWar3fmohS/18crFiIB5Pbwau9GfExRIDSdtkMqA==
   dependencies:
     "@mapbox/mapbox-gl-draw" "^1.4.3"
     "@mapbox/mapbox-gl-draw-static-mode" "^1.0.1"
@@ -4923,8 +4923,8 @@ lru-cache@^6.0.0:
     yallist "^4.0.0"
 
 lt-codes@ambrazasp/lt-codes:
-  version "1.0.0"
-  resolved "https://codeload.github.com/ambrazasp/lt-codes/tar.gz/a3dd47207f1f1a8cc94ecd300b59c0af189351bf"
+  version "1.0.3"
+  resolved "https://codeload.github.com/ambrazasp/lt-codes/tar.gz/9fbf85b126e9fd687afe34af7c99e0e951186c37"
   dependencies:
     moment "^2.29.4"
 
