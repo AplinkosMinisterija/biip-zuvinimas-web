@@ -6,7 +6,13 @@ import { LoginLayout } from '../components/Layouts/Login';
 import api from '../utils/api';
 import { handleAlert, handleUpdateTokens } from '../utils/functions';
 import { useCheckAuthMutation, useEGatesSign } from '../utils/hooks';
-import { buttonLabels, formLabels, inputLabels, validationTexts } from '../utils/texts';
+import {
+  buttonLabels,
+  descriptions,
+  formLabels,
+  inputLabels,
+  validationTexts,
+} from '../utils/texts';
 import { loginSchema } from '../utils/validations';
 
 interface LoginProps {
@@ -15,6 +21,8 @@ interface LoginProps {
 }
 
 export const Login = () => {
+  const isProdEnvironment = import.meta.env.VITE_ENVIRONMENT === 'production';
+
   const onSubmit = async ({ email, password }: { email: string; password: string }) => {
     const params = { email, password };
     loginMutation.mutateAsync(params);
@@ -70,50 +78,57 @@ export const Login = () => {
         }}
       >
         <H1>{formLabels.login}</H1>
-        <InnerContainer>
-          <TextField
-            label={inputLabels.email}
-            type="email"
-            value={values.email}
-            error={errors.email}
-            onChange={(e) => handleType('email', e)}
-          />
-          <PasswordField
-            label={inputLabels.password}
-            value={values.password}
-            error={errors.password}
-            onChange={(e) => handleType('password', e)}
-          />
-          <ButtonContainer>
-            <StyledButton loading={loading} type="submit" disabled={loading}>
-              {buttonLabels.login}
-            </StyledButton>
-          </ButtonContainer>
+        <Description>{descriptions.loginDescription}</Description>
+        {!isProdEnvironment && (
+          <>
+            <InnerContainer>
+              <TextField
+                label={inputLabels.email}
+                type="email"
+                value={values.email}
+                error={errors.email}
+                onChange={(e) => handleType('email', e)}
+              />
+              <PasswordField
+                label={inputLabels.password}
+                value={values.password}
+                error={errors.password}
+                onChange={(e) => handleType('password', e)}
+              />
+            </InnerContainer>
+            <ButtonContainer>
+              <Button loading={loading} type="submit" disabled={loading} width={'100%'}>
+                {buttonLabels.login}
+              </Button>
+            </ButtonContainer>
 
-          <OrContainer>
-            <Or>
-              <Separator />
-              <SeparatorLabelContainer>
-                <SeparatorLabel> {buttonLabels.or}</SeparatorLabel>
-              </SeparatorLabelContainer>
-            </Or>
-          </OrContainer>
-        </InnerContainer>
-        <StyledButton loading={eGatesSignLoading} type="button" onClick={() => eGatesMutation()}>
-          {buttonLabels.eLogin}
-        </StyledButton>
+            <OrContainer>
+              <Or>
+                <Separator />
+                <SeparatorLabelContainer>
+                  <SeparatorLabel> {buttonLabels.or}</SeparatorLabel>
+                </SeparatorLabelContainer>
+              </Or>
+            </OrContainer>
+          </>
+        )}
+        <ButtonContainer>
+          <Button
+            loading={eGatesSignLoading}
+            type="button"
+            onClick={() => eGatesMutation()}
+            width={'100%'}
+          >
+            {buttonLabels.eLogin}
+          </Button>
+        </ButtonContainer>
       </FormContainer>
     </LoginLayout>
   );
 };
 
-const StyledButton = styled(Button)`
-  width: 100%;
-  max-width: 300px;
-`;
-
 const ButtonContainer = styled.div`
-  margin-top: 40px;
+  margin: 2rem 0;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -125,7 +140,6 @@ const H1 = styled.h1`
   letter-spacing: 0px;
   color: #121a55;
   opacity: 1;
-  padding-bottom: 24px;
   @media only screen and (max-width: 1000px) {
     padding-bottom: 0px;
   }
@@ -137,7 +151,7 @@ const FormContainer = styled.form`
   max-width: 440px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const InnerContainer = styled.div`
@@ -146,6 +160,7 @@ const InnerContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 20px;
 `;
 
 const OrContainer = styled.div`
@@ -191,4 +206,12 @@ const Separator = styled.div`
   max-width: 400px;
   width: 100%;
   margin: 24px 0;
+`;
+
+const Description = styled.div`
+  font-size: 1.8rem;
+  letter-spacing: 0px;
+  color: ${({ theme }) => theme.colors.text.primary};
+  width: 100%;
+  margin-bottom: 2rem;
 `;
