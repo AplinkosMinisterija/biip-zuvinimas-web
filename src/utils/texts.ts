@@ -56,7 +56,7 @@ export const formLabels = {
   selectProfile: 'Pasirinkite paskyrą',
   stockingCustomer: 'ĮŽUVINIMO UŽSAKOVAS',
   stockingPerform: 'ĮŽUVINIMĄ ATLIKS',
-  login: 'Prisijungti',
+  login: 'Įžuvinimas',
   members: 'nariai',
   infoAboutFishes: 'INFORMACIJA APIE ŽUVIS',
   inActiveProfile: 'Anketa neaktyvi',
@@ -72,6 +72,7 @@ export const descriptions = {
   cantLoginTenantUser: 'Jeigu jungiatės kaip įmonės darbuotojas, susisiekite su savo įmonės vadovu',
   stockingsNotFound: 'Nėra sukurtų įžuvinimų',
   stockingsNotFoundbyFilter: 'Neradome įžuvinimų pagal pasirinktus filtrus',
+  loginDescription: 'Lietuvos vandens telkinių įžuvinimo informacinė sistema',
 };
 
 export const buttonsTitles = {
