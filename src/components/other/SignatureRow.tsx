@@ -1,11 +1,10 @@
 import { FieldArray } from 'formik';
 import { find } from 'lodash';
 import styled from 'styled-components';
-import { device } from '../../styles';
+import { ButtonColors, device } from '../../styles';
 import { useSignatureUsers } from '../../utils/hooks';
 import { buttonsTitles, inputLabels } from '../../utils/texts';
-import SimpleButton from '../buttons/SimpleButton';
-import { PhoneField } from '@aplinkosministerija/design-system';
+import { Button, PhoneField } from '@aplinkosministerija/design-system';
 import SuggestionsSelect from '../fields/SuggestionsSelect';
 import Icon from '../other/Icon';
 import SignatureField from './Signature';
@@ -114,7 +113,8 @@ const SignatureRow = ({
             );
           })}
           {!disabled && (
-            <SimpleButton
+            <AddButton
+              variant={ButtonColors.TRANSPARENT}
               onClick={() => {
                 arrayHelpers.push({
                   organization: '',
@@ -124,7 +124,7 @@ const SignatureRow = ({
               }}
             >
               {buttonsTitles.addSignature}
-            </SimpleButton>
+            </AddButton>
           )}
         </div>
       )}
@@ -162,6 +162,10 @@ const DeleteIcon = styled(Icon)`
   @media ${device.mobileL} {
     margin: 8px 0 16px 0;
   }
+`;
+
+const AddButton = styled(Button)`
+  padding: 4px 0;
 `;
 
 export default SignatureRow;
