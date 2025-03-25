@@ -31,6 +31,12 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
+  const checkIfMunicipalityExists = (item: any) => {
+    if (!item?.municipality?.id) {
+      return false;
+    }
+    return true;
+  };
   const handleReceivedMapMessage = async (event: any) => {
     const selected = event?.data?.mapIframeMsg?.userObjects;
     if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
@@ -49,15 +55,17 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           queryKey: ['locations', selected],
           queryFn: () => api.getLocations({ geom: selected }),
         });
+        const validItems = items.filter((item) => checkIfMunicipalityExists(item));
 
-        if (items.length === 1) {
-          onSave({ geom: postMessageGeom, data: items[0] });
+        if (validItems.length === 1) {
           setShowLocationPopup(false);
+          onSave({ geom: postMessageGeom, data: validItems[0] });
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-        } else if (items.length === 0) {
+        } else if (validItems.length === 0) {
           setLocations([]);
+          onSave({ geom: null, data: null });
         } else {
-          setLocations(items);
+          setLocations(validItems);
         }
         setLoading(false);
       }
