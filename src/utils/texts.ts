@@ -43,6 +43,7 @@ export const inputLabels = {
   email: 'Elektroninis paštas',
   noOptions: 'Nėra pasirinkimų',
   location: 'Žuvinimo vieta',
+  customerCheckbox: 'Pažymėkite, jei įžuvinimą atliekate kitos įmonės užsakymu',
 };
 
 export const buttonLabels = {
@@ -54,7 +55,6 @@ export const buttonLabels = {
 
 export const formLabels = {
   selectProfile: 'Pasirinkite paskyrą',
-  stockingCustomer: 'ĮŽUVINIMO UŽSAKOVAS',
   stockingPerform: 'ĮŽUVINIMĄ ATLIKS',
   login: 'Įžuvinimas',
   members: 'nariai',

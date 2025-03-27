@@ -1,27 +1,28 @@
 import { FieldArray } from 'formik';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { device } from '../../styles';
+import { ButtonColors, device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
 import { getLocationList, getTenantsList, handleAlert } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
 import { buttonsTitles, formLabels, inputLabels } from '../../utils/texts';
 import { FishStockingLocation, FishType } from '../../utils/types';
-import RadioOptions from '../buttons/RadioOptionts';
-import SimpleButton from '../buttons/SimpleButton';
 import {
   DatePicker,
   TextField,
   SelectField,
   AsyncSelectField,
   PhoneField,
+  CheckBox,
+  RadioOptions,
+  Button,
 } from '@aplinkosministerija/design-system';
 import LocationInput from '../fields/LocationInput';
 import TimePicker from '../fields/TimePicker';
 import FishRow from '../other/FishRow';
 import { fishOriginOptions } from '../../utils/options';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const RegistrationForm = ({
   values,
@@ -48,6 +49,7 @@ const RegistrationForm = ({
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
   const users = useAssignedToUsers();
+  const [isCustomerInformationVisible, setIsCustomerInformationVisible] = useState<boolean>(false);
 
   const { data, error: fishTypesError } = useQuery({
     queryKey: ['fishTypes'],
@@ -57,6 +59,10 @@ const RegistrationForm = ({
   useEffect(() => {
     if (fishTypesError) handleAlert();
   }, [fishTypesError]);
+
+  useEffect(() => {
+    values.stockingCustomer && setIsCustomerInformationVisible(true);
+  }, [values]);
 
   const fishTypesFullList = data?.rows || [];
 
@@ -182,19 +188,34 @@ const RegistrationForm = ({
         </>
       )}
 
-      <Subheader>{formLabels.stockingCustomer}</Subheader>
-      <Row>
-        <AsyncSelectField
-          label="Įmonės pavadinimas"
-          name="stockingCustomer"
-          loadOptions={(input: string, page: number) => getTenantsList(input, page)}
-          getOptionLabel={(option: any) => option?.name}
-          value={values.stockingCustomer}
-          error={errors.stockingCustomer}
-          onChange={(value: any) => setFieldValue('stockingCustomer', value)}
+      <CheckBoxRow>
+        <CheckBox
+          label={inputLabels.customerCheckbox}
           disabled={disabled}
+          onChange={(val) => {
+            setIsCustomerInformationVisible(val);
+            if (!val) {
+              setFieldValue('stockingCustomer', undefined);
+            }
+          }}
+          value={isCustomerInformationVisible}
         />
-      </Row>
+      </CheckBoxRow>
+      {isCustomerInformationVisible && (
+        <Row>
+          <AsyncSelectField
+            label="Nurodykite užsakovo įmonės pavadinimą"
+            name="stockingCustomer"
+            loadOptions={(input: string, page: number) => getTenantsList(input, page)}
+            getOptionLabel={(option: any) => option?.name}
+            value={values.stockingCustomer}
+            error={errors.stockingCustomer}
+            onChange={(value: any) => setFieldValue('stockingCustomer', value)}
+            disabled={disabled}
+          />
+        </Row>
+      )}
+
       <FieldArray
         name="batches"
         render={(arrayHelpers) => (
@@ -222,13 +243,14 @@ const RegistrationForm = ({
               );
             })}
             {!disabled && (
-              <SimpleButton
+              <AddButton
+                variant={ButtonColors.TRANSPARENT}
                 onClick={() => {
                   arrayHelpers.push({});
                 }}
               >
                 {buttonsTitles.addFish}
-              </SimpleButton>
+              </AddButton>
             )}
           </div>
         )}
@@ -236,6 +258,12 @@ const RegistrationForm = ({
     </>
   );
 };
+
+const CheckBoxRow = styled.div`
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+`;
 
 const Row = styled.div`
   display: grid;
@@ -258,7 +286,7 @@ const TimeRow = styled.div`
 const Subheader = styled.div`
   font-size: 1.4rem;
   font-weight: bold;
-  margin-top: 12px;
+  margin-top: 18px;
   color: ${({ theme }) => theme.colors.tertiary};
 `;
 
@@ -273,6 +301,10 @@ const Link = styled.div`
   @media ${device.mobileL} {
     display: block;
   }
+`;
+
+const AddButton = styled(Button)`
+  padding: 4px 0;
 `;
 
 export default RegistrationForm;

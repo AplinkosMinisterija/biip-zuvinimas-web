@@ -93,7 +93,7 @@ const Row = styled.div<{ $showDelete: boolean }>`
   display: grid;
   align-items: center;
   grid-template-columns: 1fr 1fr 1fr 1fr ${({ $showDelete }) => ($showDelete ? '50px' : '')};
-  margin-bottom: 12px;
+  margin: 12px 0;
   gap: 12px;
   width: 100%;
   @media ${device.mobileL} {

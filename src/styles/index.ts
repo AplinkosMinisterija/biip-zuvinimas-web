@@ -30,7 +30,7 @@ export const theme: Theme = {
       [ButtonColors.TRANSPARENT]: {
         background: 'transparent',
         text: '#0b1f51',
-        border: '#0b1f51',
+        border: 'transparent',
         hover: 'transparent',
       },
       [ButtonColors.DANGER]: {
