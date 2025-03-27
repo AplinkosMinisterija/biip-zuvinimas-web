@@ -31,12 +31,6 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
-  const checkIfMunicipalityExists = (item: any) => {
-    if (!item?.municipality?.id) {
-      return false;
-    }
-    return true;
-  };
   const handleReceivedMapMessage = async (event: any) => {
     const selected = event?.data?.mapIframeMsg?.userObjects;
     if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
@@ -55,7 +49,9 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           queryKey: ['locations', selected],
           queryFn: () => api.getLocations({ geom: selected }),
         });
-        const validItems = items.filter((item) => checkIfMunicipalityExists(item));
+        const validItems = items.filter((item) => {
+          return !!item?.municipality?.id;
+        });
 
         if (validItems.length === 1) {
           setShowLocationPopup(false);
