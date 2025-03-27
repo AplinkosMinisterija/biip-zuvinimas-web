@@ -30,6 +30,7 @@ import Modal from '../other/Modal';
 import DeleteCard from '../other/DeleteCard';
 import { Button } from '@aplinkosministerija/design-system';
 import { isEmpty } from 'lodash';
+import LoaderComponent from '../other/LoaderComponent';
 
 const tabs = [
   { label: 'Registracijos duomenys', route: FishStockingStatus.UPCOMING },
@@ -39,7 +40,7 @@ const tabs = [
 const cookies = new Cookies();
 
 const Unfinished = () => {
-  const { fishStocking, isLoading, isError, isRepeating } = useFishStocking();
+  const { fishStocking, isRepeating, isFetching } = useFishStocking();
   const [showMap, setShowMap] = useState(false);
   const [queryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
@@ -216,7 +217,7 @@ const Unfinished = () => {
       geom,
       eventTime,
       location: location,
-      stockingCustomer: stockingCustomer?.id,
+      stockingCustomer: stockingCustomer?.id || null,
       fishOrigin: fishOrigin.toUpperCase(),
       ...(fishOrigin === 'CAUGHT' ? { fishOriginReservoir } : { fishOriginCompanyName }),
       phone: phone || undefined,
@@ -291,7 +292,9 @@ const Unfinished = () => {
     );
   };
 
-  return (
+  return loading || isFetching ? (
+    <LoaderComponent />
+  ) : (
     <>
       <Formik
         initialValues={initialValues}
