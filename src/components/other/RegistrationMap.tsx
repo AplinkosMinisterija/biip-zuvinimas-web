@@ -49,15 +49,19 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           queryKey: ['locations', selected],
           queryFn: () => api.getLocations({ geom: selected }),
         });
+        const validItems = items.filter((item) => {
+          return !!item?.municipality?.id;
+        });
 
-        if (items.length === 1) {
-          onSave({ geom: postMessageGeom, data: items[0] });
+        if (validItems.length === 1) {
           setShowLocationPopup(false);
+          onSave({ geom: postMessageGeom, data: validItems[0] });
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-        } else if (items.length === 0) {
+        } else if (validItems.length === 0) {
           setLocations([]);
+          onSave({ geom: null, data: null });
         } else {
-          setLocations(items);
+          setLocations(validItems);
         }
         setLoading(false);
       }
