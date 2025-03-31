@@ -237,6 +237,7 @@ export const useFishStocking = () => {
     data: fishStocking,
     isLoading,
     isError,
+    isFetching,
   } = useQuery({
     queryKey: ['fishStocking', id],
     queryFn: () => api.getFishStocking(fishStockingId),
@@ -246,6 +247,7 @@ export const useFishStocking = () => {
   return {
     fishStocking,
     isLoading,
+    isFetching,
     isError,
     isRepeating: !!repeat && fishStocking?.id.toString() === repeat,
   };
