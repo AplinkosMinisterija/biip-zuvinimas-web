@@ -1,4 +1,4 @@
-import { NumericTextField, SelectField } from '@aplinkosministerija/design-system';
+import { NumericField, SelectField } from '@aplinkosministerija/design-system';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { NewReviewFishRowProps } from '../../utils/types';
@@ -56,7 +56,7 @@ const NewReviewFishRow = ({
         showError={false}
         disabled={disabled}
       />
-      <NumericTextField
+      <NumericField
         name={`newBatches.${index}.reviewAmount`}
         value={reviewAmount}
         onChange={(e) => setFieldValue(`newBatches.${index}.reviewAmount`, e)}
@@ -68,7 +68,7 @@ const NewReviewFishRow = ({
         wholeNumber={true}
         returnNumber={true}
       />
-      <NumericTextField
+      <NumericField
         name={`newBatches.${index}.reviewWeight`}
         value={reviewWeight}
         onChange={(e) => setFieldValue(`newBatches.${index}.reviewWeight`, e)}
