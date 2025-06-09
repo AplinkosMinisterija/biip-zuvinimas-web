@@ -200,12 +200,10 @@ const Unfinished = () => {
       }),
       newBatches: newBatches.map((batch) => {
         return {
-          amount: batch?.reviewAmount || undefined,
-          weight: batch?.reviewWeight || undefined,
-          reviewAmount: batch.reviewAmount || undefined,
-          reviewWeight: batch.reviewWeight || undefined,
-          fishType: batch?.fishType?.id || undefined,
-          fishAge: batch?.fishAge?.id || undefined,
+          reviewAmount: batch?.reviewAmount,
+          reviewWeight: batch?.reviewWeight,
+          fishType: batch?.fishType?.id,
+          fishAge: batch?.fishAge?.id,
         };
       }),
     };
