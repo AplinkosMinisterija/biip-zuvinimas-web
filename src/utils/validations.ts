@@ -132,22 +132,24 @@ export const validateFishStockingReview = Yup.object().shape({
       reviewAmount: Yup.string().required(validationTexts.requireText),
     }),
   ),
-  newBatches: Yup.array().of(
-    Yup.object().shape({
-      fishType: Yup.object()
-        .required(validationTexts.requireSelect)
-        .shape({
-          id: Yup.number().required(validationTexts.requireText),
-        }),
-      fishAge: Yup.object()
-        .required(validationTexts.requireSelect)
-        .shape({
-          id: Yup.number().required(validationTexts.requireText),
-        }),
-      reviewAmount: Yup.string().required(validationTexts.requireText),
-      reviewWeight: Yup.number().notRequired(),
-    }),
-  ),
+  newBatches: Yup.array()
+    .of(
+      Yup.object().shape({
+        fishType: Yup.object()
+          .required(validationTexts.requireSelect)
+          .shape({
+            id: Yup.number().required(validationTexts.requireText),
+          }),
+        fishAge: Yup.object()
+          .required(validationTexts.requireSelect)
+          .shape({
+            id: Yup.number().required(validationTexts.requireText),
+          }),
+        reviewAmount: Yup.string().required(validationTexts.requireText),
+        reviewWeight: Yup.number().notRequired(),
+      }),
+    )
+    .notRequired(),
   signatures: Yup.array().of(
     Yup.object().shape({
       organization: Yup.string().required(validationTexts.requireText),
