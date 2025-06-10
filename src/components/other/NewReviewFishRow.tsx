@@ -61,7 +61,7 @@ const NewReviewFishRow = ({
         value={reviewAmount}
         onChange={(e) => setFieldValue(`newBatches.${index}.reviewAmount`, e)}
         label="Kiekis"
-        error={errors?.amount}
+        error={errors?.reviewAmount}
         showError={false}
         right={<InputInnerLabel>vnt</InputInnerLabel>}
         disabled={disabled}
@@ -74,7 +74,7 @@ const NewReviewFishRow = ({
         onChange={(e) => setFieldValue(`newBatches.${index}.reviewWeight`, e)}
         label="Bendras svoris (Neprivaloma)"
         showError={false}
-        error={errors?.weight}
+        error={errors?.reviewWeight}
         wholeNumber={false}
         right={<InputInnerLabel>kg</InputInnerLabel>}
         disabled={disabled}
