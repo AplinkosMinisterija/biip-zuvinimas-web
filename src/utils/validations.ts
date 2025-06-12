@@ -1,9 +1,9 @@
+import { phoneNumberRegexPattern } from '@aplinkosministerija/design-system';
 import { personalCode } from 'lt-codes';
 import * as Yup from 'yup';
 import { FishOriginTypes } from './constants';
-import { validationTexts } from './texts';
-import { phoneNumberRegexPattern } from '@aplinkosministerija/design-system';
 import { checkIfDateIsAfter } from './functions';
+import { validationTexts } from './texts';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string().required(validationTexts.requireText).email(validationTexts.badEmailFormat),
@@ -132,6 +132,24 @@ export const validateFishStockingReview = Yup.object().shape({
       reviewAmount: Yup.string().required(validationTexts.requireText),
     }),
   ),
+  newBatches: Yup.array()
+    .of(
+      Yup.object().shape({
+        fishType: Yup.object()
+          .required(validationTexts.requireSelect)
+          .shape({
+            id: Yup.number().required(validationTexts.requireText),
+          }),
+        fishAge: Yup.object()
+          .required(validationTexts.requireSelect)
+          .shape({
+            id: Yup.number().required(validationTexts.requireText),
+          }),
+        reviewAmount: Yup.string().required(validationTexts.requireText),
+        reviewWeight: Yup.number().notRequired(),
+      }),
+    )
+    .notRequired(),
   signatures: Yup.array().of(
     Yup.object().shape({
       organization: Yup.string().required(validationTexts.requireText),

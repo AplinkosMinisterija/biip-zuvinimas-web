@@ -1,5 +1,4 @@
 import { FishOriginTypes, FishStockingStatus, RolesTypes } from './constants';
-import { FeatureCollection } from '@aplinkosministerija/design-system';
 export interface User {
   id: string;
   firstName: string;
@@ -203,6 +202,7 @@ export interface ReviewFormData {
     reviewAmount: number;
     reviewWeight?: number;
   }>;
+  newBatches: Array<FishBatch>;
 }
 
 export interface FishType {
@@ -237,6 +237,13 @@ export interface RegistrationFormFishRow {
   fishAge?: FishAge;
   amount?: number;
   weight?: number;
+}
+
+export interface NewReviewFishRowProps {
+  fishType?: FishType;
+  fishAge?: FishAge;
+  reviewAmount?: number;
+  reviewWeight?: number;
 }
 
 export type RegistrationFormValues = Omit<

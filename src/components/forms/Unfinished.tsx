@@ -1,23 +1,15 @@
+import { Button } from '@aplinkosministerija/design-system';
+import { useMediaQuery } from '@material-ui/core';
+import { useMutation } from '@tanstack/react-query';
+import { Form, Formik } from 'formik';
+import { isEmpty } from 'lodash';
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import Cookies from 'universal-cookie';
-import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
-import { RegistrationFormData, ReviewFormData } from '../../utils/types';
-import Registration from './Registration';
-import Review from './Review';
-import Map from '../other/RegistrationMap';
-import { Form, Formik } from 'formik';
-import { device } from '../../styles';
-import { useMediaQuery } from '@material-ui/core';
-import { buttonsTitles } from '../../utils/texts';
-import {
-  validateFishStocking,
-  validateFishStockingReview,
-  validateFreelancerFishStocking,
-} from '../../utils/validations';
 import { useAppSelector } from '../../state/hooks';
-import { useMutation } from '@tanstack/react-query';
+import { device } from '../../styles';
 import api from '../../utils/api';
+import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
 import {
   useCurrentLocation,
   useFishStocking,
@@ -25,12 +17,20 @@ import {
   useIsFreelancer,
   useSettings,
 } from '../../utils/hooks';
-import FishStockingPageTitle from '../other/PageTitle';
-import Modal from '../other/Modal';
+import { buttonsTitles } from '../../utils/texts';
+import { RegistrationFormData, ReviewFormData } from '../../utils/types';
+import {
+  validateFishStocking,
+  validateFishStockingReview,
+  validateFreelancerFishStocking,
+} from '../../utils/validations';
 import DeleteCard from '../other/DeleteCard';
-import { Button } from '@aplinkosministerija/design-system';
-import { isEmpty } from 'lodash';
 import LoaderComponent from '../other/LoaderComponent';
+import Modal from '../other/Modal';
+import FishStockingPageTitle from '../other/PageTitle';
+import Map from '../other/RegistrationMap';
+import Registration from './Registration';
+import Review from './Review';
 
 const tabs = [
   { label: 'Registracijos duomenys', route: FishStockingStatus.UPCOMING },
@@ -143,6 +143,7 @@ const Unfinished = () => {
     fishOrigin: fishStocking?.fishOrigin || FishOriginTypes.GROWN,
     location: fishStocking?.location || undefined,
     batches: initialBatches(),
+    newBatches: [],
     containerWaterTemp: isRepeating ? undefined : fishStocking?.containerWaterTemp || 0,
     waterTemp: isRepeating ? undefined : fishStocking?.waterTemp || 0,
     images: isRepeating ? undefined : fishStocking?.images || [],
@@ -177,6 +178,7 @@ const Unfinished = () => {
       waterTemp,
       batches,
       comment,
+      newBatches,
     } = values;
 
     const params: ReviewFormData = {
@@ -194,6 +196,14 @@ const Unfinished = () => {
           id: batch.id,
           reviewAmount: batch.reviewAmount,
           reviewWeight: batch.reviewWeight,
+        };
+      }),
+      newBatches: newBatches.map((batch) => {
+        return {
+          reviewAmount: batch?.reviewAmount,
+          reviewWeight: batch?.reviewWeight,
+          fishType: batch?.fishType?.id,
+          fishAge: batch?.fishAge?.id,
         };
       }),
     };

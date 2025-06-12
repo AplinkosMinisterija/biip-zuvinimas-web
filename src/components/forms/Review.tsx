@@ -1,14 +1,30 @@
+import {
+  Button,
+  NumericTextField,
+  TextAreaField,
+  TextField,
+} from '@aplinkosministerija/design-system';
+import { useQuery } from '@tanstack/react-query';
 import { FieldArray } from 'formik';
 import { isEmpty } from 'lodash';
 import styled from 'styled-components';
-import { device } from '../../styles';
+import { ButtonColors, device } from '../../styles';
 import api from '../../utils/api';
+import { useFishAges } from '../../utils/hooks';
+import { buttonsTitles } from '../../utils/texts';
 import PhotoUploadField from '../fields/PhotoUploadField';
-import { TextField, TextAreaField, NumericTextField } from '@aplinkosministerija/design-system';
 import ApproveFishRow from '../other/ApproveFishRow';
+import NewReviewFishRow from '../other/NewReviewFishRow';
 import SignatureRow from '../other/SignatureRow';
 
 const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) => {
+  const fishAges = useFishAges();
+
+  const { data } = useQuery({
+    queryKey: ['fishTypes'],
+    queryFn: () => api.getFishTypes(),
+  });
+
   return (
     <>
       <Row>
@@ -91,6 +107,44 @@ const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) 
           />
         </Row>
       )}
+      <FieldArray
+        name="newBatches"
+        render={(arrayHelpers) => (
+          <div>
+            {values?.newBatches?.map((item, index) => {
+              const fishErrors = errors.newBatches?.[index];
+              return (
+                <NewReviewFishRow
+                  key={`fish_row_${index}`}
+                  index={index}
+                  fishTypes={data?.rows || []}
+                  fishAges={fishAges}
+                  item={item}
+                  setFieldValue={(key, value) => {
+                    setFieldValue(key, value);
+                  }}
+                  handleDelete={(e) => {
+                    arrayHelpers.remove(e);
+                  }}
+                  showDelete={true}
+                  errors={fishErrors}
+                  disabled={disabled}
+                />
+              );
+            })}
+            {!disabled && (
+              <AddButton
+                variant={ButtonColors.TRANSPARENT}
+                onClick={() => {
+                  arrayHelpers.push({});
+                }}
+              >
+                {buttonsTitles.addFish}
+              </AddButton>
+            )}
+          </div>
+        )}
+      />
       <PhotoUploadField
         name={'images'}
         disabled={disabled}
@@ -132,6 +186,10 @@ const Review = ({ fishStocking, disabled, values, errors, setFieldValue }: any) 
     </>
   );
 };
+
+const AddButton = styled(Button)`
+  padding: 4px 0;
+`;
 
 const Row = styled.div`
   display: flex;
