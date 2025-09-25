@@ -40,7 +40,7 @@ const tabs = [
 const cookies = new Cookies();
 
 const Unfinished = () => {
-  const { fishStocking, isRepeating, isFetching } = useFishStocking();
+  const { fishStocking, isRepeating } = useFishStocking();
   const [showMap, setShowMap] = useState(false);
   const [queryString] = useState('');
   const isMobile = useMediaQuery(device.mobileL);
@@ -302,7 +302,7 @@ const Unfinished = () => {
     );
   };
 
-  return loading || isFetching ? (
+  return loading ? (
     <LoaderComponent />
   ) : (
     <>
