@@ -1,7 +1,7 @@
-import { inputLabels } from '../../utils/texts';
 import { AsyncSelectField } from '@aplinkosministerija/design-system';
+import * as turf from '@turf/turf';
+import { getUetkLocationList } from '../../utils/functions';
 import { FishStockingLocation } from '../../utils/types';
-import api from '../../utils/api';
 
 export interface LocationFieldProps {
   name?: string;
@@ -11,24 +11,48 @@ export interface LocationFieldProps {
   disabled?: boolean;
 }
 
+const getInputValue = (location: any) =>
+  location ? `${location?.name}, ${location?.cadastral_id || location?.cadastralId}` : '';
+
 const LocationField = ({ name, value, error, onChange, disabled }: LocationFieldProps) => {
   return (
     <AsyncSelectField
       name={name || 'location'}
-      label={inputLabels.location}
-      hasOptionKey={false}
       value={value}
-      error={error}
-      onChange={(e: FishStockingLocation) => {
-        onChange(e);
-      }}
-      getOptionLabel={(option: FishStockingLocation) =>
-        `${option.name} (${option.cadastral_id}) - ${option.municipality.name}`
-      }
-      loadOptions={(input: string, page: number) =>
-        api.getRecentLocations({ filter: { name: input }, page })
-      }
       disabled={disabled}
+      error={error}
+      label={'Pasirinkite vandens telkinį'}
+      onChange={(val) => {
+        const {
+          municipality,
+          municipalityCode,
+          length,
+          area,
+          name,
+          categoryTranslate,
+          cadastralId,
+          geom,
+        } = val;
+
+        const centroid = turf.pointOnFeature(geom);
+
+        const featureCollection = {
+          type: 'FeatureCollection',
+          features: [centroid],
+        };
+
+        onChange({
+          name,
+          geom: featureCollection,
+          length,
+          area,
+          category: categoryTranslate,
+          cadastral_id: cadastralId,
+          municipality: { name: municipality, id: municipalityCode },
+        });
+      }}
+      getOptionLabel={getInputValue}
+      loadOptions={(input: string, page: number | string) => getUetkLocationList(input, page)}
     />
   );
 };
