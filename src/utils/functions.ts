@@ -142,6 +142,28 @@ export const getLocationList = async (input: string, page: number) => {
   return await api.searchLocations({ search: input, page });
 };
 
+export const getUetkLocationList = async (input: string, page: any) => {
+  return await api.getUetkLocations({
+    search: input,
+    page,
+    populate: ['geom'],
+    query: {
+      category: {
+        $in: [
+          'RIVER',
+          'CANAL',
+          'INTERMEDIATE_WATER_BODY',
+          'TERRITORIAL_WATER_BODY',
+          'NATURAL_LAKE',
+          'PONDED_LAKE',
+          'POND',
+          'ISOLATED_WATER_BODY',
+        ],
+      },
+    },
+  });
+};
+
 export const getTenantsList = async (input: string, page: number) => {
   return await api.getTenants({
     filter: JSON.stringify({ name: input }),

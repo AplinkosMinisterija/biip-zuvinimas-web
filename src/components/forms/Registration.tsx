@@ -1,28 +1,28 @@
-import { FieldArray } from 'formik';
+import {
+  AsyncSelectField,
+  Button,
+  CheckBox,
+  DatePicker,
+  PhoneField,
+  RadioOptions,
+  SelectField,
+  TextField,
+} from '@aplinkosministerija/design-system';
 import { useQuery } from '@tanstack/react-query';
+import { FieldArray } from 'formik';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ButtonColors, device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
 import { getLocationList, getTenantsList, handleAlert } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
+import { fishOriginOptions } from '../../utils/options';
 import { buttonsTitles, formLabels, inputLabels } from '../../utils/texts';
 import { FishStockingLocation, FishType } from '../../utils/types';
-import {
-  DatePicker,
-  TextField,
-  SelectField,
-  AsyncSelectField,
-  PhoneField,
-  CheckBox,
-  RadioOptions,
-  Button,
-} from '@aplinkosministerija/design-system';
 import LocationInput from '../fields/LocationInput';
 import TimePicker from '../fields/TimePicker';
 import FishRow from '../other/FishRow';
-import { fishOriginOptions } from '../../utils/options';
-import { useEffect, useState } from 'react';
 
 const RegistrationForm = ({
   values,

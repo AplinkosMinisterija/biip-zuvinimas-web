@@ -14,7 +14,7 @@ interface GetAll {
   populate?: string[];
   municipalityId?: string;
   filter?: string | any;
-  query?: string;
+  query?: any;
   pageSize?: string;
   search?: string;
   searchFields?: string[];
@@ -79,6 +79,8 @@ interface Create {
 class Api {
   private AuthApiAxios: AxiosInstance;
   private uetkAxios: AxiosInstance;
+  private readonly riversLakesSearchUrl: string = `${import.meta.env.VITE_UETK_URL}/objects/search`;
+
   private readonly proxy: string = '/api';
 
   constructor() {
@@ -168,7 +170,7 @@ class Api {
     );
   };
 
-  getPublic = async ({ resource, id, ...rest }: GetAll) => {
+  getUetk = async ({ resource, id, ...rest }: GetAll) => {
     const config = this.getCommonConfigs(rest);
     return this.errorWrapper(() => this.uetkAxios.get(`${resource}${id ? `/${id}` : ''}`, config));
   };
@@ -463,6 +465,15 @@ class Api {
       populate: ['geometry'],
     });
   };
+
+  getUetkLocations = async ({ search, page, query, populate }: any): Promise<Location> =>
+    await this.getUetk({
+      resource: this.riversLakesSearchUrl,
+      query,
+      populate,
+      search,
+      page,
+    });
 }
 
 const api = new Api();
