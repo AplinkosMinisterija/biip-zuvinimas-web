@@ -1,6 +1,6 @@
+import { useMutation } from '@tanstack/react-query';
 import { isEqual } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import {
   Location,
   Navigate,
@@ -32,6 +32,7 @@ interface RouteProps {
 }
 
 function App() {
+  console.log(import.meta.env, "env's");
   const loggedIn = useAppSelector((state) => state.user.loggedIn);
   const profiles = useAppSelector((state) => state.user.userData.profiles);
   const [searchParams] = useSearchParams();
