@@ -6352,9 +6352,9 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lt-codes@ambrazasp/lt-codes:
-  version "1.0.3"
-  resolved "https://codeload.github.com/ambrazasp/lt-codes/tar.gz/9fbf85b126e9fd687afe34af7c99e0e951186c37"
+"lt-codes@github:AplinkosMinisterija/lt-codes#v1.1.2":
+  version "1.1.2"
+  resolved "https://codeload.github.com/AplinkosMinisterija/lt-codes/tar.gz/9938111ffa8212cfccda00938c5a502cd7f4bc97"
   dependencies:
     moment "^2.29.4"
 
