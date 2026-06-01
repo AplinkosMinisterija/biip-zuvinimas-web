@@ -171,6 +171,7 @@ const NariaiPage = () => {
                     <div key={user.id}>
                       <Card key={user.id}>
                         <InnerCardContainer
+                          data-testid="tenant-user-card"
                           onClick={() => {
                             setCurrentUser(user);
                             setOpen('form');
@@ -188,6 +189,7 @@ const NariaiPage = () => {
                         </InnerCardContainer>
 
                         <IconContainer
+                          data-testid="tenant-user-delete"
                           onClick={() => {
                             setCurrentUser(user);
                             setOpen('remove');

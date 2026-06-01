@@ -31,7 +31,7 @@ const FishRow = ({
 }: FishRowProps) => {
   const { fishType, fishAge, weight, amount } = item;
   return (
-    <Row $showDelete={showDelete}>
+    <Row data-testid="fish-batch-row" $showDelete={showDelete}>
       <SelectField
         name={`batches.${index}.fishType`}
         value={fishType}

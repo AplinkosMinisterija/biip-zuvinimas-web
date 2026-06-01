@@ -26,6 +26,7 @@ const UserSwitchMenu = () => {
   return (
     <Container tabIndex={1} onBlur={handleBlur}>
       <div
+        data-testid="profile-menu-trigger"
         onClick={() => {
           setShowSelect(!showSelect);
         }}
@@ -70,7 +71,7 @@ const UserSwitchMenu = () => {
             );
           })}
           <Hr />
-          <BottomRow onClick={() => mutateAsync()}>
+          <BottomRow data-testid="logout" onClick={() => mutateAsync()}>
             <StyledLogoutIcon name="exit" />
             <LogoutText>{buttonsTitles.logout}</LogoutText>
           </BottomRow>

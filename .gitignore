@@ -134,3 +134,11 @@ dist
 .idea
 
 eslint-results.sarif
+
+# E2E (Playwright)
+.env.e2e
+tests/e2e/.auth/
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/

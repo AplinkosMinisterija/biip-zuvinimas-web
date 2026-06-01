@@ -26,7 +26,7 @@ const EventItem = ({ fishStocking, onClick }: FishStockingItemProps) => {
   const fishStocker = fishStocking.reviewedBy || fishStocking.assignedTo || fishStocking.createdBy;
 
   return (
-    <Container onClick={onClick}>
+    <Container data-testid="fish-stocking-item" onClick={onClick}>
       <StatusContainer>
         <StatusIcon status={status} />
       </StatusContainer>
