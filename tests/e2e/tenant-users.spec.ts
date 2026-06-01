@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { clickButton, fillField, selectOption } from './helpers';
+import { clickButton, dsField, fillField, selectOption } from './helpers';
 
 // This whole area is gated behind USER_ADMIN / OWNER. If the logged-in profile
 // is not an admin, the route is filtered out and we get redirected away — every
@@ -41,8 +41,15 @@ test.describe('Tenant users', () => {
   test('can select a role in the invite modal', async ({ page }) => {
     await clickButton(page, 'Pridėti');
     await page.getByText('Pakviesti prisijungti prie įmonės').waitFor();
-    await selectOption(page, 'Rolė', 'Administratorius');
-    await expect(page.getByText('Administratorius')).toBeVisible();
+    // Open the role dropdown and confirm both options are offered.
+    await page.locator('[id="Rolė"]').click();
+    await expect(
+      dsField(page, 'Rolė').getByText('Administratorius', { exact: true }),
+    ).toBeVisible();
+    await expect(dsField(page, 'Rolė').getByText('Naudotojas', { exact: true })).toBeVisible();
+    // Pick one; the modal stays usable.
+    await dsField(page, 'Rolė').getByText('Administratorius', { exact: true }).click();
+    await expect(page.getByText('Pakviesti prisijungti prie įmonės')).toBeVisible();
   });
 
   test('cancel closes the modal', async ({ page }) => {
@@ -86,8 +93,8 @@ test.describe('Tenant users', () => {
     test.skip((await del.count()) === 0, 'No employees to delete.');
     await del.first().click();
     await expect(page.getByText('Ar norite pašalinti įmonės darbuotoją')).toBeVisible();
-    await clickButton(page, 'Ne', false).catch(async () => {
-      await page.getByText('Ne').first().click();
-    });
+    // DeleteCard's default decline label is "Atšaukti".
+    await clickButton(page, 'Atšaukti');
+    await expect(page.getByText('Ar norite pašalinti įmonės darbuotoją')).toBeHidden();
   });
 });

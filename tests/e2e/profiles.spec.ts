@@ -22,8 +22,8 @@ test.describe('Profile selection', () => {
       await expect(page.getByText('Atsijungti')).toBeVisible();
 
       const profile = creds.tenant
-        ? page.locator('a').filter({ hasText: creds.tenant }).first()
-        : page.locator('a').first();
+        ? page.getByTestId('profile-item').filter({ hasText: creds.tenant }).first()
+        : page.getByTestId('profile-item').first();
       await profile.click();
     }
 

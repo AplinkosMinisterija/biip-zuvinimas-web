@@ -44,63 +44,90 @@ export async function fillField(
   await input.fill(value);
 }
 
-/* ------------------------------------------------------------- antd select */
+/* ----------------------------------------------------- custom design-system select */
 
-/** The antd `.ant-select` control belonging to a labeled field. */
-export function antdSelect(scope: Page | Locator, label: string): Locator {
+// The design-system Select/MultiSelect/AsyncSelect are NOT antd. Each renders a
+// plain <input id="<label>"> plus a custom dropdown of <div> options inside the
+// field's `.fieldWrapperChildren`. Options carry no role, so we click them by
+// text — but SCOPED to the field wrapper, because the same text (e.g. a status)
+// can also appear in list items elsewhere on the page.
+
+/**
+ * The `.fieldWrapperChildren` element that contains a field's <input> AND its
+ * dropdown options. Scoping option clicks here avoids matching the same text
+ * (e.g. a status name) elsewhere on the page.
+ */
+export function dsField(scope: Page | Locator, label: string): Locator {
+  // `has` must be a page-rooted locator so its selector is matched RELATIVE to
+  // each .fieldWrapperChildren candidate. A scope-rooted locator (e.g. a
+  // getByTestId row) carries its prefix and matches nothing.
   return scope
-    .locator('div')
-    .filter({ has: scope.locator(`label:text-is("${esc(label)}")`) })
-    .filter({ has: scope.locator('.ant-select') })
-    .last()
-    .locator('.ant-select')
+    .locator('.fieldWrapperChildren')
+    .filter({ has: toPage(scope).locator(`[id="${esc(label)}"]`) })
     .first();
 }
 
-/** The currently-open antd dropdown (portal at body level). */
-const openDropdown = (page: Page): Locator =>
-  page.locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden)');
+/** The clickable option, by text, scoped to a field's dropdown. */
+const optionInField = (field: Locator, optionText: string): Locator =>
+  field.getByText(optionText, { exact: true });
 
-/** Open a select, type to filter (async selects), and pick an option by text. */
+/** Open a select and pick an option by visible text. */
 export async function selectOption(
   scope: Page | Locator,
   label: string,
   optionText: string,
 ): Promise<void> {
-  const page = toPage(scope);
-  const select = antdSelect(scope, label);
-  await select.locator('.ant-select-selector').click();
-  // Searchable selects focus a search input on open; type to filter.
-  await page.keyboard.type(optionText).catch(() => undefined);
-  const option = openDropdown(page).locator('.ant-select-item-option', { hasText: optionText });
-  await option.first().click();
+  const field = dsField(scope, label);
+  await inputByLabel(field, label).first().click();
+  await optionInField(field, optionText).first().click();
+}
+
+/** Read the first clickable option's text from an open field dropdown. */
+async function firstOptionText(field: Locator, timeout = 15_000): Promise<string> {
+  const deadline = timeout;
+  const start = await field.evaluate(() => performance.now());
+  // Poll the DOM until an option (cursor:pointer leaf with text) appears.
+  for (;;) {
+    const text = await field.evaluate((fwc) => {
+      const opts = Array.from(fwc.querySelectorAll('*')).filter(
+        (e) =>
+          e.children.length === 0 &&
+          (e.textContent || '').trim() &&
+          getComputedStyle(e).cursor === 'pointer',
+      );
+      return opts[0]?.textContent?.trim() || '';
+    });
+    if (text) return text;
+    const elapsed = (await field.evaluate(() => performance.now())) - start;
+    if (elapsed > deadline) return '';
+    await field.page().waitForTimeout(250);
+  }
 }
 
 /** Open a select and pick the FIRST available option (text unknown). */
 export async function selectFirstOption(scope: Page | Locator, label: string): Promise<string> {
-  const page = toPage(scope);
-  const select = antdSelect(scope, label);
-  await select.locator('.ant-select-selector').click();
-  const first = openDropdown(page).locator('.ant-select-item-option').first();
-  await first.waitFor({ state: 'visible', timeout: 15_000 });
-  const text = (await first.textContent())?.trim() || '';
-  await first.click();
+  const field = dsField(scope, label);
+  await inputByLabel(field, label).first().click();
+  const text = await firstOptionText(field);
+  if (text) await optionInField(field, text).first().click();
   return text;
 }
 
-/** Pick several options in an antd multi-select, then close it. */
+/** Pick several options in a multi-select, then close the dropdown. */
 export async function selectMultiOptions(
   scope: Page | Locator,
   label: string,
   optionTexts: string[],
 ): Promise<void> {
   const page = toPage(scope);
-  const select = antdSelect(scope, label);
-  await select.locator('.ant-select-selector').click();
+  const field = dsField(scope, label);
+  await inputByLabel(field, label).first().click();
   for (const text of optionTexts) {
-    await openDropdown(page).locator('.ant-select-item-option', { hasText: text }).first().click();
+    await optionInField(field, text).first().click();
   }
-  await page.keyboard.press('Escape');
+  // Tab blurs the field to close the option list WITHOUT closing a surrounding
+  // popup (Escape would close the whole filter popup).
+  await page.keyboard.press('Tab');
 }
 
 /** Type a query into an async select and pick the first loaded result. */
@@ -109,49 +136,44 @@ export async function searchAndPickFirst(
   label: string,
   query: string,
 ): Promise<string> {
-  const page = toPage(scope);
-  const select = antdSelect(scope, label);
-  await select.locator('.ant-select-selector').click();
-  await page.keyboard.type(query);
-  const first = openDropdown(page).locator('.ant-select-item-option').first();
-  await first.waitFor({ state: 'visible', timeout: 20_000 });
-  const text = (await first.textContent())?.trim() || '';
-  await first.click();
+  const field = dsField(scope, label);
+  const input = inputByLabel(field, label).first();
+  await input.click();
+  await input.fill(query);
+  const text = await firstOptionText(field, 20_000); // async options take a moment
+  if (text) await optionInField(field, text).first().click();
   return text;
 }
 
 /* ----------------------------------------------------------------- date */
 
 /**
- * Set a react-datepicker date field. Types yyyy-MM-dd when the input is
- * editable; otherwise opens the calendar and clicks an enabled day.
+ * Set a react-datepicker date field by opening its calendar and clicking an
+ * enabled day. `position` picks the first or last enabled day in the month
+ * (use 'first' for a "from" date and 'last' for a "to" date). Clicking a day
+ * auto-closes the calendar, avoiding overlap with the next field.
  */
 export async function pickDate(
   scope: Page | Locator,
   label: string,
-  isoDate: string,
+  position: 'first' | 'last' = 'last',
   index = 0,
 ): Promise<void> {
   const page = toPage(scope);
-  const input = inputByLabel(scope, label).nth(index);
-  await input.click();
-  const editable = await input
-    .evaluate((el) => !(el as HTMLInputElement).readOnly)
-    .catch(() => false);
-  if (editable) {
-    await input.fill(isoDate);
-    await page.keyboard.press('Enter');
-    await page.keyboard.press('Escape').catch(() => undefined);
-    return;
+  await inputByLabel(scope, label).nth(index).click();
+  const enabled =
+    '.react-datepicker__day:not(.react-datepicker__day--disabled):not(.react-datepicker__day--outside-month)';
+  let days = page.locator(enabled);
+  await days
+    .first()
+    .waitFor({ state: 'visible', timeout: 10_000 })
+    .catch(() => undefined);
+  if ((await days.count()) === 0) {
+    await page.locator('.react-datepicker__navigation--next').click();
+    await page.waitForTimeout(300);
+    days = page.locator(enabled);
   }
-  // Read-only input: pick an enabled day from the open calendar.
-  const day = page
-    .locator(
-      '.react-datepicker__day:not(.react-datepicker__day--disabled):not(.react-datepicker__day--outside-month)',
-    )
-    .last();
-  await day.waitFor({ state: 'visible', timeout: 10_000 });
-  await day.click();
+  await (position === 'first' ? days.first() : days.last()).click();
 }
 
 /** Pick the first available time from a TimePicker's inline time list. */

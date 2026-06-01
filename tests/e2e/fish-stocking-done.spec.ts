@@ -11,7 +11,9 @@ test.describe('Completed fish stocking (repeat)', () => {
     await page.goto('/zuvinimai');
     await page.waitForLoadState('networkidle');
 
-    // Filter to finished stockings so the first item is a completed one.
+    // Open the filter popup, then narrow to finished stockings.
+    await page.getByRole('button', { name: 'Filtrai' }).click();
+    await expect(page.getByText('Būsena')).toBeVisible();
     await selectMultiOptions(page, 'Būsena', ['Įžuvinta']);
     const waitList = page.waitForResponse('**/fishStockings**').catch(() => null);
     await clickButton(page, 'Filtruoti');

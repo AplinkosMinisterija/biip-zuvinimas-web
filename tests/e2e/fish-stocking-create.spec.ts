@@ -3,8 +3,6 @@ import {
   clickButton,
   expectError,
   fillField,
-  futureDate,
-  isoDate,
   pickDate,
   pickTime,
   searchAndPickFirst,
@@ -44,7 +42,7 @@ test.describe('Create fish stocking (registration)', () => {
     await searchAndPickFirst(page, 'Pasirinkite vandens telkinį', waterBodyQuery);
 
     // Date + time (must be scheduled ahead of the configured minimum lead time).
-    await pickDate(page, 'Data', isoDate(futureDate(14)));
+    await pickDate(page, 'Data', 'last');
     await pickTime(page, 'Laikas');
 
     // Fish origin defaults to "grown" -> fill the company name field.

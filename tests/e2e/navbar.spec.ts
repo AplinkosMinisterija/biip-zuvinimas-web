@@ -17,9 +17,9 @@ test.describe('Navbar & navigation', () => {
   });
 
   test('menu navigates to My profile', async ({ page }) => {
-    await page.getByText('Mano profilis').click();
+    await page.getByText('Mano profilis').first().click();
     await expect(page).toHaveURL(/\/mano-profilis/);
-    await expect(page.getByText('Mano profilis')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mano profilis' })).toBeVisible();
   });
 
   test('profile dropdown opens and shows the logout action', async ({ page }) => {

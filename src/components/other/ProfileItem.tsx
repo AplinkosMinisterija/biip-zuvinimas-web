@@ -18,7 +18,7 @@ const ProfileItem = ({ fisher, onClick }: FishStockerItemProps) => {
   const fullName = `${fisher.name} ${fisher.lastName}`;
 
   return (
-    <Container status={showStatus} onClick={() => onClick()}>
+    <Container data-testid="profile-item" status={showStatus} onClick={() => onClick()}>
       <StatusContainer>
         {showStatus ? <StatusMarker status={showStatus} /> : null}
         <StyledAvatar

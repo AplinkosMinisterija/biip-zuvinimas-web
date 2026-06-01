@@ -34,16 +34,21 @@ export async function loginViaUi(page: Page): Promise<void> {
  * when set, otherwise the first profile.
  */
 export async function selectProfile(page: Page): Promise<void> {
-  // Wait until we've either landed in the app or on the profile picker.
-  await page.waitForLoadState('networkidle');
-  if (!page.url().includes('/profiliai')) return;
+  // After submitting login the app first lands on the profile picker (or
+  // auto-redirects straight into the app for single-profile accounts).
+  await page.waitForURL(/\/(zuvinimai|profiliai)\b/, { timeout: 30_000 }).catch(() => undefined);
 
-  const items = page.locator('a');
-  const target = creds.tenant ? items.filter({ hasText: creds.tenant }).first() : items.first();
-  await expect(target).toBeVisible({ timeout: 15_000 });
-  await target.click();
-  // handleSelectProfile sets the profileId cookie and reloads the page.
-  await page.waitForLoadState('networkidle');
+  if (page.url().includes('/profiliai')) {
+    const items = page.getByTestId('profile-item');
+    const target = creds.tenant ? items.filter({ hasText: creds.tenant }).first() : items.first();
+    await target.click();
+    // handleSelectProfile sets the profileId cookie and reloads the page.
+  }
+
+  // Either path must end inside the app, off the login/profile routes.
+  await page.waitForURL((url) => !/\/(prisijungimas|profiliai)\b/.test(url.pathname), {
+    timeout: 30_000,
+  });
 }
 
 /** Full login + profile selection, ending in the authenticated app. */
