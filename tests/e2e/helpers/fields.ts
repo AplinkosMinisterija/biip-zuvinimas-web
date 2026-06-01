@@ -3,18 +3,20 @@
  * design-system fields. ALL fragile selector logic lives here so there is ONE
  * place to adjust if a control's DOM differs.
  *
- * What we learned by probing the live app + the design-system source:
+ * What we learned by probing the LIVE rendered DOM (not the source):
  *
- *  - Text fields (TextField / PasswordField / NumericTextField / PhoneField)
- *    are CUSTOM. They render <input id="<label text>">. The <label htmlFor> is
- *    intentionally NOT matched to the input id, so getByLabel() does NOT work.
- *    We target the input by `[id="<label>"]`.
+ *  - Every labeled control — text, select, multiselect, async-select AND date —
+ *    renders a plain <input id="<label text>">. The <label htmlFor> is
+ *    "field-<label>", which does NOT match the input id, so getByLabel() does
+ *    NOT work. We target the input by `[id="<label>"]`.
  *
- *  - Select / MultiSelect / AsyncSelect are antd v5 Selects. The dropdown is a
- *    body-level portal `.ant-select-dropdown` with `[role="option"]` items
- *    (class `.ant-select-item-option`). The trigger is `.ant-select-selector`.
+ *  - Selects are NOT antd in the DOM (no roles). Each opens a custom dropdown of
+ *    <div> options inside the field's `.fieldWrapperChildren`. Options carry no
+ *    role, so we click them by text, scoped to the field (the same text, e.g. a
+ *    status, can also appear in list items elsewhere).
  *
- *  - DatePicker is react-datepicker v6: an input we can type yyyy-MM-dd into.
+ *  - Date fields open a react-datepicker calendar; we click an enabled day.
+ *    Time fields open an inline react-datepicker time list.
  *
  *  - CheckBox / RadioOptions are custom: we click their visible label text.
  */
