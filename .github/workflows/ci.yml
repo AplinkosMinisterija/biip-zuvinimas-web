@@ -8,7 +8,7 @@ on:
 jobs:
   build-test:
     name: Build and test
-    runs-on: ubuntu-latest
+    runs-on: am-github-runner
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
 
   validate-docker-build:
     name: Validate if docker image builds
-    runs-on: ubuntu-latest
+    runs-on: am-github-runner
     steps:
       - uses: actions/checkout@v4
 
@@ -49,7 +49,7 @@ jobs:
 
   publish-preview:
     name: Publish preview
-    runs-on: ubuntu-latest
+    runs-on: am-github-runner
     if: github.event_name == 'pull_request'
     timeout-minutes: 10
     needs: build-test
