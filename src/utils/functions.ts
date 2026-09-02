@@ -88,6 +88,29 @@ export const handleUpdateTokens = (data: UpdateTokenProps) => {
   }
 };
 
+// A super admin opens this app from the admin panel with impersonation tokens in
+// the URL fragment (kept out of the query string so they never reach a server
+// log). The impersonator's selected profile must not carry over — the
+// impersonated user has a different profile list.
+export const consumeImpersonateTokenFromUrl = () => {
+  const hash = window.location.hash.replace(/^#/, '');
+  if (!hash) return;
+
+  const params = new URLSearchParams(hash);
+  const token = params.get('impersonate_token');
+  if (!token) return;
+
+  const refreshToken = params.get('impersonate_refresh_token') ?? undefined;
+
+  cookies.remove('profileId', { path: '/' });
+  // Impersonation issues a short-lived token with no refresh token. Leaving the
+  // previous session's refreshToken behind would silently restore that identity
+  // once the impersonated token expires.
+  if (!refreshToken) cookies.remove('refreshToken', { path: '/' });
+  handleUpdateTokens({ token, refreshToken });
+  window.history.replaceState(null, '', window.location.pathname + window.location.search);
+};
+
 export const emptyUser: UserReducerProps = {
   userData: {
     id: '',

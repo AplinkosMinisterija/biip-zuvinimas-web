@@ -15,6 +15,7 @@ import { ThemeProvider } from 'styled-components';
 import App from './App';
 import NetworkStatusIndicator from './components/other/NetworkStatusIndicator';
 import redux from './state/store';
+import { consumeImpersonateTokenFromUrl } from './utils/functions';
 import { GlobalStyle, theme } from './styles/index';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 const { store, persistor } = redux;
@@ -41,6 +42,10 @@ if (env.VITE_SENTRY_DSN) {
     tracePropagationTargets: [env.VITE_MAPS_HOST!],
   });
 }
+
+// Must run before the first render so the very first request already carries
+// the impersonated user's token.
+consumeImpersonateTokenFromUrl();
 
 root.render(
   <>
