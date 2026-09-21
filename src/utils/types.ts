@@ -259,11 +259,12 @@ export type RegistrationFormValues = Omit<
 export type Info = Array<Array<{ type: string; label: string; value: string }>>;
 
 export type FishStockingLocation = {
-  cadastral_id: string;
+  cadastral_id: string | null;
   name: string;
   municipality: { id: string; name: string };
   category: string;
   geom?: any;
   area?: number;
   length?: number;
+  source?: 'UETK' | 'PENDING' | 'GRPK_CANDIDATE';
 };

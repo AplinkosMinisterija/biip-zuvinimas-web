@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import { buttonsTitles, Url } from '../../utils/texts';
+import { buttonsTitles, locationTexts, Url } from '../../utils/texts';
 import Icon from './Icon';
 import { FishStockingLocation } from '../../utils/types';
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
-import { checkIfPointChanged, handleSuccess } from '../../utils/functions';
+import { checkIfPointChanged, handleAlert, handleSuccess } from '../../utils/functions';
 import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
@@ -26,9 +27,11 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const queryClient = useQueryClient();
   const [showLocationPopup, setShowLocationPopup] = useState(false);
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
+  const [candidate, setCandidate] = useState<FishStockingLocation | null>(null);
   const [geom, setGeom] = useState<any>();
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [requestingCandidate, setRequestingCandidate] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
   const handleReceivedMapMessage = async (event: any) => {
@@ -49,19 +52,20 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           queryKey: ['locations', selected],
           queryFn: () => api.getLocations({ geom: selected }),
         });
-        const validItems = items.filter((item) => {
-          return !!item?.municipality?.id;
-        });
+        const selectable = items.filter((item) => !!item?.municipality?.id && !!item?.cadastral_id);
+        const candidate = items.find((item) => item?.source === 'GRPK_CANDIDATE');
 
-        if (validItems.length === 1) {
+        if (selectable.length === 1) {
           setShowLocationPopup(false);
-          onSave({ geom: postMessageGeom, data: validItems[0] });
+          onSave({ geom: postMessageGeom, data: selectable[0] });
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-        } else if (validItems.length === 0) {
+        } else if (selectable.length === 0) {
+          setCandidate(candidate ?? null);
           setLocations([]);
           onSave({ geom: null, data: null });
         } else {
-          setLocations(validItems);
+          setCandidate(null);
+          setLocations(selectable);
         }
         setLoading(false);
       }
@@ -117,36 +121,80 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
             <ModalContainer>
               <>
                 <IconContainer
+                  type="button"
+                  aria-label={buttonsTitles.close}
                   onClick={() => {
                     setShowLocationPopup(false);
                     setLocations([]);
+                    setCandidate(null);
                   }}
                 >
                   <StyledIcon name="close" />
                 </IconContainer>
                 <ItemContainer>
-                  {locations.length === 0
-                    ? 'Nerastas telkinys'
-                    : locations?.map((location, index) => (
-                        <Item key={`${location.cadastral_id}_${index}`}>
-                          <TitleContainer>
-                            <Title>{location?.name}</Title>
-                            <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
-                          </TitleContainer>
-                          <PopupButton
-                            onClick={() => {
-                              if (onSave && geom) {
-                                onSave({ geom, data: location });
+                  {locations.length === 0 ? (
+                    candidate ? (
+                      <CandidateBlock>
+                        <Title>{candidate.name}</Title>
+                        <Description>{locationTexts.grpkCandidate}</Description>
+                        <PopupButton
+                          loading={requestingCandidate}
+                          disabled={requestingCandidate}
+                          onClick={async () => {
+                            if (!geom) return;
+                            setRequestingCandidate(true);
+                            try {
+                              const [x, y] = geom.features[0].geometry.coordinates;
+                              await api.requestPendingLocation({ x, y });
+                              handleSuccess(locationTexts.requested);
+                              setShowLocationPopup(false);
+                              setCandidate(null);
+                            } catch (e: unknown) {
+                              const errorType = isAxiosError(e)
+                                ? (e.response?.data as { type?: string } | undefined)?.type
+                                : undefined;
+                              handleAlert(errorType);
+                              // Stale map data — the point turned out to already be in
+                              // UETK. Close so the user's next click re-fetches fresh,
+                              // now-selectable data instead of retrying the same request.
+                              if (errorType === 'ALREADY_IN_UETK') {
                                 setShowLocationPopup(false);
+                                setCandidate(null);
                                 setLocations([]);
-                                handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
                               }
-                            }}
-                          >
-                            {buttonsTitles.select}
-                          </PopupButton>
-                        </Item>
-                      ))}
+                            } finally {
+                              setRequestingCandidate(false);
+                            }
+                          }}
+                        >
+                          {locationTexts.requestButton}
+                        </PopupButton>
+                      </CandidateBlock>
+                    ) : (
+                      locationTexts.notFound
+                    )
+                  ) : (
+                    locations?.map((location, index) => (
+                      <Item key={`${location.cadastral_id}_${index}`}>
+                        <TitleContainer>
+                          <Title>{location?.name}</Title>
+                          <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
+                        </TitleContainer>
+                        <PopupButton
+                          onClick={() => {
+                            if (onSave && geom) {
+                              onSave({ geom, data: location });
+                              setShowLocationPopup(false);
+                              setLocations([]);
+                              handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
+                            }
+                          }}
+                        >
+                          {buttonsTitles.select}
+                        </PopupButton>
+                      </Item>
+                    ))
+                  )}
                 </ItemContainer>
               </>
             </ModalContainer>
@@ -191,10 +239,11 @@ const Container = styled.div<{ $show?: boolean }>`
   }
 `;
 
-const IconContainer = styled.div`
+const IconContainer = styled.button`
   position: absolute;
   top: 5px;
   right: 5px;
+  cursor: pointer;
 `;
 
 const StyledIcon = styled(Icon)`
@@ -275,6 +324,12 @@ const Item = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+const CandidateBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const CloseWrapper = styled.div`

@@ -1,6 +1,14 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { isFinite } from 'lodash';
-import { FishStocking, FishType, RegistrationFormData, Tenant, TenantUser, User } from './types';
+import {
+  FishStocking,
+  FishStockingLocation,
+  FishType,
+  RegistrationFormData,
+  Tenant,
+  TenantUser,
+  User,
+} from './types';
 
 import { isEmpty } from 'lodash';
 import Cookies from 'universal-cookie';
@@ -301,6 +309,16 @@ class Api {
       geom,
       page,
     });
+
+  requestPendingLocation = async (params: {
+    x: number;
+    y: number;
+  }): Promise<FishStockingLocation> =>
+    await this.create({
+      resource: 'pendingLocations/request',
+      params,
+    });
+
   geUsersByTenant = async (): Promise<User[]> =>
     await this.getAll({
       resource: Resources.USERS,

@@ -26,6 +26,16 @@ export const validationTexts: any = {
   requireFiles: 'Privalote įkelti dokumentus',
   atLeastOneColumn: 'Turi būti pasirinktas bent vienas stulpelis',
   invalidEventTime: 'Pasirinkite teisingą datą',
+  ALREADY_IN_UETK:
+    'Šis telkinys jau įregistruotas UETK registre. Spustelėkite tą pačią vietą žemėlapyje dar kartą.',
+};
+
+export const locationTexts = {
+  notFound: 'Nerastas telkinys',
+  grpkCandidate: 'Šis telkinys dar neįregistruotas UETK registre.',
+  requestButton: 'Prašyti įtraukti telkinį',
+  requested:
+    'Prašymas pateiktas. Telkinį patvirtins Aplinkos apsaugos agentūra — tada galėsite registruoti žuvinimą.',
 };
 
 export const inputLabels = {
@@ -77,6 +87,7 @@ export const descriptions = {
 
 export const buttonsTitles = {
   select: 'Pasirinkti',
+  close: 'Uždaryti',
   excel: 'Atsisiųsti duomenis',
   yes: 'Taip',
   no: 'Ne',
