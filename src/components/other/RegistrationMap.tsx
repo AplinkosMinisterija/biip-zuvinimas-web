@@ -244,6 +244,15 @@ const IconContainer = styled.button`
   top: 5px;
   right: 5px;
   cursor: pointer;
+
+  /* The app's global "button { outline: none }" reset (src/styles/index.ts)
+     removes the default focus ring app-wide — a pre-existing issue out of
+     scope here. This restores a visible keyboard-focus indicator scoped to
+     just this control, without touching that global rule. */
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.secondary};
+    outline-offset: 2px;
+  }
 `;
 
 const StyledIcon = styled(Icon)`
@@ -359,6 +368,13 @@ const CloseButton = styled.div`
 
 const PopupButton = styled(Button)`
   width: fit-content;
+
+  /* Same scoped focus-visible restoration as IconContainer above — the
+     global reset removes it, this control needs it back on its own. */
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.secondary};
+    outline-offset: 2px;
+  }
 `;
 
 export default Map;
