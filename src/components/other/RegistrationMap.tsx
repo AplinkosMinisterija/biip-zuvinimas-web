@@ -47,7 +47,12 @@ const Map = ({
   const [manualMunicipality, setManualMunicipality] =
     useState<FishStockingLocation['municipality']>();
   const [geom, setGeom] = useState<GeomFeatureCollection>();
-  const resolvedPointRef = useRef<string | undefined>(undefined);
+  const lastResolvedRef = useRef<GeomFeatureCollection | undefined>(undefined);
+  // Set when our own onSave flips the form to manual (UETK knows nothing there).
+  const flippedToManualRef = useRef(false);
+  // The message listener is registered once and reads the current props here.
+  const latest = useRef({ manual, disabled, onSave, geom });
+  latest.current = { manual, disabled, onSave, geom };
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
@@ -59,23 +64,22 @@ const Map = ({
     });
 
   const resolvePoint = async (pointGeom: GeomFeatureCollection) => {
+    const { manual, disabled, onSave } = latest.current;
     if (disabled || !onSave) return;
+    // The map posts the same point several times per click.
+    if (!checkIfPointChanged(pointGeom, lastResolvedRef.current)) return;
+    lastResolvedRef.current = pointGeom;
     const selected = JSON.stringify(pointGeom);
     setLoading(true);
     setGeom(pointGeom);
     try {
-      // the user already said UETK does not list this water body, so looking the
-      // point up there would only overwrite the name they are typing
       if (manual) {
         const municipality = await resolveMunicipality(selected);
-        setManualMunicipality(municipality?.id ? municipality : undefined);
-        onSave({ geom: pointGeom, data: municipality?.id ? { name: '', municipality } : null });
-        if (municipality?.id) {
-          handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-        } else {
-          setLocations([]);
-          setShowLocationPopup(true);
-        }
+        onSave({
+          geom: pointGeom,
+          data: { name: '', municipality: municipality?.id ? municipality : undefined },
+        });
+        if (municipality?.id) handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
         return;
       }
 
@@ -94,11 +98,13 @@ const Map = ({
         const municipality = await resolveMunicipality(selected);
         setLocations([]);
         setManualMunicipality(municipality?.id ? municipality : undefined);
+        flippedToManualRef.current = !!municipality?.id;
         onSave({ geom: pointGeom, data: municipality?.id ? { name: '', municipality } : null });
       } else {
         setLocations(validItems);
       }
     } catch (e) {
+      lastResolvedRef.current = undefined;
       setShowLocationPopup(false);
     } finally {
       setLoading(false);
@@ -107,9 +113,9 @@ const Map = ({
 
   const handleReceivedMapMessage = async (event: MessageEvent) => {
     const selected = getUserObjects(event);
-    if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+    if (!selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
     const postMessageGeom = parseGeom(selected);
-    if (!postMessageGeom || !checkIfPointChanged(postMessageGeom, geom)) return;
+    if (!postMessageGeom || !checkIfPointChanged(postMessageGeom, latest.current.geom)) return;
     await resolvePoint(postMessageGeom);
   };
 
@@ -118,12 +124,27 @@ const Map = ({
     return () => {
       window.removeEventListener('message', handleReceivedMapMessage);
     };
-  }, [geom, disabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // The user opting out of UETK drops the selection list; the point is picked again.
+  useEffect(() => {
+    if (!manual) return;
+    if (flippedToManualRef.current) {
+      flippedToManualRef.current = false;
+      return;
+    }
+    closeLocationPopup();
+    setGeom(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manual]);
 
   const closeLocationPopup = () => {
     setShowLocationPopup(false);
     setLocations([]);
     setManualMunicipality(undefined);
+    // without this, clicking the same spot again would be deduped away
+    lastResolvedRef.current = undefined;
   };
 
   const handleChangedValue = () => {
@@ -139,16 +160,8 @@ const Map = ({
     }
   }, [value, iframeRef]);
 
-  // coordinates typed by hand arrive on their own prop, so loading a saved
-  // stocking never re-resolves and overwrites its water body
   useEffect(() => {
-    if (!resolveGeom) return;
-    const point = JSON.stringify(resolveGeom);
-    if (resolvedPointRef.current === point) return;
-    resolvedPointRef.current = point;
-    resolvePoint(resolveGeom);
-    // resolvePoint closes over onSave, which the parent passes inline; listing it
-    // would re-run this on every parent render. The ref above is the real guard.
+    if (resolveGeom) resolvePoint(resolveGeom);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolveGeom]);
 
