@@ -15,7 +15,7 @@ import styled from 'styled-components';
 import { ButtonColors, device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
-import { getTenantsList, handleAlert } from '../../utils/functions';
+import { getTenantsList, handleAlert, isManualLocation } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
 import { fishOriginOptions } from '../../utils/options';
 import { buttonsTitles, formLabels, inputLabels } from '../../utils/texts';
@@ -97,7 +97,9 @@ const RegistrationForm = ({
         disabled={disabled}
       />
       <Link onClick={onShowMap}>Žymėti žemėlapyje</Link>
-      <CoordinatesInput geom={geom} onChange={onCoordinatesChange} disabled={disabled} />
+      {isManualLocation(values.location) && (
+        <CoordinatesInput geom={geom} onChange={onCoordinatesChange} disabled={disabled} />
+      )}
       <TimeRow>
         <DatePicker
           label="Data"
