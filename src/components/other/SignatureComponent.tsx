@@ -1,4 +1,4 @@
-import { useMediaQuery } from '@material-ui/core';
+import { useMediaQuery } from '../../utils/hooks';
 import { useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import SignatureCanvas from 'react-signature-canvas';

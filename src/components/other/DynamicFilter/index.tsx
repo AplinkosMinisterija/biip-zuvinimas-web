@@ -1,4 +1,4 @@
-import { useMediaQuery } from '@material-ui/core';
+import { useMediaQuery } from '../../../utils/hooks';
 import { map } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';

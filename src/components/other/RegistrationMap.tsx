@@ -47,7 +47,7 @@ const Map = ({
   const [manualMunicipality, setManualMunicipality] =
     useState<FishStockingLocation['municipality']>();
   const [geom, setGeom] = useState<GeomFeatureCollection>();
-  const resolvedPointRef = useRef<string>();
+  const resolvedPointRef = useRef<string | undefined>(undefined);
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;

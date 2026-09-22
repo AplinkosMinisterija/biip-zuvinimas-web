@@ -269,10 +269,22 @@ export type GeomFeatureCollection = {
   features: GeomFeature[];
 };
 
+// Options come straight from the UETK service, in its own casing.
+export type UetkLocationOption = {
+  name?: string;
+  cadastralId?: string;
+  municipality?: string;
+  municipalityCode?: number;
+  categoryTranslate?: string;
+  area?: number;
+  length?: number;
+  geom?: GeomFeatureCollection;
+};
+
 export type FishStockingLocation = {
   cadastral_id?: string;
   name: string;
-  municipality?: { id: string; name: string };
+  municipality?: { id: string | number; name: string };
   category?: string;
   geom?: GeomFeatureCollection;
   area?: number;

@@ -1,4 +1,3 @@
-import { useMediaQuery } from '@material-ui/core';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -18,7 +17,7 @@ import { device } from '../styles';
 import api from '../utils/api';
 import { intersectionObserverConfig } from '../utils/configs';
 import { getFishStockingStatusOptions, mapFishStockingsRequestParams } from '../utils/functions';
-import { useFishTypes, useMunicipalities } from '../utils/hooks';
+import { useFishTypes, useMediaQuery, useMunicipalities } from '../utils/hooks';
 import { slugs } from '../utils/routes';
 import { buttonsTitles, descriptions, fishStockingsFiltersLabels } from '../utils/texts';
 import { FishStockingFilters, FishType, Municipality } from '../utils/types';

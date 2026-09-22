@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 import Cookies from 'universal-cookie';
@@ -17,9 +17,26 @@ import {
   isNew,
 } from './functions';
 import { routes, slugs } from './routes';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const cookies = new Cookies();
+
+export const useMediaQuery = (query: string) => {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const list = window.matchMedia(query);
+      list.addEventListener('change', onChange);
+      return () => list.removeEventListener('change', onChange);
+    },
+    [query],
+  );
+
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false,
+  );
+};
 
 export const useFilteredRoutes = () => {
   const profile = useGetCurrentProfile();
