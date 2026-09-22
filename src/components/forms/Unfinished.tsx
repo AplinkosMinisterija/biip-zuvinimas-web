@@ -19,7 +19,7 @@ import {
   useSettings,
 } from '../../utils/hooks';
 import { buttonsTitles } from '../../utils/texts';
-import { RegistrationFormData, ReviewFormData } from '../../utils/types';
+import { GeomFeatureCollection, RegistrationFormData, ReviewFormData } from '../../utils/types';
 import {
   validateFishStocking,
   validateFishStockingReview,
@@ -48,6 +48,7 @@ const Unfinished = () => {
   const iframeRef = useRef<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [geom, setGeom] = useState(fishStocking?.geom);
+  const [typedGeom, setTypedGeom] = useState<GeomFeatureCollection>();
   const { minTime, loading } = useSettings();
   const isFreelancer = useIsFreelancer();
   const user = useAppSelector((state) => state?.user?.userData);
@@ -293,6 +294,11 @@ const Unfinished = () => {
         errors={errors}
         values={values}
         isCustomer={isCustomer}
+        geom={geom}
+        onCoordinatesChange={(value: GeomFeatureCollection) => {
+          setGeom(value);
+          setTypedGeom(value);
+        }}
         setFieldValue={setFieldValue}
         setValues={setValues}
         submitLoading={submitLoading}
@@ -362,6 +368,8 @@ const Unfinished = () => {
               </StyledForm>
               <Map
                 iframeRef={iframeRef}
+                manual={isManualLocation(values.location)}
+                resolveGeom={typedGeom}
                 showMobileMap={showMap}
                 onClose={() => {
                   setShowMap(false);

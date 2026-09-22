@@ -7,9 +7,15 @@ import Cookies from 'universal-cookie';
 import { FilterConfig } from '../components/other/DynamicFilter/Filter';
 import { UserReducerProps } from '../state/user/reducer';
 import api from './api';
-import { FishStockingStatus } from './constants';
+import { FishStockingStatus, LKS94_BOUNDS } from './constants';
 import { fishStockingStatusLabels, validationTexts } from './texts';
-import { FishStockingFilters, FishStockingParams, Profile, ProfileId } from './types';
+import {
+  FishStockingFilters,
+  FishStockingParams,
+  GeomFeatureCollection,
+  Profile,
+  ProfileId,
+} from './types';
 
 interface SetResponseProps {
   endpoint: () => Promise<any>;
@@ -161,6 +167,43 @@ export const handleSetProfile = (profiles?: Profile[]) => {
   }
 };
 
+export const isGeomFeatureCollection = (value: unknown): value is GeomFeatureCollection => {
+  if (typeof value !== 'object' || value === null) return false;
+  return Array.isArray((value as { features?: unknown }).features);
+};
+
+// postMessage payloads cross a trust boundary, so the parsed value is narrowed
+// before anything treats it as a geometry
+export const parseGeom = (value: string): GeomFeatureCollection | undefined => {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return isGeomFeatureCollection(parsed) ? parsed : undefined;
+  } catch (e) {
+    return undefined;
+  }
+};
+
+export const geomToLks94 = (geom?: GeomFeatureCollection): { x?: number; y?: number } => {
+  const coordinates = geom?.features?.[0]?.geometry?.coordinates;
+  if (!Array.isArray(coordinates) || coordinates.length < 2) return {};
+  return { x: coordinates[0], y: coordinates[1] };
+};
+
+export const isInsideLithuania = (x?: number, y?: number) =>
+  typeof x === 'number' &&
+  typeof y === 'number' &&
+  x >= LKS94_BOUNDS.x.min &&
+  x <= LKS94_BOUNDS.x.max &&
+  y >= LKS94_BOUNDS.y.min &&
+  y <= LKS94_BOUNDS.y.max;
+
+// The map speaks the same LKS-94 metres the geom column stores, so the fields
+// map straight onto the geometry with no reprojection.
+export const lks94ToGeom = (x: number, y: number): GeomFeatureCollection => ({
+  type: 'FeatureCollection',
+  features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [x, y] } }],
+});
+
 export const isManualLocation = (location?: { cadastral_id?: string }) =>
   !!location && !location.cadastral_id;
 
@@ -286,7 +329,10 @@ export const checkIfDateIsAfter = (value: Date | undefined, minTime: number) => 
   return selectedDate && selectedDate > minDate;
 };
 
-export const checkIfPointChanged = (geom1, geom2) => {
+export const checkIfPointChanged = (
+  geom1?: GeomFeatureCollection,
+  geom2?: GeomFeatureCollection,
+) => {
   const coordinates1 = geom1?.features?.[0]?.geometry?.coordinates?.map((num) =>
     Math.trunc(num),
   ) || [0, 0];

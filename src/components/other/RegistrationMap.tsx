@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { buttonsTitles, mapTexts, Url } from '../../utils/texts';
 import Icon from './Icon';
-import { FishStockingLocation } from '../../utils/types';
+import { FishStockingLocation, GeomFeatureCollection } from '../../utils/types';
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
-import { checkIfPointChanged, handleSuccess } from '../../utils/functions';
+import { checkIfPointChanged, handleSuccess, parseGeom } from '../../utils/functions';
 import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
@@ -16,69 +16,101 @@ export interface MapProps {
   onClose?: () => void;
   error?: string;
   queryString?: string;
+  manual?: boolean;
+  resolveGeom?: GeomFeatureCollection;
   value?: any;
   iframeRef: any;
   disabled?: boolean;
   showMobileMap?: boolean;
 }
 
-const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMap }: MapProps) => {
+const getUserObjects = (event: MessageEvent): string | undefined => {
+  const data = event.data as { mapIframeMsg?: { userObjects?: unknown } } | undefined;
+  const userObjects = data?.mapIframeMsg?.userObjects;
+  return typeof userObjects === 'string' ? userObjects : undefined;
+};
+
+const Map = ({
+  height,
+  onSave,
+  onClose,
+  value,
+  iframeRef,
+  disabled,
+  manual,
+  resolveGeom,
+  showMobileMap,
+}: MapProps) => {
   const queryClient = useQueryClient();
   const [showLocationPopup, setShowLocationPopup] = useState(false);
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
   const [manualMunicipality, setManualMunicipality] =
     useState<FishStockingLocation['municipality']>();
-  const [geom, setGeom] = useState<any>();
+  const [geom, setGeom] = useState<GeomFeatureCollection>();
+  const resolvedPointRef = useRef<string>();
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
 
-  const handleReceivedMapMessage = async (event: any) => {
-    const selected = event?.data?.mapIframeMsg?.userObjects;
-    if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+  const resolveMunicipality = (selected: string) =>
+    queryClient.fetchQuery({
+      queryKey: ['municipality', selected],
+      queryFn: () => api.getMunicipality({ geom: selected }),
+    });
+
+  const resolvePoint = async (pointGeom: GeomFeatureCollection) => {
+    if (disabled || !onSave) return;
+    const selected = JSON.stringify(pointGeom);
+    setLoading(true);
+    setGeom(pointGeom);
     try {
-      const postMessageGeom = JSON.parse(selected);
-
-      if (!postMessageGeom) return;
-
-      const geomChanged = checkIfPointChanged(postMessageGeom, geom);
-      if (geomChanged) {
-        setLoading(true);
-        setShowLocationPopup(true);
-        setGeom(postMessageGeom);
-
-        const items = await queryClient.fetchQuery({
-          queryKey: ['locations', selected],
-          queryFn: () => api.getLocations({ geom: selected }),
-        });
-        const validItems = items.filter((item) => {
-          return !!item?.municipality?.id;
-        });
-
-        if (validItems.length === 1) {
-          setShowLocationPopup(false);
-          onSave({ geom: postMessageGeom, data: validItems[0] });
+      // the user already said UETK does not list this water body, so looking the
+      // point up there would only overwrite the name they are typing
+      if (manual) {
+        const municipality = await resolveMunicipality(selected);
+        setManualMunicipality(municipality?.id ? municipality : undefined);
+        onSave({ geom: pointGeom, data: municipality?.id ? { name: '', municipality } : null });
+        if (municipality?.id) {
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-        } else if (validItems.length === 0) {
-          const municipality = await queryClient.fetchQuery({
-            queryKey: ['municipality', selected],
-            queryFn: () => api.getMunicipality({ geom: selected }),
-          });
-          setLocations([]);
-          setManualMunicipality(municipality?.id ? municipality : undefined);
-          onSave({
-            geom: postMessageGeom,
-            data: municipality?.id ? { name: '', municipality } : null,
-          });
         } else {
-          setLocations(validItems);
+          setLocations([]);
+          setShowLocationPopup(true);
         }
+        return;
+      }
+
+      setShowLocationPopup(true);
+      const items = await queryClient.fetchQuery({
+        queryKey: ['locations', selected],
+        queryFn: () => api.getLocations({ geom: selected }),
+      });
+      const validItems = items.filter((item) => !!item?.municipality?.id);
+
+      if (validItems.length === 1) {
+        setShowLocationPopup(false);
+        onSave({ geom: pointGeom, data: validItems[0] });
+        handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
+      } else if (validItems.length === 0) {
+        const municipality = await resolveMunicipality(selected);
+        setLocations([]);
+        setManualMunicipality(municipality?.id ? municipality : undefined);
+        onSave({ geom: pointGeom, data: municipality?.id ? { name: '', municipality } : null });
+      } else {
+        setLocations(validItems);
       }
     } catch (e) {
       setShowLocationPopup(false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReceivedMapMessage = async (event: MessageEvent) => {
+    const selected = getUserObjects(event);
+    if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+    const postMessageGeom = parseGeom(selected);
+    if (!postMessageGeom || !checkIfPointChanged(postMessageGeom, geom)) return;
+    await resolvePoint(postMessageGeom);
   };
 
   useEffect(() => {
@@ -106,6 +138,19 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       handleChangedValue();
     }
   }, [value, iframeRef]);
+
+  // coordinates typed by hand arrive on their own prop, so loading a saved
+  // stocking never re-resolves and overwrites its water body
+  useEffect(() => {
+    if (!resolveGeom) return;
+    const point = JSON.stringify(resolveGeom);
+    if (resolvedPointRef.current === point) return;
+    resolvedPointRef.current = point;
+    resolvePoint(resolveGeom);
+    // resolvePoint closes over onSave, which the parent passes inline; listing it
+    // would re-run this on every parent render. The ref above is the real guard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolveGeom]);
 
   const renderNotFound = () => (
     <NotFoundContainer>

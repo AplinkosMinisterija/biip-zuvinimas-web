@@ -15,11 +15,12 @@ import styled from 'styled-components';
 import { ButtonColors, device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
-import { getTenantsList, handleAlert } from '../../utils/functions';
+import { getTenantsList, handleAlert, isManualLocation } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
 import { fishOriginOptions } from '../../utils/options';
 import { buttonsTitles, formLabels, inputLabels } from '../../utils/texts';
-import { FishStockingLocation, FishType } from '../../utils/types';
+import { FishStockingLocation, FishType, GeomFeatureCollection } from '../../utils/types';
+import CoordinatesInput from '../fields/CoordinatesInput';
 import LocationInput from '../fields/LocationInput';
 import ReservoirInput from '../fields/ReservoirInput';
 import TimePicker from '../fields/TimePicker';
@@ -31,6 +32,8 @@ const RegistrationForm = ({
   setFieldValue,
   setValues,
   isCustomer,
+  geom,
+  onCoordinatesChange,
   setGeom,
   disabled,
   onShowMap,
@@ -42,6 +45,8 @@ const RegistrationForm = ({
   setValues: any;
   isCustomer: boolean;
   submitLoading: boolean;
+  geom?: GeomFeatureCollection;
+  onCoordinatesChange: (geom: GeomFeatureCollection) => void;
   setGeom: (geom: any) => void;
   disabled: boolean;
   onShowMap: () => void;
@@ -92,6 +97,9 @@ const RegistrationForm = ({
         disabled={disabled}
       />
       <Link onClick={onShowMap}>Žymėti žemėlapyje</Link>
+      {isManualLocation(values.location) && (
+        <CoordinatesInput geom={geom} onChange={onCoordinatesChange} disabled={disabled} />
+      )}
       <TimeRow>
         <DatePicker
           label="Data"
