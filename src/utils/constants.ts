@@ -1,3 +1,10 @@
+// LKS-94 (EPSG:3346) bounds of Lithuania, in metres. The easting and northing
+// ranges do not overlap, so a swapped pair is always caught.
+export const LKS94_BOUNDS = {
+  x: { min: 280000, max: 700000 },
+  y: { min: 5960000, max: 6280000 },
+};
+
 export enum RolesTypes {
   USER = 'USER',
   USER_ADMIN = 'USER_ADMIN',
