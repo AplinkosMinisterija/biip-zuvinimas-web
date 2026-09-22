@@ -258,12 +258,23 @@ export type RegistrationFormValues = Omit<
 
 export type Info = Array<Array<{ type: string; label: string; value: string }>>;
 
+export type GeomFeature = {
+  type: string;
+  properties?: Record<string, unknown> | null;
+  geometry: { type: string; coordinates: number[] };
+};
+
+export type GeomFeatureCollection = {
+  type: string;
+  features: GeomFeature[];
+};
+
 export type FishStockingLocation = {
   cadastral_id?: string;
   name: string;
   municipality?: { id: string; name: string };
   category?: string;
-  geom?: any;
+  geom?: GeomFeatureCollection;
   area?: number;
   length?: number;
 };

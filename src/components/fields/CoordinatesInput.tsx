@@ -4,10 +4,11 @@ import styled from 'styled-components';
 import { device } from '../../styles';
 import { geomToLks94, isInsideLithuania, lks94ToGeom } from '../../utils/functions';
 import { inputLabels, validationTexts } from '../../utils/texts';
+import { GeomFeatureCollection } from '../../utils/types';
 
 export interface CoordinatesInputProps {
-  geom?: any;
-  onChange: (geom: any) => void;
+  geom?: GeomFeatureCollection;
+  onChange: (geom: GeomFeatureCollection) => void;
   disabled?: boolean;
 }
 

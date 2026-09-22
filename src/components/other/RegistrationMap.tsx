@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { device } from '../../styles';
 import { buttonsTitles, mapTexts, Url } from '../../utils/texts';
 import Icon from './Icon';
-import { FishStockingLocation } from '../../utils/types';
+import { FishStockingLocation, GeomFeatureCollection } from '../../utils/types';
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import { Button } from '@aplinkosministerija/design-system';
-import { checkIfPointChanged, handleSuccess } from '../../utils/functions';
+import { checkIfPointChanged, handleSuccess, parseGeom } from '../../utils/functions';
 import LoaderComponent from './LoaderComponent';
 
 export interface MapProps {
@@ -17,12 +17,18 @@ export interface MapProps {
   error?: string;
   queryString?: string;
   manual?: boolean;
-  resolveGeom?: any;
+  resolveGeom?: GeomFeatureCollection;
   value?: any;
   iframeRef: any;
   disabled?: boolean;
   showMobileMap?: boolean;
 }
+
+const getUserObjects = (event: MessageEvent): string | undefined => {
+  const data = event.data as { mapIframeMsg?: { userObjects?: unknown } } | undefined;
+  const userObjects = data?.mapIframeMsg?.userObjects;
+  return typeof userObjects === 'string' ? userObjects : undefined;
+};
 
 const Map = ({
   height,
@@ -40,7 +46,7 @@ const Map = ({
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
   const [manualMunicipality, setManualMunicipality] =
     useState<FishStockingLocation['municipality']>();
-  const [geom, setGeom] = useState<any>();
+  const [geom, setGeom] = useState<GeomFeatureCollection>();
   const resolvedPointRef = useRef<string>();
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -52,7 +58,7 @@ const Map = ({
       queryFn: () => api.getMunicipality({ geom: selected }),
     });
 
-  const resolvePoint = async (pointGeom: any) => {
+  const resolvePoint = async (pointGeom: GeomFeatureCollection) => {
     if (disabled || !onSave) return;
     const selected = JSON.stringify(pointGeom);
     setLoading(true);
@@ -99,15 +105,10 @@ const Map = ({
     }
   };
 
-  const handleReceivedMapMessage = async (event: any) => {
-    const selected = event?.data?.mapIframeMsg?.userObjects;
+  const handleReceivedMapMessage = async (event: MessageEvent) => {
+    const selected = getUserObjects(event);
     if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
-    let postMessageGeom;
-    try {
-      postMessageGeom = JSON.parse(selected);
-    } catch (e) {
-      return;
-    }
+    const postMessageGeom = parseGeom(selected);
     if (!postMessageGeom || !checkIfPointChanged(postMessageGeom, geom)) return;
     await resolvePoint(postMessageGeom);
   };
