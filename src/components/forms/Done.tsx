@@ -73,7 +73,9 @@ const FishStockingCompleted = () => {
     [
       {
         type: 'info',
-        value: `${fishStocking.location?.name}, ${fishStocking.location?.cadastral_id}`,
+        value: [fishStocking.location?.name, fishStocking.location?.cadastral_id]
+          .filter(Boolean)
+          .join(', '),
         label: 'Telkinys',
       },
       {

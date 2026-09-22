@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
-import { buttonsTitles, Url } from '../../utils/texts';
+import { buttonsTitles, mapTexts, Url } from '../../utils/texts';
 import Icon from './Icon';
 import { FishStockingLocation } from '../../utils/types';
 import { useQueryClient } from '@tanstack/react-query';
@@ -26,6 +26,8 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const queryClient = useQueryClient();
   const [showLocationPopup, setShowLocationPopup] = useState(false);
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
+  const [manualMunicipality, setManualMunicipality] =
+    useState<FishStockingLocation['municipality']>();
   const [geom, setGeom] = useState<any>();
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -58,15 +60,24 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           onSave({ geom: postMessageGeom, data: validItems[0] });
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
         } else if (validItems.length === 0) {
+          const municipality = await queryClient.fetchQuery({
+            queryKey: ['municipality', selected],
+            queryFn: () => api.getMunicipality({ geom: selected }),
+          });
           setLocations([]);
-          onSave({ geom: null, data: null });
+          setManualMunicipality(municipality?.id ? municipality : undefined);
+          onSave({
+            geom: postMessageGeom,
+            data: municipality?.id ? { name: '', municipality } : null,
+          });
         } else {
           setLocations(validItems);
         }
-        setLoading(false);
       }
     } catch (e) {
-      return;
+      setShowLocationPopup(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,6 +87,12 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       window.removeEventListener('message', handleReceivedMapMessage);
     };
   }, [geom, disabled]);
+
+  const closeLocationPopup = () => {
+    setShowLocationPopup(false);
+    setLocations([]);
+    setManualMunicipality(undefined);
+  };
 
   const handleChangedValue = () => {
     if (value && checkIfPointChanged(value, geom)) {
@@ -89,6 +106,13 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       handleChangedValue();
     }
   }, [value, iframeRef]);
+
+  const renderNotFound = () => (
+    <NotFoundContainer>
+      <Title>{mapTexts.waterBodyNotFound}</Title>
+      {!!manualMunicipality && <Description>{mapTexts.enterWaterBodyManually}</Description>}
+    </NotFoundContainer>
+  );
 
   const renderContent = () => (
     <>
@@ -116,17 +140,12 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           ) : (
             <ModalContainer>
               <>
-                <IconContainer
-                  onClick={() => {
-                    setShowLocationPopup(false);
-                    setLocations([]);
-                  }}
-                >
+                <IconContainer onClick={closeLocationPopup}>
                   <StyledIcon name="close" />
                 </IconContainer>
                 <ItemContainer>
                   {locations.length === 0
-                    ? 'Nerastas telkinys'
+                    ? renderNotFound()
                     : locations?.map((location, index) => (
                         <Item key={`${location.cadastral_id}_${index}`}>
                           <TitleContainer>
@@ -259,6 +278,12 @@ const ItemContainer = styled.div`
 
 const Description = styled.div`
   font-size: 1.3rem;
+`;
+
+const NotFoundContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const TitleContainer = styled.div`

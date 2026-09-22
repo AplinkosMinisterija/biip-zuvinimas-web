@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { FishOriginTypes } from './constants';
 import { checkIfDateIsAfter } from './functions';
 import { validationTexts } from './texts';
+import { FishStockingLocation } from './types';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string().required(validationTexts.requireText).email(validationTexts.badEmailFormat),
@@ -46,9 +47,36 @@ export const validateMyProfile = Yup.object().shape({
     .matches(phoneNumberRegexPattern, validationTexts.badPhoneFormat),
 });
 
+const waterBodyLocationSchema = Yup.mixed<FishStockingLocation>()
+  .required(validationTexts.requireText)
+  .test(
+    'waterBodyName',
+    validationTexts.requireLocationName,
+    (value?: FishStockingLocation) => !!value?.cadastral_id || !!value?.name,
+  )
+  .test(
+    'waterBodyMunicipality',
+    validationTexts.requireLocationMunicipality,
+    (value?: FishStockingLocation) => !!value?.municipality?.id,
+  );
+
+const fishOriginReservoirSchema = Yup.mixed<FishStockingLocation>().when(
+  'fishOrigin',
+  (fishOrigin: any, schema: any) =>
+    fishOrigin?.[0] === FishOriginTypes.CAUGHT
+      ? schema
+          .required(validationTexts.requireText)
+          .test(
+            'reservoirName',
+            validationTexts.requireLocationName,
+            (value?: FishStockingLocation) => !!value?.name,
+          )
+      : schema,
+);
+
 export const validateFishStocking = (minTime: number) =>
   Yup.object().shape({
-    location: Yup.object().required(validationTexts.requireText),
+    location: waterBodyLocationSchema,
     eventTime: Yup.date()
       .test('valid eventTime', validationTexts.invalidEventTime, (value) => {
         return checkIfDateIsAfter(value, minTime);
@@ -79,16 +107,12 @@ export const validateFishStocking = (minTime: number) =>
         ? schema.required(validationTexts.requireText)
         : schema,
     ),
-    fishOriginReservoir: Yup.object().when('fishOrigin', (fishOrigin: any, schema: any) =>
-      fishOrigin?.[0] === FishOriginTypes.CAUGHT
-        ? schema.required(validationTexts.requireText)
-        : schema,
-    ),
+    fishOriginReservoir: fishOriginReservoirSchema,
   });
 
 export const validateFreelancerFishStocking = (minTime: number) =>
   Yup.object().shape({
-    location: Yup.object().required(validationTexts.requireText),
+    location: waterBodyLocationSchema,
     eventTime: Yup.date()
       .test('valid eventTime', validationTexts.invalidEventTime, (value) => {
         return checkIfDateIsAfter(value, minTime);
@@ -115,11 +139,7 @@ export const validateFreelancerFishStocking = (minTime: number) =>
         ? schema.required(validationTexts.requireText)
         : schema,
     ),
-    fishOriginReservoir: Yup.object().when('fishOrigin', (fishOrigin: any, schema: any) =>
-      fishOrigin?.[0] === FishOriginTypes.CAUGHT
-        ? schema.required(validationTexts.requireText)
-        : schema,
-    ),
+    fishOriginReservoir: fishOriginReservoirSchema,
   });
 
 export const validateFishStockingReview = Yup.object().shape({
