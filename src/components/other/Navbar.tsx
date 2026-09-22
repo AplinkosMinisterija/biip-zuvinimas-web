@@ -1,8 +1,7 @@
-import { useMediaQuery } from '@material-ui/core';
 import { useLocation, useNavigate } from 'react-router';
 import styled, { css } from 'styled-components';
 import { ButtonColors, device } from '../../styles';
-import { useFilteredRoutes } from '../../utils/hooks';
+import { useFilteredRoutes, useMediaQuery } from '../../utils/hooks';
 import { slugs } from '../../utils/routes';
 import { buttonsTitles } from '../../utils/texts';
 import { Button } from '@aplinkosministerija/design-system';

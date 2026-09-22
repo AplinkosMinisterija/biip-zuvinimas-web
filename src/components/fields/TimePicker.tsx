@@ -101,7 +101,8 @@ const TimePicker = ({
           showTimeSelectOnly
           timeIntervals={30}
           selected={time}
-          onChange={(date: Date) => {
+          onChange={(date: Date | null) => {
+            if (!date) return;
             if (maxDate && date > new Date(maxDate)) {
               return onChange(maxDate);
             }

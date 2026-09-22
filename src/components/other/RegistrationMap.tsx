@@ -47,7 +47,7 @@ const Map = ({
   const [manualMunicipality, setManualMunicipality] =
     useState<FishStockingLocation['municipality']>();
   const [geom, setGeom] = useState<GeomFeatureCollection>();
-  const lastResolvedRef = useRef<GeomFeatureCollection>();
+  const lastResolvedRef = useRef<GeomFeatureCollection | undefined>(undefined);
   // Set when our own onSave flips the form to manual (UETK knows nothing there).
   const flippedToManualRef = useRef(false);
   // The message listener is registered once and reads the current props here.

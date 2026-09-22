@@ -44,7 +44,7 @@ const ReservoirField = ({ value, error, onChange, disabled }: ReservoirFieldProp
           value={value}
           error={error}
           disabled={disabled}
-          onChange={(reservoir) => onChange(reservoir)}
+          onChange={(reservoir) => onChange(reservoir ?? undefined)}
           hasOptionKey={false}
           getOptionLabel={getOptionLabel}
           loadOptions={(input: string, page: number) => getLocationList(input, page)}

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getUetkLocationList, isManualLocation } from '../../utils/functions';
 import { inputLabels, validationTexts } from '../../utils/texts';
-import { FishStockingLocation } from '../../utils/types';
+import { FishStockingLocation, GeomFeature, UetkLocationOption } from '../../utils/types';
 
 export interface LocationFieldProps {
   name?: string;
@@ -14,8 +14,11 @@ export interface LocationFieldProps {
   disabled?: boolean;
 }
 
-const getInputValue = (location: any) =>
-  location ? `${location?.name}, ${location?.cadastral_id || location?.cadastralId}` : '';
+const toOption = (location?: FishStockingLocation): UetkLocationOption | undefined =>
+  location ? { name: location.name, cadastralId: location.cadastral_id } : undefined;
+
+const getOptionLabel = (option: UetkLocationOption) =>
+  [option.name, option.cadastralId].filter(Boolean).join(', ');
 
 const LocationField = ({ name, value, error, onChange, disabled }: LocationFieldProps) => {
   const [isManual, setIsManual] = useState(isManualLocation(value));
@@ -46,42 +49,27 @@ const LocationField = ({ name, value, error, onChange, disabled }: LocationField
           }
         />
       ) : (
-        <AsyncSelectField
+        <AsyncSelectField<UetkLocationOption>
           name={name || 'location'}
-          value={value}
+          value={toOption(value)}
           disabled={disabled}
           error={error}
           label={inputLabels.selectWaterBody}
-          onChange={(val) => {
-            const {
-              municipality,
-              municipalityCode,
-              length,
-              area,
-              name,
-              categoryTranslate,
-              cadastralId,
-              geom,
-            } = val;
-
-            const centroid = turf.pointOnFeature(geom);
-
-            const featureCollection = {
-              type: 'FeatureCollection',
-              features: [centroid],
-            };
-
+          onChange={(option) => {
+            if (!option?.geom) return onChange(undefined);
+            const centroid = turf.pointOnFeature(option.geom as turf.AllGeoJSON);
             onChange({
-              name,
-              geom: featureCollection,
-              length,
-              area,
-              category: categoryTranslate,
-              cadastral_id: cadastralId,
-              municipality: { name: municipality, id: municipalityCode },
+              name: option.name || '',
+              geom: { type: 'FeatureCollection', features: [centroid as GeomFeature] },
+              length: option.length,
+              area: option.area,
+              category: option.categoryTranslate,
+              cadastral_id: option.cadastralId,
+              // municipalityCode stays untouched: the admin scope matches it as a number
+              municipality: { name: option.municipality || '', id: option.municipalityCode ?? '' },
             });
           }}
-          getOptionLabel={getInputValue}
+          getOptionLabel={getOptionLabel}
           loadOptions={(input: string, page: number | string) => getUetkLocationList(input, page)}
         />
       )}

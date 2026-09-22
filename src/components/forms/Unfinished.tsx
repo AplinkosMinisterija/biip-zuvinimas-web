@@ -1,5 +1,4 @@
 import { Button } from '@aplinkosministerija/design-system';
-import { useMediaQuery } from '@material-ui/core';
 import { useMutation } from '@tanstack/react-query';
 import { Form, Formik } from 'formik';
 import { isEmpty } from 'lodash';
@@ -16,6 +15,7 @@ import {
   useFishStocking,
   useFishStockingCallbacks,
   useIsFreelancer,
+  useMediaQuery,
   useSettings,
 } from '../../utils/hooks';
 import { buttonsTitles } from '../../utils/texts';

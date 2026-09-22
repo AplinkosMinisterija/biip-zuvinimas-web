@@ -1,4 +1,4 @@
-import { useMediaQuery } from '@material-ui/core';
+import { useMediaQuery } from '../../utils/hooks';
 import React from 'react';
 import styled from 'styled-components';
 import { FishStocking } from '../../utils/types';

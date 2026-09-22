@@ -1,8 +1,7 @@
-import { useMediaQuery } from '@material-ui/core';
 import { format } from 'date-fns';
 import { isEmpty } from 'lodash';
 import { useNavigate } from 'react-router';
-import { createSearchParams } from 'react-router-dom';
+import { createSearchParams } from 'react-router';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { FishStockingStatus } from '../../utils/constants';
@@ -18,7 +17,7 @@ import PreviewMap from '../other/PreviewMap';
 import SignatureList from '../other/SignatureList';
 import FishStockingTable from '../other/Table';
 import { fishOriginOptions } from '../../utils/options';
-import { useFishStocking } from '../../utils/hooks';
+import { useFishStocking, useMediaQuery } from '../../utils/hooks';
 
 export interface FishStockingCompletedProps {
   fishStocking: FishStocking;
