@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
 import { buttonsTitles, mapTexts, Url } from '../../utils/texts';
@@ -17,6 +17,7 @@ export interface MapProps {
   error?: string;
   queryString?: string;
   manual?: boolean;
+  resolveGeom?: any;
   value?: any;
   iframeRef: any;
   disabled?: boolean;
@@ -31,6 +32,7 @@ const Map = ({
   iframeRef,
   disabled,
   manual,
+  resolveGeom,
   showMobileMap,
 }: MapProps) => {
   const queryClient = useQueryClient();
@@ -39,6 +41,7 @@ const Map = ({
   const [manualMunicipality, setManualMunicipality] =
     useState<FishStockingLocation['municipality']>();
   const [geom, setGeom] = useState<any>();
+  const resolvedPointRef = useRef<string>();
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
@@ -49,67 +52,64 @@ const Map = ({
       queryFn: () => api.getMunicipality({ geom: selected }),
     });
 
-  const handleReceivedMapMessage = async (event: any) => {
-    const selected = event?.data?.mapIframeMsg?.userObjects;
-    if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+  const resolvePoint = async (pointGeom: any) => {
+    if (disabled || !onSave) return;
+    const selected = JSON.stringify(pointGeom);
+    setLoading(true);
+    setGeom(pointGeom);
     try {
-      const postMessageGeom = JSON.parse(selected);
-
-      if (!postMessageGeom) return;
-
-      const geomChanged = checkIfPointChanged(postMessageGeom, geom);
-      if (geomChanged) {
-        setLoading(true);
-        setGeom(postMessageGeom);
-
-        // the user already said UETK does not list this water body, so looking the
-        // point up there would only overwrite the name they are typing
-        if (manual) {
-          const municipality = await resolveMunicipality(selected);
-          setManualMunicipality(municipality?.id ? municipality : undefined);
-          onSave({
-            geom: postMessageGeom,
-            data: municipality?.id ? { name: '', municipality } : null,
-          });
-          if (municipality?.id) {
-            handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-          } else {
-            setLocations([]);
-            setShowLocationPopup(true);
-          }
-          return;
-        }
-
-        setShowLocationPopup(true);
-        const items = await queryClient.fetchQuery({
-          queryKey: ['locations', selected],
-          queryFn: () => api.getLocations({ geom: selected }),
-        });
-        const validItems = items.filter((item) => {
-          return !!item?.municipality?.id;
-        });
-
-        if (validItems.length === 1) {
-          setShowLocationPopup(false);
-          onSave({ geom: postMessageGeom, data: validItems[0] });
+      // the user already said UETK does not list this water body, so looking the
+      // point up there would only overwrite the name they are typing
+      if (manual) {
+        const municipality = await resolveMunicipality(selected);
+        setManualMunicipality(municipality?.id ? municipality : undefined);
+        onSave({ geom: pointGeom, data: municipality?.id ? { name: '', municipality } : null });
+        if (municipality?.id) {
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
-        } else if (validItems.length === 0) {
-          const municipality = await resolveMunicipality(selected);
-          setLocations([]);
-          setManualMunicipality(municipality?.id ? municipality : undefined);
-          onSave({
-            geom: postMessageGeom,
-            data: municipality?.id ? { name: '', municipality } : null,
-          });
         } else {
-          setLocations(validItems);
+          setLocations([]);
+          setShowLocationPopup(true);
         }
+        return;
+      }
+
+      setShowLocationPopup(true);
+      const items = await queryClient.fetchQuery({
+        queryKey: ['locations', selected],
+        queryFn: () => api.getLocations({ geom: selected }),
+      });
+      const validItems = items.filter((item) => !!item?.municipality?.id);
+
+      if (validItems.length === 1) {
+        setShowLocationPopup(false);
+        onSave({ geom: pointGeom, data: validItems[0] });
+        handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
+      } else if (validItems.length === 0) {
+        const municipality = await resolveMunicipality(selected);
+        setLocations([]);
+        setManualMunicipality(municipality?.id ? municipality : undefined);
+        onSave({ geom: pointGeom, data: municipality?.id ? { name: '', municipality } : null });
+      } else {
+        setLocations(validItems);
       }
     } catch (e) {
       setShowLocationPopup(false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReceivedMapMessage = async (event: any) => {
+    const selected = event?.data?.mapIframeMsg?.userObjects;
+    if (disabled || !onSave || !selected || event.origin !== import.meta.env.VITE_MAPS_HOST) return;
+    let postMessageGeom;
+    try {
+      postMessageGeom = JSON.parse(selected);
+    } catch (e) {
+      return;
+    }
+    if (!postMessageGeom || !checkIfPointChanged(postMessageGeom, geom)) return;
+    await resolvePoint(postMessageGeom);
   };
 
   useEffect(() => {
@@ -137,6 +137,19 @@ const Map = ({
       handleChangedValue();
     }
   }, [value, iframeRef]);
+
+  // coordinates typed by hand arrive on their own prop, so loading a saved
+  // stocking never re-resolves and overwrites its water body
+  useEffect(() => {
+    if (!resolveGeom) return;
+    const point = JSON.stringify(resolveGeom);
+    if (resolvedPointRef.current === point) return;
+    resolvedPointRef.current = point;
+    resolvePoint(resolveGeom);
+    // resolvePoint closes over onSave, which the parent passes inline; listing it
+    // would re-run this on every parent render. The ref above is the real guard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolveGeom]);
 
   const renderNotFound = () => (
     <NotFoundContainer>
