@@ -362,6 +362,7 @@ const Unfinished = () => {
               </StyledForm>
               <Map
                 iframeRef={iframeRef}
+                manual={isManualLocation(values.location)}
                 showMobileMap={showMap}
                 onClose={() => {
                   setShowMap(false);

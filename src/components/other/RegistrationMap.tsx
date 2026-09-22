@@ -16,13 +16,23 @@ export interface MapProps {
   onClose?: () => void;
   error?: string;
   queryString?: string;
+  manual?: boolean;
   value?: any;
   iframeRef: any;
   disabled?: boolean;
   showMobileMap?: boolean;
 }
 
-const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMap }: MapProps) => {
+const Map = ({
+  height,
+  onSave,
+  onClose,
+  value,
+  iframeRef,
+  disabled,
+  manual,
+  showMobileMap,
+}: MapProps) => {
   const queryClient = useQueryClient();
   const [showLocationPopup, setShowLocationPopup] = useState(false);
   const [locations, setLocations] = useState<FishStockingLocation[]>([]);
@@ -32,6 +42,12 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
   const [mapLoading, setMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const src = (preview?: boolean) => `${Url.DRAW}${preview ? `?preview=true` : ''}`;
+
+  const resolveMunicipality = (selected: string) =>
+    queryClient.fetchQuery({
+      queryKey: ['municipality', selected],
+      queryFn: () => api.getMunicipality({ geom: selected }),
+    });
 
   const handleReceivedMapMessage = async (event: any) => {
     const selected = event?.data?.mapIframeMsg?.userObjects;
@@ -44,9 +60,27 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
       const geomChanged = checkIfPointChanged(postMessageGeom, geom);
       if (geomChanged) {
         setLoading(true);
-        setShowLocationPopup(true);
         setGeom(postMessageGeom);
 
+        // the user already said UETK does not list this water body, so looking the
+        // point up there would only overwrite the name they are typing
+        if (manual) {
+          const municipality = await resolveMunicipality(selected);
+          setManualMunicipality(municipality?.id ? municipality : undefined);
+          onSave({
+            geom: postMessageGeom,
+            data: municipality?.id ? { name: '', municipality } : null,
+          });
+          if (municipality?.id) {
+            handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
+          } else {
+            setLocations([]);
+            setShowLocationPopup(true);
+          }
+          return;
+        }
+
+        setShowLocationPopup(true);
         const items = await queryClient.fetchQuery({
           queryKey: ['locations', selected],
           queryFn: () => api.getLocations({ geom: selected }),
@@ -60,10 +94,7 @@ const Map = ({ height, onSave, onClose, value, iframeRef, disabled, showMobileMa
           onSave({ geom: postMessageGeom, data: validItems[0] });
           handleSuccess('Sėkmingai pasirinkta žuvinimo vieta');
         } else if (validItems.length === 0) {
-          const municipality = await queryClient.fetchQuery({
-            queryKey: ['municipality', selected],
-            queryFn: () => api.getMunicipality({ geom: selected }),
-          });
+          const municipality = await resolveMunicipality(selected);
           setLocations([]);
           setManualMunicipality(municipality?.id ? municipality : undefined);
           onSave({
