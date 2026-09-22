@@ -26,8 +26,10 @@ const LocationField = ({ name, value, error, onChange, disabled }: LocationField
 
   const handleModeChange = (manual: boolean) => {
     setIsManual(manual);
-    if (!manual || !value?.municipality) return onChange(undefined);
-    onChange({ name: '', municipality: value.municipality, geom: value.geom });
+    if (!manual) return onChange(undefined);
+    // always emit a location so the form value itself carries the manual flag —
+    // the map reads it to know it must not look the point up in UETK
+    onChange({ name: value?.name || '', municipality: value?.municipality, geom: value?.geom });
   };
 
   return (
