@@ -4,6 +4,8 @@ export const validationTexts: any = {
   formFillError: 'Neteisingai užpildyta forma',
   offline: 'Šiuo metu esate neprisijungęs',
   requireMap: 'Privalote pasirinkti vietą žemėlapyje',
+  requireLocationName: 'Įveskite vandens telkinio pavadinimą',
+  requireLocationMunicipality: 'Pažymėkite įžuvinimo vietą žemėlapyje',
   requirePhotos: 'Privalote įkelti nuotrauką',
   userDeniedLocation: 'Turite leisti nustatyti jūsų buvimo vietą',
   requireSpeciesType: 'Privalote pasirinkti bent vieną rūšių tipą',
@@ -28,8 +30,17 @@ export const validationTexts: any = {
   invalidEventTime: 'Pasirinkite teisingą datą',
 };
 
+export const mapTexts = {
+  waterBodyNotFound: 'Nerastas telkinys',
+  enterWaterBodyManually: 'Šioje vietoje UETK telkinio nėra. Įveskite pavadinimą ranka.',
+};
+
 export const inputLabels = {
   selectFromMap: 'pasirinkti iš žemėlapio',
+  selectWaterBody: 'Pasirinkite vandens telkinį',
+  waterBody: 'Vandens telkinys',
+  waterBodyName: 'Vandens telkinio pavadinimas',
+  waterBodyNotInUetk: 'Telkinio nėra UETK sąraše',
   signature: 'Parašas',
   currentLocation: 'dabartinė vieta',
   password: 'Slaptažodis',

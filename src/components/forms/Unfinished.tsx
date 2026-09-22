@@ -10,6 +10,7 @@ import { useAppSelector } from '../../state/hooks';
 import { device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
+import { isManualLocation } from '../../utils/functions';
 import {
   useCurrentLocation,
   useFishStocking,
@@ -314,7 +315,7 @@ const Unfinished = () => {
         enableReinitialize={true}
       >
         {(formikParams: any) => {
-          const { setFieldValue, handleSubmit } = formikParams;
+          const { setFieldValue, handleSubmit, values } = formikParams;
           return (
             <InnerContainer>
               <StyledForm
@@ -368,7 +369,13 @@ const Unfinished = () => {
                 value={geom}
                 onSave={({ geom, data }) => {
                   setGeom(geom);
-                  setFieldValue('location', data);
+                  // the map has no name for a water body UETK does not know, so keep
+                  // the one the user already typed
+                  const keepsTypedName = !!data && isManualLocation(data) && !data.name;
+                  setFieldValue(
+                    'location',
+                    keepsTypedName ? { ...data, name: values.location?.name || '' } : data,
+                  );
                 }}
                 queryString={queryString}
                 height="100%"

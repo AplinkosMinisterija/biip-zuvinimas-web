@@ -161,6 +161,9 @@ export const handleSetProfile = (profiles?: Profile[]) => {
   }
 };
 
+export const isManualLocation = (location?: { cadastral_id?: string }) =>
+  !!location && !location.cadastral_id;
+
 export const getLocationList = async (input: string, page: number) => {
   return await api.searchLocations({ search: input, page });
 };

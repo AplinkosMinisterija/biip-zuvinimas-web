@@ -15,12 +15,13 @@ import styled from 'styled-components';
 import { ButtonColors, device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes } from '../../utils/constants';
-import { getLocationList, getTenantsList, handleAlert } from '../../utils/functions';
+import { getTenantsList, handleAlert } from '../../utils/functions';
 import { useAssignedToUsers, useFishAges, useIsFreelancer, useSettings } from '../../utils/hooks';
 import { fishOriginOptions } from '../../utils/options';
 import { buttonsTitles, formLabels, inputLabels } from '../../utils/texts';
 import { FishStockingLocation, FishType } from '../../utils/types';
 import LocationInput from '../fields/LocationInput';
+import ReservoirInput from '../fields/ReservoirInput';
 import TimePicker from '../fields/TimePicker';
 import FishRow from '../other/FishRow';
 
@@ -84,8 +85,8 @@ const RegistrationForm = ({
       <LocationInput
         value={values.location}
         error={errors.location}
-        onChange={(value: FishStockingLocation) => {
-          setGeom(value.geom);
+        onChange={(value?: FishStockingLocation) => {
+          if (value?.geom) setGeom(value.geom);
           setFieldValue('location', value);
         }}
         disabled={disabled}
@@ -137,22 +138,13 @@ const RegistrationForm = ({
           disabled={disabled}
         />
       ) : (
-        <AsyncSelectField
-          label="Vandens telkinys"
-          name="fishOriginReservoir"
+        <ReservoirInput
           value={values.fishOriginReservoir}
           error={errors.fishOriginReservoir}
-          onChange={(value) => {
+          onChange={(value?: FishStockingLocation) => {
             setFieldValue('fishOriginReservoir', value);
           }}
-          hasOptionKey={false}
-          // getInputLabel={(option) =>
-          //   `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
-          // }
-          getOptionLabel={(option) =>
-            `${option?.name} (${option?.cadastral_id}) - ${option?.municipality?.name}`
-          }
-          loadOptions={(input: string, page: number) => getLocationList(input, page)}
+          disabled={disabled}
         />
       )}
 
