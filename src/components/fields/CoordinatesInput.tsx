@@ -1,4 +1,4 @@
-import { NumericTextField } from '@aplinkosministerija/design-system';
+import { TextField } from '@aplinkosministerija/design-system';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { device } from '../../styles';
@@ -14,6 +14,8 @@ export interface CoordinatesInputProps {
 
 const toInput = (value?: number) => (typeof value === 'number' ? String(Math.round(value)) : '');
 
+const onlyDigits = (value: string) => value.replace(/\D/g, '');
+
 const CoordinatesInput = ({ geom, onChange, disabled }: CoordinatesInputProps) => {
   const fromGeom = geomToLks94(geom);
   const [x, setX] = useState(toInput(fromGeom.x));
@@ -26,7 +28,9 @@ const CoordinatesInput = ({ geom, onChange, disabled }: CoordinatesInputProps) =
     setY(toInput(next.y));
   }, [geom]);
 
-  const handleChange = (nextX: string, nextY: string) => {
+  const handleChange = (rawX: string, rawY: string) => {
+    const nextX = onlyDigits(rawX);
+    const nextY = onlyDigits(rawY);
     setX(nextX);
     setY(nextY);
     const parsedX = Number(nextX);
@@ -43,18 +47,16 @@ const CoordinatesInput = ({ geom, onChange, disabled }: CoordinatesInputProps) =
 
   return (
     <Row>
-      <NumericTextField
+      <TextField
         label={inputLabels.coordinateX}
         name="coordinateX"
-        wholeNumber={true}
         value={x}
         disabled={disabled}
         onChange={(value: string) => handleChange(value, y)}
       />
-      <NumericTextField
+      <TextField
         label={inputLabels.coordinateY}
         name="coordinateY"
-        wholeNumber={true}
         value={y}
         disabled={disabled}
         error={error}
