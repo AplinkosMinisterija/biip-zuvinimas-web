@@ -16,7 +16,7 @@
     "formik": "^2.2.9",
     "leaflet": "^1.9.3",
     "lodash": "^4.17.21",
-    "lt-codes": "ambrazasp/lt-codes",
+    "lt-codes": "github:AplinkosMinisterija/lt-codes#v1.1.2",
     "react": "^18.2.0",
     "react-datepicker": "^4.11.0",
     "react-div-100vh": "^0.7.0",
