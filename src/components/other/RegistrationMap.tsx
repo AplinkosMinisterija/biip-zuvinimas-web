@@ -208,7 +208,11 @@ const Map = ({
                         <Item key={`${location.cadastral_id}_${index}`}>
                           <TitleContainer>
                             <Title>{location?.name}</Title>
-                            <Description>{`${location?.cadastral_id}, ${location?.municipality?.name}`}</Description>
+                            <Description>
+                              {[location?.cadastral_id, location?.municipality?.name]
+                                .filter(Boolean)
+                                .join(', ')}
+                            </Description>
                           </TitleContainer>
                           <PopupButton
                             onClick={() => {
