@@ -190,8 +190,9 @@ export const useFishStockingCallbacks = () => {
     onError: () => {
       handleAlert();
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['fishStockings', JSON.stringify(filters)] });
+    // awaiting the refetch would keep the saved form on screen with its spinner
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fishStockings', JSON.stringify(filters)] });
       navigate(slugs.fishStockings);
     },
   };
