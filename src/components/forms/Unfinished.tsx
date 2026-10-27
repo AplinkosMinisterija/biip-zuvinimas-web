@@ -38,6 +38,13 @@ const tabs = [
   { label: 'Faktiniai duomenys', route: FishStockingStatus.ONGOING },
 ];
 
+// mirrors the statuses fishStockings.cancel accepts
+const cancelableStatuses = [
+  FishStockingStatus.UPCOMING,
+  FishStockingStatus.ONGOING,
+  FishStockingStatus.NOT_FINISHED,
+];
+
 const cookies = new Cookies();
 
 const Unfinished = () => {
@@ -248,6 +255,8 @@ const Unfinished = () => {
   };
 
   const handleSubmit = async (values: any) => {
+    if (submitLoading) return;
+
     if (selectedTab === FishStockingStatus.UPCOMING) {
       await submitRegistration(values);
     } else {
@@ -327,11 +336,6 @@ const Unfinished = () => {
               <StyledForm
                 $display={!isMobile || !showMap}
                 noValidate={true}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSubmit();
-                  }
-                }}
                 tabIndex={0}
                 onSubmit={handleSubmit}
               >
@@ -339,16 +343,18 @@ const Unfinished = () => {
                 {renderTabs}
                 {renderContent(formikParams)}
                 <ButtonRow>
-                  {!!fishStocking && !isRepeating && (
-                    <StyledButtons
-                      type="button"
-                      variant="danger"
-                      disabled={false}
-                      onClick={() => setShowModal(true)}
-                    >
-                      {deleteInfo.name}
-                    </StyledButtons>
-                  )}
+                  {!!fishStocking &&
+                    !isRepeating &&
+                    cancelableStatuses.includes(fishStocking.status) && (
+                      <StyledButtons
+                        type="button"
+                        variant="danger"
+                        disabled={false}
+                        onClick={() => setShowModal(true)}
+                      >
+                        {deleteInfo.name}
+                      </StyledButtons>
+                    )}
                   <StyledButtons type="submit" loading={submitLoading} disabled={submitLoading}>
                     {buttonsTitles.save}
                   </StyledButtons>
