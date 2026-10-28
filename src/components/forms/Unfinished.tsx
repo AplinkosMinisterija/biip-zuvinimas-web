@@ -336,6 +336,15 @@ const Unfinished = () => {
               <StyledForm
                 $display={!isMobile || !showMap}
                 noValidate={true}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return;
+                  const target = e.target as HTMLElement;
+                  // a textarea takes newlines, and a combobox owns Enter for its own dropdown
+                  if (target.tagName === 'TEXTAREA' || target.closest('[role="combobox"]')) return;
+                  // the form itself is focusable, and there Enter has no native submit to rely on
+                  e.preventDefault();
+                  handleSubmit();
+                }}
                 tabIndex={0}
                 onSubmit={handleSubmit}
               >
