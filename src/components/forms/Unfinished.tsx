@@ -9,7 +9,7 @@ import { useAppSelector } from '../../state/hooks';
 import { device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
-import { isManualLocation } from '../../utils/functions';
+import { isManualLocation, submitOnEnter } from '../../utils/functions';
 import {
   useCurrentLocation,
   useFishStocking,
@@ -336,15 +336,7 @@ const Unfinished = () => {
               <StyledForm
                 $display={!isMobile || !showMap}
                 noValidate={true}
-                onKeyDown={(e) => {
-                  if (e.key !== 'Enter') return;
-                  const target = e.target as HTMLElement;
-                  // a textarea takes newlines, and a combobox owns Enter for its own dropdown
-                  if (target.tagName === 'TEXTAREA' || target.closest('[role="combobox"]')) return;
-                  // the form itself is focusable, and there Enter has no native submit to rely on
-                  e.preventDefault();
-                  handleSubmit();
-                }}
+                onKeyDown={submitOnEnter(handleSubmit)}
                 tabIndex={0}
                 onSubmit={handleSubmit}
               >

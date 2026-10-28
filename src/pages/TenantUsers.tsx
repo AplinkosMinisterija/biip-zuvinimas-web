@@ -20,7 +20,7 @@ import Modal from '../components/other/Modal';
 import { ButtonColors, device } from '../styles';
 import api from '../utils/api';
 import { RolesTypes } from '../utils/constants';
-import { handleAlert } from '../utils/functions';
+import { handleAlert, submitOnEnter } from '../utils/functions';
 import { useGetCurrentProfile } from '../utils/hooks';
 
 import React from 'react';
@@ -122,11 +122,13 @@ const NariaiPage = () => {
     },
   });
 
-  const submitLoading = [updateUserMutation.isPaused, createUserMutation.isPending].some(
+  const submitLoading = [updateUserMutation.isPending, createUserMutation.isPending].some(
     (loading) => loading,
   );
 
   const handleSubmit = async (user: User) => {
+    if (submitLoading) return;
+
     await createOrUpdateUser(user);
     setOpen('');
     refetch();
@@ -230,11 +232,7 @@ const NariaiPage = () => {
                 return (
                   <StyledForm
                     noValidate={true}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSubmit();
-                      }
-                    }}
+                    onKeyDown={submitOnEnter(handleSubmit)}
                     tabIndex={0}
                     onSubmit={handleSubmit}
                   >
