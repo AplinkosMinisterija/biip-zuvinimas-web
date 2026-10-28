@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { PasswordField, TextField, Button } from '@aplinkosministerija/design-system';
 import { LoginLayout } from '../components/Layouts/Login';
 import api from '../utils/api';
-import { handleAlert, handleUpdateTokens } from '../utils/functions';
+import { handleAlert, handleUpdateTokens, submitOnEnter } from '../utils/functions';
 import { useCheckAuthMutation, useEGatesSign } from '../utils/hooks';
 import {
   buttonLabels,
@@ -24,6 +24,8 @@ export const Login = () => {
   const isProdEnvironment = import.meta.env.VITE_ENVIRONMENT === 'production';
 
   const onSubmit = async ({ email, password }: { email: string; password: string }) => {
+    if (loading) return;
+
     const params = { email, password };
     loginMutation.mutateAsync(params);
   };
@@ -69,14 +71,7 @@ export const Login = () => {
 
   return (
     <LoginLayout>
-      <FormContainer
-        onSubmit={handleSubmit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            handleSubmit();
-          }
-        }}
-      >
+      <FormContainer onSubmit={handleSubmit} onKeyDown={submitOnEnter(handleSubmit)}>
         <H1>{formLabels.login}</H1>
         <Description>{descriptions.loginDescription}</Description>
         {!isProdEnvironment && (

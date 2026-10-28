@@ -9,7 +9,7 @@ import { useAppSelector } from '../../state/hooks';
 import { device } from '../../styles';
 import api from '../../utils/api';
 import { FishOriginTypes, FishStockingStatus } from '../../utils/constants';
-import { isManualLocation } from '../../utils/functions';
+import { isManualLocation, submitOnEnter } from '../../utils/functions';
 import {
   useCurrentLocation,
   useFishStocking,
@@ -336,6 +336,7 @@ const Unfinished = () => {
               <StyledForm
                 $display={!isMobile || !showMap}
                 noValidate={true}
+                onKeyDown={submitOnEnter(handleSubmit)}
                 tabIndex={0}
                 onSubmit={handleSubmit}
               >

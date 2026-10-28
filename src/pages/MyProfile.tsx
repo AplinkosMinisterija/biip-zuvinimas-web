@@ -7,7 +7,7 @@ import DefaultLayout from '../components/Layouts/Default';
 import { useAppSelector } from '../state/hooks';
 import { device } from '../styles';
 import api from '../utils/api';
-import { handleAlert, handleSuccess } from '../utils/functions';
+import { handleAlert, handleSuccess, submitOnEnter } from '../utils/functions';
 import { useCheckAuthMutation } from '../utils/hooks';
 import { buttonsTitles, descriptions, inputLabels, toasts } from '../utils/texts';
 import { validateMyProfile } from '../utils/validations';
@@ -48,12 +48,14 @@ const MyProfile = () => {
         <Formik
           enableReinitialize={true}
           initialValues={initialValues}
-          onSubmit={(values) =>
-            profileMutation.mutateAsync({
+          onSubmit={(values) => {
+            if (isLoading) return;
+
+            return profileMutation.mutateAsync({
               email: values.email,
               phone: values.phone,
-            })
-          }
+            });
+          }}
           validateOnChange={false}
           validationSchema={validateMyProfile}
         >
@@ -63,11 +65,7 @@ const MyProfile = () => {
             return (
               <StyledForm
                 noValidate={true}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSubmit();
-                  }
-                }}
+                onKeyDown={submitOnEnter(handleSubmit)}
                 tabIndex={0}
                 onSubmit={handleSubmit}
               >

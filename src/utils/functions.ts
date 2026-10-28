@@ -1,3 +1,4 @@
+import { KeyboardEvent } from 'react';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 import { isEmpty, map } from 'lodash';
@@ -345,4 +346,15 @@ export const checkIfPointChanged = (
   const yChanged = ydiff > 1 || ydiff < -1;
 
   return xChanged || yChanged;
+};
+
+// Enter must submit from the form itself too - it carries tabIndex, so focus can
+// land on it where the browser has no control to submit from. preventDefault keeps
+// this the only submit path, so it cannot race the browser's implicit submission.
+export const submitOnEnter = (submit: () => void) => (e: KeyboardEvent<HTMLFormElement>) => {
+  if (e.key !== 'Enter') return;
+  const target = e.target as HTMLElement;
+  if (target.tagName === 'TEXTAREA' || target.closest('[role="combobox"]')) return;
+  e.preventDefault();
+  submit();
 };
