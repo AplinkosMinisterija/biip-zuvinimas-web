@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { isEqual } from 'lodash';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Location,
   Navigate,
@@ -20,6 +20,7 @@ import { Login } from './pages/Login';
 import { useAppSelector } from './state/hooks';
 import api from './utils/api';
 import { ServerErrorCodes } from './utils/constants';
+import { claimEGatesTicket, getSearchWithoutEGatesTicket } from './utils/egatesTicket';
 import { handleUpdateTokens } from './utils/functions';
 import { useCheckAuthMutation, useEGatesSign, useFilteredRoutes } from './utils/hooks';
 import { slugs } from './utils/routes';
@@ -35,10 +36,12 @@ function App() {
   const loggedIn = useAppSelector((state) => state.user.loggedIn);
   const profiles = useAppSelector((state) => state.user.userData.profiles);
   const [searchParams] = useSearchParams();
-  const { ticket, eGates } = Object.fromEntries([...Array.from(searchParams)]);
+  const ticket = searchParams.get('ticket');
+  const eGates = searchParams.get('eGates');
   const profileId: ProfileId = cookies.get('profileId');
   const [initialLoading, setInitialLoading] = useState(true);
   const location = useLocation();
+  const locationRef = useRef(location);
   const navigate = useNavigate();
   const routes = useFilteredRoutes();
   const navigateRef = useRef(navigate);
@@ -68,14 +71,31 @@ function App() {
 
   const { mutateAsync: checkAuthMutation } = useCheckAuthMutation();
 
-  const { mutateAsync: eGatesLoginMutation, isPending: eGatesLoginLoading } = useMutation({
+  useLayoutEffect(() => {
+    locationRef.current = location;
+  }, [location]);
+
+  const finishEGatesLogin = (submittedTicket: string, redirectTo?: string) => {
+    const { pathname, search, hash } = locationRef.current;
+    const remainingSearch = getSearchWithoutEGatesTicket(search, submittedTicket);
+    if (remainingSearch === undefined) return;
+
+    navigate(
+      { pathname: redirectTo ?? pathname, search: remainingSearch, hash },
+      { replace: true },
+    );
+  };
+
+  const { mutate: sendEGatesTicket, isPending: eGatesLoginLoading } = useMutation({
     mutationFn: (ticket: string) => api.eGatesLogin({ ticket }),
-    onError: () => {
-      navigate(slugs.cantLogin);
+    onError: (_error, submittedTicket) => {
+      finishEGatesLogin(submittedTicket, cookies.get('token') ? undefined : slugs.cantLogin);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data, submittedTicket) => {
       handleUpdateTokens(data);
-      checkAuthMutation();
+      // Selecting the only profile can reload the page during the auth check.
+      finishEGatesLogin(submittedTicket);
+      await checkAuthMutation();
     },
     retry: false,
   });
@@ -92,20 +112,17 @@ function App() {
     })();
   }, [location.pathname, checkAuthMutation, shouldUpdateTokens]);
 
-  const eGatesLoginMutationMutateAsync = eGatesLoginMutation;
+  useEffect(() => {
+    if (!loggedIn && ticket && claimEGatesTicket(ticket)) {
+      sendEGatesTicket(ticket);
+    }
+  }, [ticket, sendEGatesTicket, loggedIn]);
 
   useEffect(() => {
-    (async () => {
-      if (loggedIn) return;
-
-      if (ticket) {
-        eGatesLoginMutationMutateAsync(ticket);
-      }
-      if (eGates !== undefined) {
-        eGateSignsMutation();
-      }
-    })();
-  }, [ticket, eGates, eGateSignsMutation, eGatesLoginMutationMutateAsync, loggedIn]);
+    if (!loggedIn && eGates !== null) {
+      eGateSignsMutation();
+    }
+  }, [eGates, eGateSignsMutation, loggedIn]);
 
   useEffect(() => {
     if (!isInvalidProfile) return;
